@@ -86,7 +86,6 @@
             padding: 14px 14px 24px;
         }
 
-        /* Верхняя белая шапка как на фото (с < и названием раздела по центру) */
         .sub-header {
             position: sticky;
             top: 0;
@@ -136,7 +135,6 @@
             text-overflow: ellipsis;
         }
 
-        /* Главная: Избранное + 3-колоночная сетка */
         .favorites-banner {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -262,7 +260,6 @@
             line-height: 1.25;
         }
 
-        /* Большие карточки внутри разделов (как на фото) */
         .showcase-list {
             display: flex;
             flex-direction: column;
@@ -401,7 +398,6 @@
             transform: rotate(90deg);
         }
 
-        /* Выпадающий список доступных вкусов (для жижи, снюса и т.д.) */
         .tastes-drawer {
             max-height: 0;
             overflow: hidden;
@@ -464,7 +460,6 @@
             color: var(--accent);
         }
 
-        /* Подстраница моделей (внутри Вейпы -> VAPORESSO XROS и т.д.) */
         .models-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -548,7 +543,6 @@
             margin-top: auto;
         }
 
-        /* Корзина и Профиль */
         .section-title {
             font-size: 22px;
             font-weight: 700;
@@ -660,7 +654,6 @@
             font-size: 14px;
         }
 
-        /* Нижняя синяя панель */
         .bottom-nav {
             flex-shrink: 0;
             width: 100%;
@@ -765,7 +758,6 @@
 <body>
     <div class="app">
         <main id="mainScroll">
-            <!-- Главная -->
             <div class="page active" id="homePage">
                 <div class="page-body">
                     <div class="favorites-banner" id="openFavoritesBtn">
@@ -782,7 +774,6 @@
                 </div>
             </div>
 
-            <!-- Список линеек/позиций выбранной категории -->
             <div class="page" id="brandPage">
                 <div class="sub-header">
                     <button class="sub-back-btn" id="backToHome" aria-label="Назад">
@@ -797,7 +788,6 @@
                 </div>
             </div>
 
-            <!-- Модели внутри бренда (для Вейпов и Расходников) -->
             <div class="page" id="modelsPage">
                 <div class="sub-header">
                     <button class="sub-back-btn" id="backToCategory" aria-label="Назад">
@@ -812,7 +802,6 @@
                 </div>
             </div>
 
-            <!-- Избранное -->
             <div class="page" id="favoritesPage">
                 <div class="sub-header">
                     <button class="sub-back-btn" id="backFromFavs" aria-label="Назад">
@@ -827,7 +816,6 @@
                 </div>
             </div>
 
-            <!-- Корзина -->
             <div class="page" id="cartPage">
                 <div class="page-body">
                     <h1 class="section-title">Корзина</h1>
@@ -836,7 +824,6 @@
                 </div>
             </div>
 
-            <!-- Профиль -->
             <div class="page" id="profilePage">
                 <div class="page-body">
                     <h1 class="section-title">Профиль</h1>
@@ -881,8 +868,6 @@
     { id: 'snus', name: 'Снюс', icon: '📦', image: 'snus.jpg', badge: '' }
 ];
 
-        // mode: 'page' -> стрелка ">" открывает отдельную страницу моделей (Вейпы, Расходники)
-        // mode: 'tastes' -> стрелка ">" раскрывает доступные вкусы прямо под карточкой (Жижа, Пластинки, Одноразки)
         const catalogData = {
             devices: [
                 {
@@ -928,7 +913,6 @@
                 }
             ],
             liquids: [
-                // Замените списки flavors на ваши реальные вкусы в наличии
                 { id: 'bjorn-headshot', name: 'BJORN HEADSHOT', strength: '100MG', desc: 'Максимальная крепость и яркие насыщенные миксы', icon: '💧', image: '', mode: 'tastes', price: 0, flavors: ['Ледяной арбуз', 'Кислое яблоко', 'Ягодный микс'] },
                 { id: 'bjorn-zloy-long', name: 'BJORN ZLOY LONG', strength: '80MG', desc: 'Крепкая линейка с холодком и фруктовыми вкусами', icon: '💧', image: '', mode: 'tastes', price: 0, flavors: ['Клубника-киви', 'Виноград-лёд', 'Маракуйя'] },
                 { id: 'bjorn-don-oro', name: 'BJORN DON ORO', strength: '80MG', desc: 'Премиальные насыщенные сочетания на каждый день', icon: '💧', image: '', mode: 'tastes', price: 0, flavors: ['Манго-персик', 'Черника-мята', 'Цитрус'] },
@@ -994,9 +978,25 @@
             ]
         };
 
+        // ===== Состояние с сохранением в localStorage =====
         let cart = [];
-        let favorites = []; // храним { key, name, sub, price, icon }
+        let favorites = [];
         let currentCategoryId = null;
+
+        try {
+            cart = JSON.parse(localStorage.getItem('vape_cart') || '[]');
+            favorites = JSON.parse(localStorage.getItem('vape_favs') || '[]');
+        } catch (e) {
+            cart = [];
+            favorites = [];
+        }
+
+        function persistState() {
+            try {
+                localStorage.setItem('vape_cart', JSON.stringify(cart));
+                localStorage.setItem('vape_favs', JSON.stringify(favorites));
+            } catch (e) {}
+        }
 
         const pages = {
             home: document.getElementById('homePage'),
@@ -1058,18 +1058,21 @@
                 favorites.splice(idx, 1);
                 if (btnEl) {
                     btnEl.classList.remove('active');
-                    btnEl.querySelector('svg').setAttribute('fill', 'none');
+                    const svg = btnEl.querySelector('svg');
+                    if (svg) svg.setAttribute('fill', 'none');
                 }
                 showToast('Убрано из избранного');
             } else {
                 favorites.push(favObj);
                 if (btnEl) {
                     btnEl.classList.add('active');
-                    btnEl.querySelector('svg').setAttribute('fill', 'currentColor');
+                    const svg = btnEl.querySelector('svg');
+                    if (svg) svg.setAttribute('fill', 'currentColor');
                 }
                 showToast('Добавлено в избранное');
             }
             updateFavCount();
+            persistState();
         }
 
         function addToCart(name, sub, price) {
@@ -1081,6 +1084,7 @@
                 cart.push({ key, name, sub, price: price || 0, qty: 1 });
             }
             updateCartBadge();
+            persistState();
             showToast(`${name} добавлен в корзину`);
         }
 
@@ -1253,6 +1257,7 @@
                     btn.addEventListener('click', () => {
                         favorites.splice(Number(btn.dataset.removeFav), 1);
                         updateFavCount();
+                        persistState();
                         renderFavorites();
                     });
                 });
@@ -1297,6 +1302,7 @@
                         if (cart[idx].qty <= 0) cart.splice(idx, 1);
                     }
                     updateCartBadge();
+                    persistState();
                     renderCart();
                 });
             });
@@ -1309,6 +1315,10 @@
                     try { Telegram.WebApp.sendData(JSON.stringify({ items: cart, total })); } catch (e) {}
                 }
                 showToast('Заказ сформирован!');
+                cart = [];
+                persistState();
+                updateCartBadge();
+                renderCart();
             });
         }
 
@@ -1348,102 +1358,148 @@
             if (tg.setBackgroundColor) tg.setBackgroundColor('#0d6efd');
         }
 
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKsclp9BNO6AGdBL3JalqHSfz4nmyZV_osjJX_Vhn4QxdS5SNb2sR1HQltEUKJruEvvvou9K3-Y3Y/pub?gid=0&single=true&output=csv';
-function parseCSV(text) {
-    const rows = [];
-    let row = [], cell = '', inQuotes = false;
-    for (let i = 0; i < text.length; i++) {
-        const ch = text[i], next = text[i + 1];
-        if (ch === '"' && inQuotes && next === '"') {
-            cell += '"'; i++;
-        } else if (ch === '"') {
-            inQuotes = !inQuotes;
-        } else if (ch === ',' && !inQuotes) {
-            row.push(cell.trim()); cell = '';
-        } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
+       // ===== ИСТОЧНИК ДАННЫХ =====
+const SPREADSHEET_ID = '1oGNpgqPZJaPN1mG-Hh0-FcR2foh9Dj8qGwWzacJJqd4';
+const SHEET_GID = '0';
+const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=${SHEET_GID}&tqx=out:csv`;Ы
+
+        function parseCSV(text) {
+            const rows = [];
+            let row = [], cell = '', inQuotes = false;
+            for (let i = 0; i < text.length; i++) {
+                const ch = text[i], next = text[i + 1];
+                if (ch === '"' && inQuotes && next === '"') {
+                    cell += '"'; i++;
+                } else if (ch === '"') {
+                    inQuotes = !inQuotes;
+                } else if (ch === ',' && !inQuotes) {
+                    row.push(cell.trim()); cell = '';
+                } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
+                    if (cell.length || row.length) {
+                        row.push(cell.trim());
+                        rows.push(row);
+                        row = []; cell = '';
+                    }
+                } else {
+                    cell += ch;
+                }
+            }
             if (cell.length || row.length) {
                 row.push(cell.trim());
                 rows.push(row);
-                row = []; cell = '';
             }
-        } else {
-            cell += ch;
+            return rows;
         }
-    }
-    if (cell.length || row.length) {
-        row.push(cell.trim());
-        rows.push(row);
-    }
-    return rows;
-}
 
-function applyStockData(rows) {
-    if (rows.length < 2) return;
-    const headers = rows[0].map(h => h.toLowerCase());
-    const idxCat = headers.indexOf('category');
-    const idxBrand = headers.indexOf('brand_id');
-    const idxName = headers.indexOf('name');
-    const idxPrice = headers.indexOf('price');
-    const idxStock = headers.indexOf('stock');
+        function applyStockData(rows) {
+            if (rows.length < 2) return;
+            const headers = rows[0].map(h => h.toLowerCase());
+            const idxCat = headers.indexOf('category');
+            const idxBrand = headers.indexOf('brand_id');
+            const idxName = headers.indexOf('name');
+            const idxPrice = headers.indexOf('price');
+            const idxStock = headers.indexOf('stock');
 
-    const map = {};
-    for (let i = 1; i < rows.length; i++) {
-        const r = rows[i];
-        if (!r[idxCat] || !r[idxBrand] || !r[idxName]) continue;
-        const key = `${r[idxCat]}__${r[idxBrand]}__${r[idxName].toLowerCase()}`;
-        map[key] = {
-            name: r[idxName],
-            price: Number(r[idxPrice]) || 0,
-            stock: Number(r[idxStock]) || 0
-        };
-    }
-
-    Object.keys(catalogData).forEach(catId => {
-        catalogData[catId] = catalogData[catId].filter(entry => {
-            if (entry.mode === 'page') {
-                entry.items = entry.items.filter(item => {
-                    const key = `${catId}__${entry.id}__${item.name.toLowerCase()}`;
-                    if (!(key in map)) return true;
-                    item.price = map[key].price;
-                    return map[key].stock > 0;
-                });
-                return entry.items.length > 0;
+            const map = {};
+            for (let i = 1; i < rows.length; i++) {
+                const r = rows[i];
+                if (!r[idxCat] || !r[idxBrand] || !r[idxName]) continue;
+                const key = `${r[idxCat]}__${r[idxBrand]}__${r[idxName].toLowerCase()}`;
+                map[key] = {
+                    name: r[idxName],
+                    price: Number(r[idxPrice]) || 0,
+                    stock: Number(r[idxStock]) || 0
+                };
             }
 
-            if (entry.mode === 'tastes') {
-                const tableFlavors = Object.entries(map)
-                    .filter(([k]) => k.startsWith(`${catId}__${entry.id}__`));
-
-                if (tableFlavors.length > 0) {
-                    const available = tableFlavors.filter(([, v]) => v.stock > 0);
-                    entry.flavors = available.map(([, v]) => v.name);
-                    if (available.length > 0 && available[0][1].price > 0) {
-                        entry.price = available[0][1].price;
+            Object.keys(catalogData).forEach(catId => {
+                catalogData[catId] = catalogData[catId].filter(entry => {
+                    if (entry.mode === 'page') {
+                        entry.items = entry.items.filter(item => {
+                            const key = `${catId}__${entry.id}__${item.name.toLowerCase()}`;
+                            if (!(key in map)) return true;
+                            item.price = map[key].price;
+                            return map[key].stock > 0;
+                        });
+                        return entry.items.length > 0;
                     }
-                }
-                return entry.flavors.length > 0;
-            }
-            return true;
-        });
-    });
-}
 
-async function initApp() {
-    renderCategories();
-    try {
-        const res = await fetch(`${SHEET_CSV_URL}&t=${Date.now()}`);
-        const csvText = await res.text();
-        applyStockData(parseCSV(csvText));
-        if (currentCategoryId && pages.brand.classList.contains('active')) {
-            openCategory(currentCategoryId);
+                    if (entry.mode === 'tastes') {
+                        const tableFlavors = Object.entries(map)
+                            .filter(([k]) => k.startsWith(`${catId}__${entry.id}__`));
+
+                        if (tableFlavors.length > 0) {
+                            const available = tableFlavors.filter(([, v]) => v.stock > 0);
+                            entry.flavors = available.map(([, v]) => v.name);
+                            if (available.length > 0 && available[0][1].price > 0) {
+                                entry.price = available[0][1].price;
+                            }
+                        }
+                        return entry.flavors.length > 0;
+                    }
+                    return true;
+                });
+            });
         }
-    } catch (err) {
-        console.error('Ошибка загрузки таблицы:', err);
-    }
-}
 
-initApp();
+        // ===== ЗАГРУЗКА ДАННЫХ С АВТООБНОВЛЕНИЕМ =====
+        let lastCsvHash = '';
+        let refreshTimer = null;
+
+        function simpleHash(str) {
+            let h = 0;
+            for (let i = 0; i < str.length; i++) {
+                h = ((h << 5) - h + str.charCodeAt(i)) | 0;
+            }
+            return String(h);
+        }
+
+        async function loadSheetData(showErrorToast = false) {
+            try {
+                const res = await fetch(`${SHEET_CSV_URL}&t=${Date.now()}`, { cache: 'no-store' });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const csvText = await res.text();
+                const hash = simpleHash(csvText);
+
+                if (hash === lastCsvHash) return false;
+
+                lastCsvHash = hash;
+                applyStockData(parseCSV(csvText));
+
+                if (pages.brand.classList.contains('active') && currentCategoryId) {
+                    openCategory(currentCategoryId);
+                } else if (pages.models.classList.contains('active')) {
+                    showPage('brand');
+                } else if (pages.cart.classList.contains('active')) {
+                    renderCart();
+                } else if (pages.favorites.classList.contains('active')) {
+                    renderFavorites();
+                } else if (pages.home.classList.contains('active')) {
+                    renderCategories();
+                }
+                return true;
+            } catch (err) {
+                console.error('Ошибка загрузки таблицы:', err);
+                if (showErrorToast) showToast('Не удалось обновить данные, показаны последние');
+                return false;
+            }
+        }
+
+        async function initApp() {
+            renderCategories();
+            updateCartBadge();
+            updateFavCount();
+            await loadSheetData(true);
+
+            if (refreshTimer) clearInterval(refreshTimer);
+            refreshTimer = setInterval(() => loadSheetData(false), 60000);
+
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) loadSheetData(false);
+            });
+        }
+
+        initApp();
     </script>
 </body>
 </html>
-
