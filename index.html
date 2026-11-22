@@ -1302,15 +1302,27 @@
             });
 
             document.getElementById('checkoutBtn').addEventListener('click', () => {
-                const lines = cart.map(i => `• ${i.name} (${i.sub}) x${i.qty}`);
-                const orderText = `Новый заказ:\n${lines.join('\n')}${total > 0 ? `\nИтого: ${total} BYN` : ''}`;
-                if (navigator.clipboard) navigator.clipboard.writeText(orderText).catch(() => {});
-                if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initData) {
-                    try { Telegram.WebApp.sendData(JSON.stringify({ items: cart, total })); } catch (e) {}
+                const sellerUsername = 'ТВОЙ_НИК'; // <-- впиши свой @username БЕЗ знака @
+
+                const lines = cart.map(i => {
+                    const pricePart = i.price > 0 ? ` — ${i.price * i.qty} BYN` : '';
+                    return `• ${i.name} (${i.sub}) x${i.qty}${pricePart}`;
+                });
+
+                const orderText =
+                    `Привет! Хочу оформить заказ:\n` +
+                    `${lines.join('\n')}` +
+                    `${total > 0 ? `\n\nИтого: ${total} BYN` : ''}` +
+                    `\n\nКуда подходить и в какое время?`;
+
+                const tgUrl = `https://t.me/${sellerUsername}?text=${encodeURIComponent(orderText)}`;
+
+                if (window.Telegram && Telegram.WebApp && Telegram.WebApp.openTelegramLink) {
+                    Telegram.WebApp.openTelegramLink(tgUrl);
+                } else {
+                    window.open(tgUrl, '_blank');
                 }
-                showToast('Заказ сформирован!');
             });
-        }
 
         function renderProfile() {
             const tgUser = window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe ? Telegram.WebApp.initDataUnsafe.user : null;
