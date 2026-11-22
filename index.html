@@ -1350,7 +1350,102 @@
             if (tg.setBackgroundColor) tg.setBackgroundColor('#0d6efd');
         }
 
-        renderCategories();
+        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKscpIo9BNO6AGdBL3JaIqHSfz4nmyZV_osjJX_Vhn4QxdS5SNb2sR1HQltEUKJruEvvvou9K3-Y3Y/pub?gid=0&single=true&output=csv';
+
+function parseCSV(text) {
+    const rows = [];
+    let row = [], cell = '', inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+        const ch = text[i], next = text[i + 1];
+        if (ch === '"' && inQuotes && next === '"') {
+            cell += '"'; i++;
+        } else if (ch === '"') {
+            inQuotes = !inQuotes;
+        } else if (ch === ',' && !inQuotes) {
+            row.push(cell.trim()); cell = '';
+        } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
+            if (cell.length || row.length) {
+                row.push(cell.trim());
+                rows.push(row);
+                row = []; cell = '';
+            }
+        } else {
+            cell += ch;
+        }
+    }
+    if (cell.length || row.length) {
+        row.push(cell.trim());
+        rows.push(row);
+    }
+    return rows;
+}
+
+function applyStockData(rows) {
+    if (rows.length < 2) return;
+    const headers = rows[0].map(h => h.toLowerCase());
+    const idxCat = headers.indexOf('category');
+    const idxBrand = headers.indexOf('brand_id');
+    const idxName = headers.indexOf('name');
+    const idxPrice = headers.indexOf('price');
+    const idxStock = headers.indexOf('stock');
+
+    const map = {};
+    for (let i = 1; i < rows.length; i++) {
+        const r = rows[i];
+        if (!r[idxCat] || !r[idxBrand] || !r[idxName]) continue;
+        const key = `${r[idxCat]}__${r[idxBrand]}__${r[idxName].toLowerCase()}`;
+        map[key] = {
+            name: r[idxName],
+            price: Number(r[idxPrice]) || 0,
+            stock: Number(r[idxStock]) || 0
+        };
+    }
+
+    Object.keys(catalogData).forEach(catId => {
+        catalogData[catId] = catalogData[catId].filter(entry => {
+            if (entry.mode === 'page') {
+                entry.items = entry.items.filter(item => {
+                    const key = `${catId}__${entry.id}__${item.name.toLowerCase()}`;
+                    if (!(key in map)) return true;
+                    item.price = map[key].price;
+                    return map[key].stock > 0;
+                });
+                return entry.items.length > 0;
+            }
+
+            if (entry.mode === 'tastes') {
+                const tableFlavors = Object.entries(map)
+                    .filter(([k]) => k.startsWith(`${catId}__${entry.id}__`));
+
+                if (tableFlavors.length > 0) {
+                    const available = tableFlavors.filter(([, v]) => v.stock > 0);
+                    entry.flavors = available.map(([, v]) => v.name);
+                    if (available.length > 0 && available[0][1].price > 0) {
+                        entry.price = available[0][1].price;
+                    }
+                }
+                return entry.flavors.length > 0;
+            }
+            return true;
+        });
+    });
+}
+
+async function initApp() {
+    renderCategories();
+    try {
+        const res = await fetch(`${SHEET_CSV_URL}&t=${Date.now()}`);
+        const csvText = await res.text();
+        applyStockData(parseCSV(csvText));
+        if (currentCategoryId && pages.brand.classList.contains('active')) {
+            openCategory(currentCategoryId);
+        }
+    } catch (err) {
+        console.error('Ошибка загрузки таблицы:', err);
+    }
+}
+
+initApp();
     </script>
 </body>
 </html>
