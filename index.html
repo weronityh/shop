@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#f0f7ff">
-    <title>VapeShop</title>
+    <meta name="theme-color" content="#000000">
+    <title>ПЕПЕЛЬНИК</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -15,19 +15,14 @@
         }
 
         :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f0f7ff;
-            --bg-card: #ffffff;
-            --bg-input: #f7faff;
-            --text-primary: #1a1a2e;
-            --text-secondary: #6b7280;
-            --text-muted: #9ca3af;
-            --accent: #0d6efd;
-            --accent-hover: #0b5ed7;
-            --accent-light: #e7f1ff;
-            --border: #e5ebf5;
-            --shadow-card: 0 2px 10px rgba(13, 110, 253, 0.06);
-            --price-color: #d32f2f;
+            --bg-dark: #000000;
+            --bg-card: #111111;
+            --bg-card-hover: #1a1a1a;
+            --text-white: #ffffff;
+            --text-gray: #888888;
+            --accent: #ffffff;
+            --border-dark: #222222;
+            --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
         html, body {
@@ -38,9 +33,9 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: var(--accent);
-            color: var(--text-primary);
+            font-family: var(--font-main);
+            background: var(--bg-dark);
+            color: var(--text-white);
             display: flex;
             flex-direction: column;
             font-size: 15px;
@@ -53,713 +48,637 @@
             width: 100%;
             max-width: 640px;
             margin: 0 auto;
-            background: var(--bg-secondary);
-            border-bottom-left-radius: 28px;
-            border-bottom-right-radius: 28px;
+            background: var(--bg-dark);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+            position: relative;
         }
 
         main {
             flex: 1;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            position: relative;
         }
 
         .page {
             display: none;
             min-height: 100%;
+            flex-direction: column;
         }
 
         .page.active {
-            display: block;
-            animation: fadeIn 0.2s ease;
+            display: flex;
+            animation: fadeIn 0.3s ease;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        .page-body {
-            padding: 14px 14px 24px;
-        }
-
-        /* Верхняя белая шапка */
-        .sub-header {
-            position: sticky;
-            top: 0;
-            z-index: 20;
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--border);
-            border-bottom-left-radius: 22px;
-            border-bottom-right-radius: 22px;
-            height: 52px;
-            display: flex;
-            align-items: center;
+        /* ========== ЭКРАН 1: ПРИВЕТСТВИЕ ========== */
+        #welcomePage {
             justify-content: center;
-            padding: 0 48px;
-            box-shadow: 0 4px 14px rgba(13, 110, 253, 0.06);
-        }
-
-        .sub-back-btn {
-            position: absolute;
-            left: 10px;
-            width: 36px;
-            height: 36px;
-            border: none;
-            background: transparent;
-            border-radius: 50%;
-            display: flex;
             align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: var(--text-primary);
-        }
-
-        .sub-back-btn:active {
-            background: var(--accent-light);
-        }
-
-        .sub-back-btn svg {
-            width: 22px;
-            height: 22px;
-        }
-
-        .sub-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-primary);
-            white-space: nowrap;
+            padding: 40px 24px;
+            text-align: center;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000000 70%);
+            position: relative;
             overflow: hidden;
-            text-overflow: ellipsis;
         }
 
-        /* Главная: Избранное + сетка */
-        .favorites-banner {
+        #welcomePage::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.03"><path d="M50 0 L100 50 L50 100 L0 50 Z" fill="white"/></svg>');
+            background-size: 200px;
+            pointer-events: none;
+        }
+
+        .welcome-logo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
             background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 8px 16px 8px 8px;
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            box-shadow: var(--shadow-card);
-            transition: transform 0.15s ease;
-        }
-
-        .favorites-banner:active {
-            transform: scale(0.985);
-        }
-
-        .favorites-left {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .favorites-avatar {
-            width: 46px;
-            height: 46px;
-            border-radius: 14px;
-            background: var(--accent-light);
+            border: 2px solid var(--border-dark);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 48px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .welcome-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .welcome-title {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-subtitle {
+            font-size: 14px;
+            color: var(--text-gray);
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-subtitle span {
+            display: block;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 40px;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            border: 1px solid var(--border-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: rgba(255,255,255,0.03);
+        }
+
+        .feature-text {
+            font-size: 10px;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            line-height: 1.2;
+            text-align: center;
+        }
+
+        .main-btn {
+            width: 100%;
+            max-width: 340px;
+            padding: 18px 24px;
+            border: 2px solid var(--accent);
+            border-radius: 40px;
+            background: transparent;
+            color: var(--text-white);
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+            transition: all 0.2s ease;
+        }
+
+        .main-btn:active {
+            background: var(--accent);
+            color: var(--bg-dark);
+        }
+
+        /* ========== ЭКРАН 2: ВЫБОР ТОЧКИ ========== */
+        #locationPage {
+            padding: 40px 24px;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at top, #1a1a1a 0%, #000000 60%);
+        }
+
+        .location-header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .location-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.8;
+        }
+
+        .location-title {
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .location-desc {
+            font-size: 13px;
+            color: var(--text-gray);
+            line-height: 1.5;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .location-list {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .location-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dark);
+            border-radius: 20px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+            text-align: left;
+        }
+
+        .location-card:active {
+            background: var(--bg-card-hover);
+        }
+
+        .location-card.selected {
+            border-color: var(--text-white);
+        }
+
+        .location-card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
             flex-shrink: 0;
         }
 
-        .favorites-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-primary);
+        .location-card-content {
+            flex: 1;
         }
 
-        .favorites-meta {
+        .location-card-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .location-card-sub {
             font-size: 12px;
-            color: var(--text-secondary);
-            margin-left: auto;
-            margin-right: 8px;
+            color: var(--text-gray);
         }
 
-        .favorites-arrow {
+        .location-card-arrow {
+            color: var(--text-gray);
+            font-size: 18px;
+        }
+
+        .legal-info {
+            text-align: center;
+            font-size: 11px;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            max-width: 320px;
+        }
+
+        .legal-info p {
+            margin-bottom: 6px;
+        }
+
+        /* ========== ЭКРАН 3: КАТАЛОГ ========== */
+        #catalogPage {
+            padding: 20px 16px 100px;
+        }
+
+        .catalog-header {
+            margin-bottom: 20px;
+        }
+
+        .catalog-title {
+            font-size: 26px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-dark);
+            border-radius: 20px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+        }
+
+        .search-bar input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-white);
+            font-size: 14px;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        .search-bar input::placeholder {
+            color: var(--text-gray);
+        }
+
+        .search-bar svg {
             width: 20px;
             height: 20px;
-            color: var(--text-secondary);
+            stroke: var(--text-gray);
             flex-shrink: 0;
+        }
+
+        .filters-row {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            scrollbar-width: none;
+            margin-bottom: 20px;
+        }
+
+        .filters-row::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-chip {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dark);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 12px;
+            color: var(--text-white);
+            white-space: nowrap;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .filter-chip.active {
+            background: var(--text-white);
+            color: var(--bg-dark);
+            border-color: var(--text-white);
+        }
+
+        .filter-chip .badge-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--text-white);
+            border-radius: 50%;
         }
 
         .category-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px 10px;
-        }
-
-        .category-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            transition: transform 0.15s ease;
-        }
-
-        .category-card:active {
-            transform: scale(0.95);
-        }
-
-        .category-image {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-            box-shadow: var(--shadow-card);
-        }
-
-        .category-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .category-placeholder {
-            font-size: 38px;
-            line-height: 1;
-        }
-
-        .category-badge {
-            position: absolute;
-            bottom: 6px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--accent);
-            color: #ffffff;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 0.4px;
-            padding: 3px 10px;
-            border-radius: 999px;
-            white-space: nowrap;
-            box-shadow: 0 2px 6px rgba(13, 110, 253, 0.3);
-        }
-
-        .category-label {
-            margin-top: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-primary);
-            text-align: center;
-            line-height: 1.25;
-        }
-
-        /* --- НОВЫЕ КАРТОЧКИ (КАК НА ФОТО) --- */
-        .showcase-list {
-            display: flex;
-            flex-direction: column;
+            grid-template-columns: repeat(2, 1fr);
             gap: 12px;
         }
 
-        .showcase-wrap {
+        .category-card {
             background: var(--bg-card);
-            border-radius: 22px;
-            box-shadow: var(--shadow-card);
-            overflow: hidden;
-            padding: 14px;
+            border: 1px solid var(--border-dark);
+            border-radius: 24px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            position: relative;
-            border: none; /* Убрал рамку для чистоты как на фото */
-        }
-
-        .showcase-card {
-            display: flex;
-            align-items: flex-start;
-            gap: 14px;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
             cursor: pointer;
+            transition: background 0.2s;
+            text-align: center;
+            position: relative;
         }
 
-        /* Квадратная картинка как на фото */
-        .showcase-thumb {
-            width: 90px;
-            height: 90px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            background: var(--bg-primary);
+        .category-card:active {
+            background: var(--bg-card-hover);
+        }
+
+        .category-card-image {
+            width: 100px;
+            height: 100px;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
-            overflow: hidden;
-            padding: 4px;
-            position: relative;
+            margin-bottom: 12px;
+            font-size: 48px;
         }
 
-        .showcase-thumb img {
+        .category-card-image img {
             width: 100%;
             height: 100%;
             object-fit: contain;
         }
 
-        .showcase-thumb-icon {
-            font-size: 40px;
-        }
-
-        /* Контент справа */
-        .showcase-content {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 4px;
-            padding-top: 4px;
-        }
-
-        .showcase-title {
+        .category-card-title {
             font-size: 16px;
-            font-weight: 800;
-            color: var(--text-primary);
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.2px;
-            line-height: 1.2;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
         }
 
-        .showcase-sub {
-            font-size: 13px;
-            color: var(--text-secondary);
-            font-weight: 500;
+        .category-card-sub {
+            font-size: 12px;
+            color: var(--text-gray);
         }
 
-        /* Рейтинг и отзывы как на фото */
-        .reviews-row {
+        .scroll-hint {
+            position: absolute;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--text-white);
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 2px;
-        }
-        
-        .reviews-row .star {
-            color: var(--price-color);
-            font-size: 14px;
-        }
-        
-        .reviews-row .count {
-            color: var(--text-muted);
+            pointer-events: none;
+            animation: fadeInOut 3s infinite;
         }
 
-        .reviews-row .link {
-            color: var(--accent);
-            font-weight: 600;
-            font-size: 12px;
-            cursor: pointer;
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
         }
 
-        /* Кнопка Избранное (белая с контуром) */
-        .fav-pill-btn {
-            margin-top: 6px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 999px;
-            border: 1px solid var(--border);
-            background: var(--bg-card);
-            color: var(--text-primary);
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.15s ease;
-        }
-
-        .fav-pill-btn.active {
-            border-color: var(--accent);
-            background: var(--accent-light);
-            color: var(--accent);
-        }
-
-        .fav-pill-btn svg {
-            width: 14px;
-            height: 14px;
-        }
-
-        /* Круглая кнопка со стрелкой */
-        .circle-arrow-btn {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            border: none;
-            background: var(--bg-input);
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            cursor: pointer;
-            position: absolute;
-            right: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .circle-arrow-btn svg {
-            width: 16px;
-            height: 16px;
-        }
-
-        /* Цена внизу карточки как на фото */
-        .price-block {
-            margin-top: 10px;
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--price-color);
-            display: flex;
-            align-items: center;
-        }
-
-        /* Выпадающий список вкусов (внутри карточки, если нужно) */
-        .tastes-drawer {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-            background: var(--bg-input);
-            border-radius: 12px;
-            margin-top: 8px;
-        }
-
-        .tastes-drawer.open {
-            max-height: 900px;
-            border: 1px solid var(--border);
-        }
-
-        .tastes-inner {
-            padding: 10px;
-        }
-
-        .tastes-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-        }
-
-        .taste-chip {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 8px;
-            font-size: 12px;
-            text-align: center;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        .taste-chip:active {
-            background: var(--accent-light);
-            border-color: var(--accent);
-        }
-
-        /* Сетка моделей */
-        .models-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-
-        .model-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 14px 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            gap: 8px;
-            position: relative;
-            cursor: pointer;
-            box-shadow: var(--shadow-card);
-        }
-
-        .model-card:active {
-            transform: scale(0.97);
-        }
-
-        .model-fav-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 28px;
-            height: 28px;
-            border: none;
-            border-radius: 50%;
-            background: var(--bg-input);
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        .model-fav-btn.active {
-            background: var(--accent-light);
-            color: var(--accent);
-        }
-
-        .model-fav-btn svg {
-            width: 15px;
-            height: 15px;
-        }
-
-        .model-image {
-            width: 64px;
-            height: 64px;
-            border-radius: 12px;
-            background: var(--bg-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            overflow: hidden;
-        }
-
-        .model-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .model-name {
-            font-size: 13.5px;
-            font-weight: 700;
-            color: var(--text-primary);
-            line-height: 1.25;
-        }
-
-        .model-price {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--accent);
-            margin-top: auto;
-        }
-
-        /* Корзина и Профиль */
-        .section-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 14px;
-        }
-
-        .cart-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-
-        .cart-item {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 12px 14px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            box-shadow: var(--shadow-card);
-        }
-
-        .cart-item-info {
-            min-width: 0;
-            flex: 1;
-        }
-
-        .cart-item-title {
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .cart-item-sub {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .qty-controls {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .qty-btn {
-            width: 28px;
-            height: 28px;
-            border: none;
-            border-radius: 8px;
-            background: var(--accent-light);
-            color: var(--accent);
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .qty-val {
-            font-size: 14px;
-            font-weight: 600;
-            min-width: 18px;
-            text-align: center;
-        }
-
-        .primary-btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 14px;
-            background: var(--accent);
-            color: #ffffff;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .primary-btn:active {
-            background: var(--accent-hover);
-        }
-
-        .profile-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: var(--shadow-card);
-        }
-
-        .profile-avatar {
-            width: 68px;
-            height: 68px;
-            border-radius: 20px;
-            background: var(--accent-light);
-            color: var(--accent);
-            font-size: 28px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 12px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 16px;
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-
-        /* Нижняя панель */
+        /* ========== НИЖНЯЯ НАВИГАЦИЯ ========== */
         .bottom-nav {
-            flex-shrink: 0;
-            width: 100%;
-            max-width: 640px;
-            margin: 0 auto;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-dark);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
             height: calc(68px + env(safe-area-inset-bottom));
             padding-bottom: env(safe-area-inset-bottom);
-            background: var(--accent);
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
+            z-index: 100;
         }
 
         .nav-btn {
             background: none;
             border: none;
-            color: #ffffff;
+            color: var(--text-gray);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 5px;
+            gap: 4px;
             cursor: pointer;
-            padding: 8px 20px;
-            position: relative;
-            opacity: 0.78;
-            transition: opacity 0.15s ease, transform 0.15s ease;
+            padding: 8px 16px;
+            font-family: inherit;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.2s;
         }
 
         .nav-btn.active {
-            opacity: 1;
-        }
-
-        .nav-btn:active {
-            transform: scale(0.92);
+            color: var(--text-white);
         }
 
         .nav-btn svg {
-            width: 24px;
-            height: 24px;
-            stroke: #ffffff;
+            width: 22px;
+            height: 22px;
+            stroke: currentColor;
+            fill: none;
         }
 
-        .nav-dot {
-            width: 5px;
-            height: 5px;
+        /* ========== СТРАНИЦА БРЕНДА ========== */
+        .sub-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            background: var(--bg-dark);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: #ffffff;
-            opacity: 0;
-            transition: opacity 0.15s ease;
-        }
-
-        .nav-btn.active .nav-dot {
-            opacity: 1;
-        }
-
-        .nav-cart-badge {
-            position: absolute;
-            top: 2px;
-            right: 10px;
-            min-width: 17px;
-            height: 17px;
-            padding: 0 5px;
-            border-radius: 999px;
-            background: #ffffff;
-            color: var(--accent);
-            font-size: 10px;
-            font-weight: 700;
-            display: none;
+            background: var(--bg-card);
+            border: 1px solid var(--border-dark);
+            display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
+            color: var(--text-white);
         }
 
-        .nav-cart-badge.visible {
+        .sub-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .product-list {
             display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 0 16px 100px;
         }
 
+        .product-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dark);
+            border-radius: 20px;
+            padding: 14px;
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .product-card:active {
+            background: var(--bg-card-hover);
+        }
+
+        .product-thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .product-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .product-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .product-title {
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .product-desc {
+            font-size: 12px;
+            color: var(--text-gray);
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .product-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-white);
+        }
+
+        .product-price span {
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--text-gray);
+            margin-left: 4px;
+        }
+
+        /* ========== КОРЗИНА И ПРОФИЛЬ ========== */
+        #cartPage, #profilePage {
+            padding: 20px 16px 100px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-gray);
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        /* ========== TOAST ========== */
         .toast {
             position: fixed;
-            bottom: 92px;
+            bottom: 100px;
             left: 50%;
-            transform: translateX(-50%) translateY(30px);
-            background: var(--text-primary);
-            color: #ffffff;
-            padding: 10px 18px;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--text-white);
+            color: var(--bg-dark);
+            padding: 10px 20px;
             border-radius: 12px;
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
             opacity: 0;
             pointer-events: none;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             z-index: 1000;
-            white-space: nowrap;
         }
 
         .toast.show {
@@ -771,266 +690,224 @@
 <body>
     <div class="app">
         <main id="mainScroll">
-            <!-- Главная -->
-            <div class="page active" id="homePage">
-                <div class="page-body">
-                    <div class="favorites-banner" id="openFavoritesBtn">
-                        <div class="favorites-left">
-                            <div class="favorites-avatar">❤️</div>
-                            <span class="favorites-title">Избранное</span>
-                        </div>
-                        <span class="favorites-meta" id="favCountText"></span>
-                        <svg class="favorites-arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                        </svg>
+            <!-- ЭКРАН 1: ПРИВЕТСТВИЕ -->
+            <div class="page active" id="welcomePage">
+                <div class="welcome-logo">👶</div>
+                <div class="welcome-title">ПЕПЕЛЬНИК</div>
+                <div class="welcome-subtitle">БОЛЬШЕ ЧЕМ ПРОСТО ЗАКАЗ<span>ПЕПЕЛЬНИК MARKET</span></div>
+
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">🛡️</div>
+                        <div class="feature-text">Оригинал<br>и качество</div>
                     </div>
-                    <div class="category-grid" id="categoryGrid"></div>
+                    <div class="feature-item">
+                        <div class="feature-icon">💬</div>
+                        <div class="feature-text">Удобный<br>выбор</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">📦</div>
+                        <div class="feature-text">Актуальные<br>новинки</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">❤️</div>
+                        <div class="feature-text">Приятная<br>упаковка</div>
+                    </div>
                 </div>
+
+                <button class="main-btn" id="goToLocationBtn">ПЕРЕЙТИ В КАТАЛОГ →</button>
             </div>
 
-            <!-- Список линеек/позиций -->
+            <!-- ЭКРАН 2: ВЫБОР ТОЧКИ -->
+            <div class="page" id="locationPage">
+                <div class="location-header">
+                    <div class="location-icon">📍</div>
+                    <div class="location-title">ГДЕ ЗАБРАТЬ<br>ЗАКАЗ?</div>
+                    <div class="location-desc">Каталог и наличие зависят от точки. Выберите, откуда вам удобно забрать.</div>
+                </div>
+
+                <div class="location-list">
+                    <div class="location-card" data-location="novobelitsky">
+                        <div class="location-card-icon">📍</div>
+                        <div class="location-card-content">
+                            <div class="location-card-title">Новобелицкий район</div>
+                            <div class="location-card-sub">г. Гомель</div>
+                        </div>
+                        <div class="location-card-arrow">›</div>
+                    </div>
+                    <div class="location-card" data-location="central">
+                        <div class="location-card-icon">📍</div>
+                        <div class="location-card-content">
+                            <div class="location-card-title">Центральный район</div>
+                            <div class="location-card-sub">г. Гомель</div>
+                        </div>
+                        <div class="location-card-arrow">›</div>
+                    </div>
+                </div>
+
+                <div class="legal-info">
+                    <p>УНП ЕЕ8821178</p>
+                    <p>Деятельность осуществляется в рамках законодательства Республики Беларусь</p>
+                    <p>Согласно ст. 12.26, а также ст. 13.11 ч. 4</p>
+                    <p>Входя в приложение вы подтверждаете свое совершеннолетие.</p>
+                </div>
+
+                <button class="main-btn" id="goToCatalogBtn">ПРОДОЛЖИТЬ →</button>
+            </div>
+
+            <!-- ЭКРАН 3: КАТАЛОГ -->
+            <div class="page" id="catalogPage">
+                <div class="catalog-header">
+                    <div class="catalog-title">КАТАЛОГ</div>
+                    <div class="search-bar">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                        <input type="text" placeholder="Поиск товаров..." id="searchInput">
+                    </div>
+                    <div class="filters-row">
+                        <div class="filter-chip">📍 Новобелицки... <span>⌄</span></div>
+                        <div class="filter-chip">АКЦИИ</div>
+                        <div class="filter-chip">НОВОСТИ <span class="badge-dot"></span></div>
+                    </div>
+                </div>
+
+                <div class="category-grid" id="categoryGrid">
+                    <!-- Карточки будут добавлены через JS -->
+                </div>
+
+                <div class="scroll-hint" id="scrollHint">Листайте вниз ↓</div>
+            </div>
+
+            <!-- СТРАНИЦА БРЕНДА (список товаров) -->
             <div class="page" id="brandPage">
                 <div class="sub-header">
-                    <button class="sub-back-btn" id="backToHome" aria-label="Назад">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.4" stroke="currentColor">
+                    <button class="back-btn" id="backToCatalog">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.4" stroke="currentColor" style="width:20px;height:20px;">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                         </svg>
                     </button>
-                    <div class="sub-title" id="brandPageTitle">Вейпы</div>
+                    <div class="sub-title" id="brandPageTitle">Бренд</div>
                 </div>
-                <div class="page-body">
-                    <div class="showcase-list" id="brandList"></div>
-                </div>
+                <div class="product-list" id="brandList"></div>
             </div>
 
-            <!-- Модели внутри бренда -->
-            <div class="page" id="modelsPage">
-                <div class="sub-header">
-                    <button class="sub-back-btn" id="backToCategory" aria-label="Назад">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.4" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                        </svg>
-                    </button>
-                    <div class="sub-title" id="modelsPageTitle">Модели</div>
-                </div>
-                <div class="page-body">
-                    <div class="models-grid" id="modelsGrid"></div>
-                </div>
-            </div>
-
-            <!-- Избранное -->
-            <div class="page" id="favoritesPage">
-                <div class="sub-header">
-                    <button class="sub-back-btn" id="backFromFavs" aria-label="Назад">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.4" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                        </svg>
-                    </button>
-                    <div class="sub-title">Избранное</div>
-                </div>
-                <div class="page-body">
-                    <div class="showcase-list" id="favoritesList"></div>
-                </div>
-            </div>
-
-            <!-- Корзина -->
+            <!-- КОРЗИНА -->
             <div class="page" id="cartPage">
-                <div class="page-body">
-                    <h1 class="section-title">Корзина</h1>
-                    <div class="cart-list" id="cartList"></div>
-                    <div id="cartSummary"></div>
-                </div>
+                <h1 class="section-title">КОРЗИНА</h1>
+                <div class="empty-state">Корзина пока пуста</div>
             </div>
 
-            <!-- Профиль -->
+            <!-- ПРОФИЛЬ -->
             <div class="page" id="profilePage">
-                <div class="page-body">
-                    <h1 class="section-title">Профиль</h1>
-                    <div class="profile-card" id="profileCard"></div>
-                </div>
+                <h1 class="section-title">ПРОФИЛЬ</h1>
+                <div class="empty-state" id="profileCard"></div>
             </div>
         </main>
+
+        <!-- НИЖНЯЯ НАВИГАЦИЯ (появляется только в каталоге) -->
+        <nav class="bottom-nav" id="bottomNav" style="display: none;">
+            <button class="nav-btn" data-tab="home" aria-label="Главная">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                </svg>
+                <span>Главная</span>
+            </button>
+            <button class="nav-btn active" data-tab="catalog" aria-label="Каталог">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+                </svg>
+                <span>Каталог</span>
+            </button>
+            <button class="nav-btn" data-tab="cart" aria-label="Корзина">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
+                </svg>
+                <span>Корзина</span>
+            </button>
+            <button class="nav-btn" data-tab="profile" aria-label="Профиль">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+                <span>Профиль</span>
+            </button>
+        </nav>
     </div>
 
-    <nav class="bottom-nav">
-        <button class="nav-btn active" data-tab="home" aria-label="Главная">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-            </svg>
-            <span class="nav-dot"></span>
-        </button>
-
-        <button class="nav-btn" data-tab="cart" aria-label="Корзина">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
-            </svg>
-            <span class="nav-cart-badge" id="navCartBadge">0</span>
-            <span class="nav-dot"></span>
-        </button>
-
-        <button class="nav-btn" data-tab="profile" aria-label="Профиль">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-            </svg>
-            <span class="nav-dot"></span>
-        </button>
-    </nav>
-
-    <div class="toast" id="toast">Добавлено в корзину</div>
+    <div class="toast" id="toast">Добавлено</div>
 
     <script>
-       const categories = [
-            { id: 'liquids', name: 'Жижа', icon: '💧', image: 'zhizha.jpg', badge: 'СКИДКИ' },
-            { id: 'consumables', name: 'Расходники', icon: '🔧', image: 'rashodniki.jpg', badge: '' },
-            { id: 'devices', name: 'Вейпы', icon: '📱', image: 'vape.png', badge: '' },
-            { id: 'disposables', name: 'Одноразки', icon: '🚬', image: 'odnorazki.jpg', badge: 'СКИДКИ' },
-            { id: 'snus', name: 'Снюс', icon: '📦', image: 'snus.jpg', badge: '' }
+        // --- ДАННЫЕ ---
+        const categories = [
+            { id: 'winter', name: 'ЗИМНИЙ ЗАПАС', sub: '1 вариант', icon: '❄️', image: '' },
+            { id: 'pods', name: 'POD-СИСТЕМЫ', sub: '3 бренда', icon: '📱', image: '' },
+            { id: 'snus', name: 'СНЮС', sub: '4 бренда', icon: '📦', image: '' },
+            { id: 'liquids', name: 'ЖИДКОСТИ', sub: '29 брендов', icon: '💧', image: '' },
+            { id: 'disposables', name: 'ОДНОРАЗКИ', sub: '12 брендов', icon: '🚬', image: '' },
+            { id: 'consumables', name: 'РАСХОДНИКИ', sub: '5 брендов', icon: '🔧', image: '' }
         ];
 
         const catalogData = {
-            devices: [
-                {
-                    id: 'xros',
-                    name: 'VAPORESSO XROS',
-                    desc: 'Идеальные повседневные устройства для вкусопередачи и умеренной крепости',
-                    icon: '📱',
-                    image: '',
-                    mode: 'page',
-                    items: [
-                        { name: 'XROS 6', price: 85, image: '' },
-                        { name: 'XROS 6 mini', price: 65, image: '' },
-                        { name: 'XROS 5 mini', price: 60, image: '' },
-                        { name: 'XROS 5 mini CE', price: 65, image: '' },
-                        { name: 'XROS CUBE', price: 50, image: '' },
-                        { name: 'XROS PRO 2', price: 90, image: '' }
-                    ]
-                },
-                {
-                    id: 'geekvape',
-                    name: 'GEEKVAPE AEGIS',
-                    desc: 'Устройства с упором на мощность, крепость и обильность пара',
-                    icon: '🔋',
-                    image: '',
-                    mode: 'page',
-                    items: [
-                        { name: 'AEGIS HERO CRYSTAL', price: 85, image: '' },
-                        { name: 'AEGIS HERO 3', price: 85, image: '' },
-                        { name: 'AEGIS HERO 5', price: 95, image: '' },
-                        { name: 'AEGIS BOOST 3', price: 100, image: '' }
-                    ]
-                },
-                {
-                    id: 'smoant',
-                    name: 'SMOANT PASITO',
-                    desc: 'Мощные и автономные под-моды с яркой передачей вкуса',
-                    icon: '⚡',
-                    image: '',
-                    mode: 'page',
-                    items: [
-                        { name: 'PASITO 3', price: 110, image: '' }
-                    ]
-                }
+            winter: [
+                { id: 'w1', name: 'ЗИМНИЙ НАБОР', desc: 'Подарочный набор', price: 50, icon: '❄️', image: '' }
             ],
-            liquids: [
-                { id: 'bjorn-headshot', name: 'BJORN HEADSHOT', strength: '100MG', desc: 'Максимальная крепость и яркие насыщенные миксы', icon: '💧', image: '', mode: 'tastes', price: 17, flavors: ['Ледяной арбуз', 'Кислое яблоко', 'Ягодный микс'] },
-                { id: 'bjorn-zloy-long', name: 'BJORN ZLOY LONG', strength: '80MG', desc: 'Крепкая линейка с холодком и фруктовыми вкусами', icon: '💧', image: '', mode: 'tastes', price: 17, flavors: ['Клубника-киви', 'Виноград-лёд', 'Маракуйя'] },
-                { id: 'bjorn-don-oro', name: 'BJORN DON ORO', strength: '80MG', desc: 'Премиальные насыщенные сочетания на каждый день', icon: '💧', image: '', mode: 'tastes', price: 18, flavors: ['Манго-персик', 'Черника-мята', 'Цитрус'] },
-                { id: 'bjorn-son', name: 'BJORN СОН ПРИЗРАКА', strength: '80MG', desc: 'Необычные авторские миксы с высокой крепостью', icon: '💧', image: '', mode: 'tastes', price: 18, flavors: ['Лесные ягоды', 'Энергетик-лёд', 'Вишня'] },
-                { id: 'bjorn-zloy-v12', name: 'BJORN ZLOY V1/V2', strength: '50MG', desc: 'Классическая сбалансированная крепость 50MG', icon: '💧', image: '', mode: 'tastes', price: 17, flavors: ['Малина-лимон', 'Арбуз-дыня', 'Хвоя-ягоды'] },
-                { id: 'bjorn-vmed', name: 'BJORN VMЁD', strength: '50MG', desc: 'Мягкая подача и сладкие десертно-фруктовые вкусы', icon: '💧', image: '', mode: 'tastes', price: 17, flavors: ['Медовая дыня', 'Персик', 'Клубничный джем'] },
-                { id: 'bjorn-joker', name: 'BJORN JOKER', strength: '20MG', desc: 'Лёгкая крепость с акцентом на чистый вкус', icon: '💧', image: '', mode: 'tastes', price: 16, flavors: ['Яблоко', 'Банан-клубника', 'Мохито'] },
-                { id: 'elfiq', name: 'ELFIQ', strength: '50MG', desc: 'Популярные вкусы как в одноразках Elf Bar', icon: '💧', image: '', mode: 'tastes', price: 17, flavors: ['Черника-кислая малина', 'Арбуз', 'Розовый лимонад'] },
-                { id: 'annima-love', name: 'ANNIMA LOVE', strength: '50MG', desc: 'Сочные кисло-сладкие ягодные и тропические миксы', icon: '💧', image: '', mode: 'tastes', price: 17, flavors: ['Киви-маракуйя', 'Вишня-кола', 'Ананас-лёд'] },
-                { id: 'podonki', name: 'PODONKI PODGON', strength: '50MG', desc: 'Яркий вкус и мощный удар, топ продаж', icon: '💧', image: '', mode: 'tastes', price: 17, flavors: ['Ежевичный лимонад', 'Яблочный сок', 'Грейпфрут'] },
-                { id: 'rick-morty', name: 'РИК И МОРТИ', strength: '50MG', desc: 'Сочные фруктовые миксы в культовом стиле', icon: '💧', image: '', mode: 'tastes', price: 17, flavors: ['Ледяная жвачка', 'Тропик', 'Смородина'] },
-                { id: 'hotspot', name: 'HOTSPOT', strength: '50MG', desc: 'Холодные кислые и сладкие вкусы на любой под', icon: '💧', image: '', mode: 'tastes', price: 17, flavors: ['Кислое яблоко', 'Кислый ананас', 'Ягодный энергетик'] }
+            pods: [
+                { id: 'p1', name: 'VAPORESSO XROS', desc: 'Под-система', price: 85, icon: '📱', image: '' },
+                { id: 'p2', name: 'GEEKVAPE AEGIS', desc: 'Под-система', price: 95, icon: '🔋', image: '' }
             ],
             snus: [
-                { id: 'drymost', name: 'DRYMOST', strength: '75/150/175/200MG', desc: 'Белые сухие пластинки разной крепости', icon: '📦', image: '', mode: 'tastes', price: 15, flavors: ['Холодная мята', 'Ягода', 'Цитрус', 'Кола'] },
-                { id: 'iceburn', name: 'ICEBURN', strength: '75/150MG', desc: 'Сильный холодок и насыщенный вкус', icon: '📦', image: '', mode: 'tastes', price: 15, flavors: ['Toffifee', 'Ледяная мята', 'Арбуз'] },
-                { id: 'glich', name: 'GLICH POUCHES', strength: '75MG', desc: 'Комфортные паучи со сбалансированной крепостью', icon: '📦', image: '', mode: 'tastes', price: 15, flavors: ['Мята-эвкалипт', 'Тропик', 'Лесные ягоды'] }
+                { id: 's1', name: 'ICEBERG', desc: 'Снюс', price: 15, icon: '📦', image: '' },
+                { id: 's2', name: 'DRYMOST', desc: 'Снюс', price: 15, icon: '📦', image: '' }
+            ],
+            liquids: [
+                { id: 'l1', name: 'BJORN HEADSHOT', desc: 'Жидкость 100MG', price: 17, icon: '💧', image: '' },
+                { id: 'l2', name: 'PODONKI', desc: 'Жидкость 50MG', price: 17, icon: '💧', image: '' }
             ],
             disposables: [
-                { id: 'puffup', name: 'PUFFUP', strength: '5k затяжек', desc: 'Компактная одноразка с яркой вкусопередачей', icon: '🚬', image: '', mode: 'tastes', price: 25, flavors: ['Арбуз-лёд', 'Клубника-банан', 'Черника'] },
-                { id: 'elfbar', name: 'ELFBAR', strength: '40k затяжек', desc: 'Регулировка мощности и огромный запас затяжек', icon: '🚬', image: '', mode: 'tastes', price: 35, flavors: ['Черника-малина', 'Персик-манго', 'Кислое яблоко'] },
-                { id: 'vozol', name: 'VOZOL', strength: '40k затяжек', desc: 'Мощная одноразка с экраном и быстрой зарядкой', icon: '🚬', image: '', mode: 'tastes', price: 35, flavors: ['Виноград-лёд', 'Мята', 'Тропические фрукты'] },
-                { id: 'bjorn-tron', name: 'BJORN TRON', strength: '55k затяжек', desc: 'Рекордный объём и фирменные насыщенные вкусы', icon: '🚬', image: '', mode: 'tastes', price: 40, flavors: ['Энергетик', 'Вишня-лёд', 'Двойное яблоко'] }
+                { id: 'd1', name: 'ELFBAR', desc: 'Одноразка', price: 35, icon: '🚬', image: '' }
             ],
             consumables: [
-                {
-                    id: 'xros-pods',
-                    name: 'XROS КАРТРИДЖИ',
-                    desc: 'Оригинальные картриджи для всей линейки Vaporesso XROS',
-                    icon: '🔧',
-                    image: '',
-                    mode: 'page',
-                    items: [
-                        { name: 'XROS 0.6 Ом 2ml', price: 12, image: '' },
-                        { name: 'XROS 0.6 Ом 3ml', price: 12, image: '' },
-                        { name: 'XROS 0.4 Ом 3ml', price: 13, image: '' }
-                    ]
-                },
-                {
-                    id: 'aegis-coils',
-                    name: 'AEGIS HERO / BOOST',
-                    desc: 'Сменные испарители серии B для отличного вкуса и навала',
-                    icon: '🔧',
-                    image: '',
-                    mode: 'page',
-                    items: [
-                        { name: 'Aegis hero/boost (0.3)', price: 10, image: '' }
-                    ]
-                },
-                {
-                    id: 'pasito-coils',
-                    name: 'PASITO / KNIGHT',
-                    desc: 'Испарители и картриджи для Smoant Pasito и Knight',
-                    icon: '🔧',
-                    image: '',
-                    mode: 'page',
-                    items: [
-                        { name: 'Pasito 2/knight 55-65Ватт', price: 12, image: '' },
-                        { name: 'Pasito 2/knight 70-90Ватт', price: 12, image: '' },
-                        { name: 'Картридж Pasito 3 (без испар)', price: 8, image: '' }
-                    ]
-                }
+                { id: 'c1', name: 'XROS КАРТРИДЖИ', desc: 'Картриджи', price: 12, icon: '🔧', image: '' }
             ]
         };
 
-        let cart = [];
-        let favorites = [];
+        // --- СОСТОЯНИЕ ---
+        let currentLocation = null;
         let currentCategoryId = null;
 
         const pages = {
-            home: document.getElementById('homePage'),
+            welcome: document.getElementById('welcomePage'),
+            location: document.getElementById('locationPage'),
+            catalog: document.getElementById('catalogPage'),
             brand: document.getElementById('brandPage'),
-            models: document.getElementById('modelsPage'),
-            favorites: document.getElementById('favoritesPage'),
             cart: document.getElementById('cartPage'),
             profile: document.getElementById('profilePage')
         };
 
         const mainScroll = document.getElementById('mainScroll');
+        const bottomNav = document.getElementById('bottomNav');
         const categoryGrid = document.getElementById('categoryGrid');
         const brandList = document.getElementById('brandList');
         const brandPageTitle = document.getElementById('brandPageTitle');
-        const modelsGrid = document.getElementById('modelsGrid');
-        const modelsPageTitle = document.getElementById('modelsPageTitle');
-        const favoritesList = document.getElementById('favoritesList');
-        const favCountText = document.getElementById('favCountText');
-        const cartList = document.getElementById('cartList');
-        const cartSummary = document.getElementById('cartSummary');
-        const navCartBadge = document.getElementById('navCartBadge');
         const toast = document.getElementById('toast');
 
+        // --- ФУНКЦИИ ---
         function showPage(name) {
             Object.values(pages).forEach(p => p.classList.remove('active'));
             pages[name].classList.add('active');
             mainScroll.scrollTop = 0;
 
-            const tabMap = { home: 'home', brand: 'home', models: 'home', favorites: 'home', cart: 'cart', profile: 'profile' };
+            // Показываем навигацию только в каталоге, корзине, профиле и бренде
+            if (name === 'catalog' || name === 'cart' || name === 'profile' || name === 'brand') {
+                bottomNav.style.display = 'flex';
+            } else {
+                bottomNav.style.display = 'none';
+            }
+
+            // Подсветка активной вкладки
+            const tabMap = { catalog: 'catalog', brand: 'catalog', cart: 'cart', profile: 'profile' };
             document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.tab === tabMap[name]);
+                btn.classList.toggle('active', btn.dataset.tab === (tabMap[name] || ''));
             });
         }
 
@@ -1038,63 +915,17 @@
             toast.textContent = text;
             toast.classList.add('show');
             clearTimeout(window._toastTimer);
-            window._toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
-        }
-
-        function isFav(key) {
-            return favorites.some(f => f.key === key);
-        }
-
-        function updateFavCount() {
-            favCountText.textContent = favorites.length ? `${favorites.length}` : '';
-        }
-
-        function updateCartBadge() {
-            const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
-            navCartBadge.textContent = totalQty;
-            navCartBadge.classList.toggle('visible', totalQty > 0);
-        }
-
-        function toggleFavoriteItem(favObj, btnEl) {
-            const idx = favorites.findIndex(f => f.key === favObj.key);
-            if (idx >= 0) {
-                favorites.splice(idx, 1);
-                if (btnEl) {
-                    btnEl.classList.remove('active');
-                    btnEl.querySelector('svg').setAttribute('fill', 'none');
-                }
-                showToast('Убрано из избранного');
-            } else {
-                favorites.push(favObj);
-                if (btnEl) {
-                    btnEl.classList.add('active');
-                    btnEl.querySelector('svg').setAttribute('fill', 'currentColor');
-                }
-                showToast('Добавлено в избранное');
-            }
-            updateFavCount();
-        }
-
-        function addToCart(name, sub, price) {
-            const key = `${name}__${sub}`;
-            const existing = cart.find(c => c.key === key);
-            if (existing) {
-                existing.qty++;
-            } else {
-                cart.push({ key, name, sub, price: price || 0, qty: 1 });
-            }
-            updateCartBadge();
-            showToast(`${name} добавлен в корзину`);
+            window._toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
         }
 
         function renderCategories() {
             categoryGrid.innerHTML = categories.map(cat => `
                 <div class="category-card" data-category="${cat.id}">
-                    <div class="category-image">
-                        ${cat.image ? `<img src="${cat.image}" alt="${cat.name}">` : `<span class="category-placeholder">${cat.icon}</span>`}
-                        ${cat.badge ? `<span class="category-badge">${cat.badge}</span>` : ''}
+                    <div class="category-card-image">
+                        ${cat.image ? `<img src="${cat.image}" alt="${cat.name}">` : `<span>${cat.icon}</span>`}
                     </div>
-                    <div class="category-label">${cat.name}</div>
+                    <div class="category-card-title">${cat.name}</div>
+                    <div class="category-card-sub">${cat.sub}</div>
                 </div>
             `).join('');
 
@@ -1103,7 +934,6 @@
             });
         }
 
-        // --- НОВАЯ ФУНКЦИЯ РЕНДЕРА КАРТОЧЕК (КАК НА ФОТО) ---
         function openCategory(categoryId) {
             currentCategoryId = categoryId;
             const category = categories.find(c => c.id === categoryId);
@@ -1111,367 +941,62 @@
 
             brandPageTitle.textContent = category.name;
 
-            brandList.innerHTML = entries.map((entry, idx) => {
-                const favKey = `entry_${entry.id}`;
-                const favActive = isFav(favKey);
-                
-                // Для режима 'tastes' мы скрываем кнопку стрелки, т.к. на фото для жижи она не нужна (или ведет на отдельную страницу, но мы сделаем раскрытие)
-                // Но чтобы было как на фото - стрелка есть. Сделаем её для перехода, если mode='page', иначе просто для декора/раскрытия.
-                const isPageMode = entry.mode === 'page';
-                
-                return `
-                    <div class="showcase-wrap" data-entry-idx="${idx}">
-                        <div class="showcase-card" data-entry-idx="${idx}">
-                            <div class="showcase-thumb">
-                                ${entry.image ? `<img src="${entry.image}" alt="${entry.name}">` : `<span class="showcase-thumb-icon">${entry.icon}</span>`}
-                            </div>
-                            <div class="showcase-content">
-                                <div class="showcase-title">${entry.name}</div>
-                                ${entry.strength ? `<div class="showcase-sub">Крепость ${entry.strength}</div>` : ''}
-                                
-                                <!-- Блок с отзывами как на фото -->
-                                <div class="reviews-row">
-                                    <span class="star">★</span>
-                                    <span>5 (12)</span>
-                                    <span class="link">посмотреть отзывы</span>
-                                </div>
-                                
-                                <!-- Кнопка Избранное -->
-                                <button class="fav-pill-btn ${favActive ? 'active' : ''}" data-fav-idx="${idx}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="${favActive ? 'currentColor' : 'none'}" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                                    </svg>
-                                    Избранное
-                                </button>
-                            </div>
-                            
-                            <!-- Круглая стрелка -->
-                            <button class="circle-arrow-btn" id="arrow-${entry.id}" aria-label="Открыть">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.4" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                                </svg>
-                            </button>
-                        </div>
-                        
-                        <!-- Блок цены (внизу как на фото) -->
-                        <div class="price-block">${entry.price > 0 ? entry.price + ' BYN' : ''}</div>
-
-                        <!-- Выпадающий список вкусов (если нужно) -->
-                        ${entry.mode === 'tastes' ? `
-                            <div class="tastes-drawer" id="drawer-${entry.id}">
-                                <div class="tastes-inner">
-                                    <div class="tastes-caption">Доступные вкусы:</div>
-                                    <div class="tastes-grid">
-                                        ${entry.flavors.map((taste, tIdx) => `
-                                            <button class="taste-chip" data-entry-idx="${idx}" data-taste-idx="${tIdx}">
-                                                ${taste}
-                                            </button>
-                                        `).join('')}
-                                    </div>
-                                </div>
-                            </div>
-                        ` : ''}
+            brandList.innerHTML = entries.map(entry => `
+                <div class="product-card" data-entry-id="${entry.id}">
+                    <div class="product-thumb">
+                        ${entry.image ? `<img src="${entry.image}" alt="${entry.name}">` : `<span>${entry.icon}</span>`}
                     </div>
-                `;
-            }).join('');
-
-            // Обработчики
-            brandList.querySelectorAll('.showcase-card').forEach(card => {
-                card.addEventListener('click', (e) => {
-                    const idx = Number(card.dataset.entryIdx);
-                    const entry = entries[idx];
-
-                    if (e.target.closest('.fav-pill-btn')) {
-                        e.stopPropagation();
-                        toggleFavoriteItem({
-                            key: `entry_${entry.id}`,
-                            name: entry.name,
-                            sub: entry.strength || category.name,
-                            price: entry.price || 0,
-                            icon: entry.icon
-                        }, e.target.closest('.fav-pill-btn'));
-                        return;
-                    }
-
-                    if (entry.mode === 'page') {
-                        openModelsPage(entry);
-                    } else {
-                        // Раскрываем список вкусов
-                        const drawer = document.getElementById(`drawer-${entry.id}`);
-                        const arrow = document.getElementById(`arrow-${entry.id}`);
-                        const isOpen = drawer.classList.toggle('open');
-                        arrow.classList.toggle('open', isOpen);
-                        if (isOpen) {
-                            arrow.style.transform = 'translateY(-50%) rotate(90deg)';
-                        } else {
-                            arrow.style.transform = 'translateY(-50%) rotate(0deg)';
-                        }
-                    }
-                });
-            });
-
-            brandList.querySelectorAll('.taste-chip').forEach(chip => {
-                chip.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const entry = entries[Number(chip.dataset.entryIdx)];
-                    const taste = entry.flavors[Number(chip.dataset.tasteIdx)];
-                    addToCart(`${entry.name} (${taste})`, entry.strength || category.name, entry.price || 0);
-                });
-            });
-
-            showPage('brand');
-        }
-
-        function openModelsPage(entry) {
-            modelsPageTitle.textContent = entry.name;
-            modelsGrid.innerHTML = entry.items.map((item, idx) => {
-                const favKey = `model_${entry.id}_${item.name}`;
-                const favActive = isFav(favKey);
-                return `
-                    <div class="model-card" data-model-idx="${idx}">
-                        <button class="model-fav-btn ${favActive ? 'active' : ''}" aria-label="В избранное">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="${favActive ? 'currentColor' : 'none'}" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                            </svg>
-                        </button>
-                        <div class="model-image">
-                            ${item.image ? `<img src="${item.image}" alt="${item.name}">` : `<span>${entry.icon}</span>`}
-                        </div>
-                        <div class="model-name">${item.name}</div>
-                        <div class="model-price">${item.price > 0 ? item.price + ' BYN' : 'Цена по запросу'}</div>
-                    </div>
-                `;
-            }).join('');
-
-            modelsGrid.querySelectorAll('.model-card').forEach(card => {
-                card.addEventListener('click', (e) => {
-                    const item = entry.items[Number(card.dataset.modelIdx)];
-                    if (e.target.closest('.model-fav-btn')) {
-                        e.stopPropagation();
-                        toggleFavoriteItem({
-                            key: `model_${entry.id}_${item.name}`,
-                            name: item.name,
-                            sub: entry.name,
-                            price: item.price || 0,
-                            icon: entry.icon
-                        }, e.target.closest('.model-fav-btn'));
-                        return;
-                    }
-                    addToCart(item.name, entry.name, item.price || 0);
-                });
-            });
-
-            showPage('models');
-        }
-
-        function renderFavorites() {
-            if (!favorites.length) {
-                favoritesList.innerHTML = `<div class="empty-state">Пока пусто — нажми «♡ Избранное» на любом товаре или линейке</div>`;
-            } else {
-                favoritesList.innerHTML = favorites.map((item, idx) => `
-                    <div class="cart-item">
-                        <div class="cart-item-info">
-                            <div class="cart-item-title">${item.icon || '❤️'} ${item.name}</div>
-                            <div class="cart-item-sub">${item.sub}${item.price > 0 ? ' · ' + item.price + ' BYN' : ''}</div>
-                        </div>
-                        <button class="qty-btn" data-remove-fav="${idx}" aria-label="Удалить">✕</button>
-                    </div>
-                `).join('');
-
-                favoritesList.querySelectorAll('[data-remove-fav]').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        favorites.splice(Number(btn.dataset.removeFav), 1);
-                        updateFavCount();
-                        renderFavorites();
-                    });
-                });
-            }
-            showPage('favorites');
-        }
-
-        function renderCart() {
-            if (!cart.length) {
-                cartList.innerHTML = `<div class="empty-state">Корзина пока пуста</div>`;
-                cartSummary.innerHTML = '';
-                return;
-            }
-
-            cartList.innerHTML = cart.map((item, idx) => `
-                <div class="cart-item">
-                    <div class="cart-item-info">
-                        <div class="cart-item-title">${item.name}</div>
-                        <div class="cart-item-sub">${[item.sub, item.price > 0 ? item.price + ' BYN' : 'цена по запросу'].filter(Boolean).join(' · ')}</div>
-                    </div>
-                    <div class="qty-controls">
-                        <button class="qty-btn" data-action="dec" data-idx="${idx}">−</button>
-                        <span class="qty-val">${item.qty}</span>
-                        <button class="qty-btn" data-action="inc" data-idx="${idx}">+</button>
+                    <div class="product-info">
+                        <div class="product-title">${entry.name}</div>
+                        <div class="product-desc">${entry.desc}</div>
+                        <div class="product-price">${entry.price} BYN</div>
                     </div>
                 </div>
             `).join('');
 
-            const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
-            cartSummary.innerHTML = `
-                <button class="primary-btn" id="checkoutBtn">
-                    Оформить заказ${total > 0 ? ` · ${total} BYN` : ''}
-                </button>
-            `;
-
-            cartList.querySelectorAll('.qty-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const idx = Number(btn.dataset.idx);
-                    if (btn.dataset.action === 'inc') cart[idx].qty++;
-                    else {
-                        cart[idx].qty--;
-                        if (cart[idx].qty <= 0) cart.splice(idx, 1);
-                    }
-                    updateCartBadge();
-                    renderCart();
-                });
-            });
-
-            document.getElementById('checkoutBtn').addEventListener('click', () => {
-                const lines = cart.map(i => `• ${i.name} (${i.sub}) x${i.qty}`);
-                const orderText = `Новый заказ:\n${lines.join('\n')}${total > 0 ? `\nИтого: ${total} BYN` : ''}`;
-                if (navigator.clipboard) navigator.clipboard.writeText(orderText).catch(() => {});
-                if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initData) {
-                    try { Telegram.WebApp.sendData(JSON.stringify({ items: cart, total })); } catch (e) {}
-                }
-                showToast('Заказ сформирован!');
-            });
+            showPage('brand');
         }
 
-        function renderProfile() {
-            const tgUser = window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe ? Telegram.WebApp.initDataUnsafe.user : null;
-            const name = tgUser ? [tgUser.first_name, tgUser.last_name].filter(Boolean).join(' ') : 'Гость';
-            const username = tgUser && tgUser.username ? `@${tgUser.username}` : 'Открыто в браузере';
-            const initial = name.charAt(0).toUpperCase();
+        // --- ОБРАБОТЧИКИ ---
+        document.getElementById('goToLocationBtn').addEventListener('click', () => showPage('location'));
 
-            document.getElementById('profileCard').innerHTML = `
-                <div class="profile-avatar">${initial}</div>
-                <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">${name}</div>
-                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">${username}</div>
-                <div style="font-size: 13px; color: var(--text-secondary);">В избранном: <b>${favorites.length}</b> · В корзине: <b>${cart.reduce((s, i) => s + i.qty, 0)}</b></div>
-            `;
-        }
+        document.querySelectorAll('.location-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.location-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                currentLocation = card.dataset.location;
+            });
+        });
 
-        document.getElementById('backToHome').addEventListener('click', () => showPage('home'));
-        document.getElementById('backToCategory').addEventListener('click', () => showPage('brand'));
-        document.getElementById('backFromFavs').addEventListener('click', () => showPage('home'));
-        document.getElementById('openFavoritesBtn').addEventListener('click', renderFavorites);
+        document.getElementById('goToCatalogBtn').addEventListener('click', () => {
+            if (!currentLocation) {
+                showToast('Выберите точку выдачи');
+                return;
+            }
+            renderCategories();
+            showPage('catalog');
+        });
+
+        document.getElementById('backToCatalog').addEventListener('click', () => showPage('catalog'));
 
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const tab = btn.dataset.tab;
-                if (tab === 'home') showPage('home');
-                if (tab === 'cart') { renderCart(); showPage('cart'); }
-                if (tab === 'profile') { renderProfile(); showPage('profile'); }
+                if (tab === 'home') showPage('welcome');
+                if (tab === 'catalog') showPage('catalog');
+                if (tab === 'cart') showPage('cart');
+                if (tab === 'profile') showPage('profile');
             });
         });
 
+        // Инициализация Telegram
         if (window.Telegram && window.Telegram.WebApp) {
             const tg = window.Telegram.WebApp;
             tg.ready();
             tg.expand();
-            if (tg.setHeaderColor) tg.setHeaderColor('#f0f7ff');
-            if (tg.setBackgroundColor) tg.setBackgroundColor('#0d6efd');
+            if (tg.setHeaderColor) tg.setHeaderColor('#000000');
+            if (tg.setBackgroundColor) tg.setBackgroundColor('#000000');
         }
-
-        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKsclp9BNO6AGdBL3JalqHSfz4nmyZV_osjJX_Vhn4QxdS5SNb2sR1HQltEUKJruEvvvou9K3-Y3Y/pub?gid=0&single=true&output=csv';
-        function parseCSV(text) {
-            const rows = [];
-            let row = [], cell = '', inQuotes = false;
-            for (let i = 0; i < text.length; i++) {
-                const ch = text[i], next = text[i + 1];
-                if (ch === '"' && inQuotes && next === '"') {
-                    cell += '"'; i++;
-                } else if (ch === '"') {
-                    inQuotes = !inQuotes;
-                } else if (ch === ',' && !inQuotes) {
-                    row.push(cell.trim()); cell = '';
-                } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
-                    if (cell.length || row.length) {
-                        row.push(cell.trim());
-                        rows.push(row);
-                        row = []; cell = '';
-                    }
-                } else {
-                    cell += ch;
-                }
-            }
-            if (cell.length || row.length) {
-                row.push(cell.trim());
-                rows.push(row);
-            }
-            return rows;
-        }
-
-        function applyStockData(rows) {
-            if (rows.length < 2) return;
-            const headers = rows[0].map(h => h.toLowerCase());
-            const idxCat = headers.indexOf('category');
-            const idxBrand = headers.indexOf('brand_id');
-            const idxName = headers.indexOf('name');
-            const idxPrice = headers.indexOf('price');
-            const idxStock = headers.indexOf('stock');
-
-            const map = {};
-            for (let i = 1; i < rows.length; i++) {
-                const r = rows[i];
-                if (!r[idxCat] || !r[idxBrand] || !r[idxName]) continue;
-                const key = `${r[idxCat]}__${r[idxBrand]}__${r[idxName].toLowerCase()}`;
-                map[key] = {
-                    name: r[idxName],
-                    price: Number(r[idxPrice]) || 0,
-                    stock: Number(r[idxStock]) || 0
-                };
-            }
-
-            Object.keys(catalogData).forEach(catId => {
-                catalogData[catId] = catalogData[catId].filter(entry => {
-                    if (entry.mode === 'page') {
-                        entry.items = entry.items.filter(item => {
-                            const key = `${catId}__${entry.id}__${item.name.toLowerCase()}`;
-                            if (!(key in map)) return true;
-                            item.price = map[key].price;
-                            return map[key].stock > 0;
-                        });
-                        return entry.items.length > 0;
-                    }
-
-                    if (entry.mode === 'tastes') {
-                        const tableFlavors = Object.entries(map)
-                            .filter(([k]) => k.startsWith(`${catId}__${entry.id}__`));
-
-                        if (tableFlavors.length > 0) {
-                            const available = tableFlavors.filter(([, v]) => v.stock > 0);
-                            entry.flavors = available.map(([, v]) => v.name);
-                            if (available.length > 0 && available[0][1].price > 0) {
-                                entry.price = available[0][1].price;
-                            }
-                        }
-                        return entry.flavors.length > 0;
-                    }
-                    return true;
-                });
-            });
-        }
-
-        async function initApp() {
-            renderCategories();
-            try {
-                const res = await fetch(`${SHEET_CSV_URL}&t=${Date.now()}`);
-                const csvText = await res.text();
-                applyStockData(parseCSV(csvText));
-                if (currentCategoryId && pages.brand.classList.contains('active')) {
-                    openCategory(currentCategoryId);
-                }
-            } catch (err) {
-                console.error('Ошибка загрузки таблицы:', err);
-            }
-        }
-
-        initApp();
     </script>
 </body>
 </html>
