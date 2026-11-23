@@ -53,6 +53,7 @@
         .page { display: none; min-height: 100%; flex-direction: column; }
         .page.active { display: flex; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* КОТ НА ГЛАВНОЙ */
         .cat-mask {
@@ -1040,22 +1041,6 @@
                     });
                 });
 
-                // Color chip click handlers for vapes
-                brandList.querySelectorAll('.color-chip').forEach(chip => {
-                    chip.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const color = chip.textContent.trim();
-                        const productCard = chip.closest('.product-card');
-                        const titleEl = productCard.querySelector('.product-title');
-                        const priceEl = productCard.querySelector('.product-price');
-                        const name = titleEl ? titleEl.textContent.replace('🤑 скидка на жидкость', '').trim() : '';
-                        const price = priceEl ? parseInt(priceEl.textContent) : 0;
-                        if (name && price) {
-                            addToCart({ name, price, color, desc: `Вейп: ${name}, цвет: ${color}` });
-                        }
-                    });
-                });
-
                 showPage('brand');
                 return;
             }
@@ -1228,6 +1213,93 @@
                 showToast('Корзина пуста');
                 return;
             }
+            showDeliveryModal();
+        }
+
+        function showDeliveryModal() {
+            const modal = document.createElement('div');
+            modal.className = 'delivery-modal';
+            modal.style.cssText = `
+                position: fixed; inset: 0; z-index: 1000;
+                background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+                display: flex; align-items: center; justify-content: center;
+                padding: 20px; animation: fadeIn 0.2s ease;
+            `;
+            modal.innerHTML = `
+                <div style="
+                    background: var(--bg-card); border: 1px solid var(--border-dark);
+                    border-radius: 20px; padding: 24px; width: 100%; max-width: 360px;
+                    animation: slideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+                ">
+                    <h3 style="font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; text-align: center;">ВРЕМЯ ПОЛУЧЕНИЯ</h3>
+                    <p style="font-size: 13px; color: var(--text-gray); text-align: center; margin-bottom: 20px;">Когда вам удобно забрать заказ?</p>
+                    <div class="delivery-options" style="display: flex; flex-direction: column; gap: 10px;">
+                        <button class="delivery-option" data-day="today" style="
+                            padding: 16px; border-radius: 14px; border: 1px solid var(--border-dark);
+                            background: var(--bg-dark); color: var(--text-white); font-size: 15px; font-weight: 600;
+                            text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;
+                            display: flex; align-items: center; justify-content: center; gap: 10px;
+                            transition: background 0.2s, border-color 0.2s;
+                        ">📍 Сегодня</button>
+                        <button class="delivery-option" data-day="tomorrow" style="
+                            padding: 16px; border-radius: 14px; border: 1px solid var(--border-dark);
+                            background: var(--bg-dark); color: var(--text-white); font-size: 15px; font-weight: 600;
+                            text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;
+                            display: flex; align-items: center; justify-content: center; gap: 10px;
+                            transition: background 0.2s, border-color 0.2s;
+                        ">📅 Завтра</button>
+                    </div>
+                    <div class="time-picker" style="display: none; margin-top: 16px;">
+                        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Выберите время</label>
+                        <select id="deliveryTime" style="
+                            width: 100%; padding: 14px 16px; border-radius: 12px;
+                            background: var(--bg-dark); border: 1px solid var(--border-dark);
+                            color: var(--text-white); font-size: 14px; font-family: inherit;
+                        "></select>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            const timeSelect = modal.querySelector('#deliveryTime');
+            const timeOptions = [
+                '10:00', '10:30', '11:00', '11:30', '12:00', '12:30',
+                '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
+                '16:00', '16:30', '17:00', '17:30', '18:00', '18:30',
+                '19:00', '19:30', '20:00', '20:30'
+            ];
+            timeOptions.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t;
+                opt.textContent = t;
+                timeSelect.appendChild(opt);
+            });
+
+            modal.querySelectorAll('.delivery-option').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const day = btn.dataset.day;
+                    if (day === 'today') {
+                        sendOrder('Сегодня', 'Как можно быстрее');
+                        modal.remove();
+                    } else {
+                        modal.querySelector('.delivery-options').style.display = 'none';
+                        modal.querySelector('.time-picker').style.display = 'block';
+                        modal.querySelector('h3').textContent = 'ВРЕМЯ НА ЗАВТРА';
+                    }
+                });
+            });
+
+            modal.querySelector('#deliveryTime').addEventListener('change', (e) => {
+                sendOrder('Завтра', e.target.value);
+                modal.remove();
+            });
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
+            });
+        }
+
+        function sendOrder(dayLabel, timeLabel) {
             let orderText = 'Здравствуйте! Хочу оформить заказ:\n';
             let total = 0;
             cart.forEach((item, i) => {
@@ -1237,6 +1309,8 @@
                 orderText += `${i + 1}. ${item.name}${colorStr} × ${item.qty} — ${lineTotal} BYN\n`;
             });
             orderText += `\nИтого: ${total} BYN`;
+            orderText += `\n📅 Получение: ${dayLabel}`;
+            orderText += `\n⏰ Время: ${timeLabel}`;
             const url = 'https://t.me/Seregablatnou?text=' + encodeURIComponent(orderText);
             if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openTelegramLink) {
                 window.Telegram.WebApp.openTelegramLink(url);
@@ -1270,6 +1344,7 @@
 
         // Delegated add-to-cart for dynamically rendered buttons
         document.getElementById('brandList').addEventListener('click', (e) => {
+            // Add-to-cart buttons
             const btn = e.target.closest('.add-to-cart-btn');
             if (btn && btn.dataset.product) {
                 try {
@@ -1277,6 +1352,21 @@
                     addToCart(product);
                 } catch (err) {
                     console.error('Add to cart parse error:', err);
+                }
+                return;
+            }
+            // Color chips for vapes
+            const chip = e.target.closest('.color-chip');
+            if (chip) {
+                e.stopPropagation();
+                const color = chip.textContent.trim();
+                const productCard = chip.closest('.product-card');
+                const titleEl = productCard?.querySelector('.product-title');
+                const priceEl = productCard?.querySelector('.product-price');
+                const name = titleEl ? titleEl.textContent.replace('🤑 скидка на жидкость', '').trim() : '';
+                const price = priceEl ? parseInt(priceEl.textContent) : 0;
+                if (name && price) {
+                    addToCart({ name, price, color, desc: `Вейп: ${name}, цвет: ${color}` });
                 }
             }
         });
