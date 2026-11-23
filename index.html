@@ -133,6 +133,33 @@
         .product-price span { font-size: 12px; font-weight: 400; color: var(--text-gray); margin-left: 4px; }
         .promo-badge { display: inline-block; background: #ff9800; color: #000; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px; text-transform: uppercase; }
 
+        /* АККОРДЕОН БРЕНДОВ И РАСЦВЕТОК */
+        .brand-group { display: flex; flex-direction: column; gap: 8px; }
+        .brand-group-card {
+            background: var(--bg-card); border: 1px solid var(--border-dark); border-radius: 20px;
+            padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer; transition: background 0.2s, border-color 0.2s;
+        }
+        .brand-group-card:active { background: var(--bg-card-hover); }
+        .brand-group-card.open { border-color: var(--text-white); }
+        .brand-group-title { font-size: 18px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+        .brand-group-arrow { font-size: 18px; color: var(--text-gray); transition: transform 0.2s; }
+        .brand-group-card.open .brand-group-arrow { transform: rotate(90deg); color: var(--text-white); }
+
+        .brand-models-list { display: none; flex-direction: column; gap: 8px; padding-left: 12px; }
+        .brand-models-list.open { display: flex; }
+
+        .model-colors-list {
+            display: none; flex-wrap: wrap; gap: 8px; padding: 10px 14px;
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-dark);
+            border-radius: 16px; margin-top: -4px;
+        }
+        .model-colors-list.open { display: flex; }
+        .color-chip {
+            background: var(--bg-card); border: 1px solid var(--border-dark);
+            border-radius: 12px; padding: 6px 12px; font-size: 12px; color: var(--text-white);
+        }
+
         /* КОРЗИНА И ПРОФИЛЬ */
         #cartPage, #profilePage { padding: 20px 16px 100px; }
         .empty-state { text-align: center; padding: 60px 20px; color: var(--text-gray); }
@@ -274,8 +301,36 @@
             { id: 'consumables', name: 'РАСХОДНИКИ', sub: '5 брендов', icon: '🔧', image: 'rashodniki.png' }
         ];
 
+        const vapeBrands = [
+            {
+                brand: 'XROS',
+                models: [
+                    { name: 'XROS 6', desc: 'Под-система', price: 85, image: 'vape.png', colors: ['Чёрный', 'Серебро', 'Синий', 'Красный'] },
+                    { name: 'XROS 6 mini', desc: 'Под-система', price: 65, image: 'xros6mini.png', isCover: true, colors: ['Чёрный', 'Серебро', 'Фиолетовый', 'Зелёный'] },
+                    { name: 'XROS 5 mini', desc: 'Под-система', price: 60, image: 'vape.png', colors: ['Чёрный', 'Серый', 'Розовый'] },
+                    { name: 'XROS 5 mini CE', desc: 'Под-система', price: 65, image: 'vape.png', colors: ['Чёрный', 'Белый', 'Синий'] },
+                    { name: 'XROS CUBE', desc: 'Под-система', price: 50, image: 'vape.png', colors: ['Чёрный', 'Серый', 'Оранжевый'] },
+                    { name: 'XROS PRO 2', desc: 'Под-система', price: 90, image: 'vape.png', colors: ['Чёрный', 'Серебро', 'Синий'] }
+                ]
+            },
+            {
+                brand: 'AEGIS',
+                models: [
+                    { name: 'AEGIS HERO CRYSTAL', desc: 'Под-система', price: 85, image: 'vape.png', colors: ['Чёрный', 'Прозрачный', 'Синий'] },
+                    { name: 'AEGIS HERO 3', desc: 'Под-система', price: 85, image: 'vape.png', colors: ['Чёрный', 'Красный', 'Синий'] },
+                    { name: 'AEGIS HERO 5', desc: 'Под-система', price: 95, image: 'vape.png', colors: ['Чёрный', 'Серебро', 'Зелёный'] },
+                    { name: 'AEGIS BOOST 3', desc: 'Под-система', price: 100, image: 'vape.png', colors: ['Чёрный', 'Серый', 'Синий'] }
+                ]
+            },
+            {
+                brand: 'PASITO 3',
+                models: [
+                    { name: 'PASITO 3', desc: 'Под-система', price: 110, image: 'vape.png', colors: ['Чёрный', 'Серебро', 'Карбон'] }
+                ]
+            }
+        ];
+
         const catalogData = {
-            winter: [ { id: 'w1', name: 'ЗИМНИЙ НАБОР', desc: 'Подарочный набор', price: 50, icon: '❄️', image: '' } ],
             vapes: [
                 { id: 'v1', name: 'XROS 6', desc: 'Под-система', price: 85, icon: '📱', image: 'vape.png' },
                 { id: 'v2', name: 'XROS 6 mini', desc: 'Под-система', price: 65, icon: '📱', image: 'xros6mini.png', isCover: true },
@@ -414,7 +469,6 @@
                 };
 
                 const newData = {
-                    winter: [...catalogData.winter],
                     vapes: [],
                     snus: [],
                     liquids: [],
@@ -459,7 +513,7 @@
                 }
 
                 Object.keys(newData).forEach(key => {
-                    if (newData[key].length > 0 || key === 'winter') {
+                    if (newData[key].length > 0) {
                         catalogData[key] = newData[key];
                     }
                 });
@@ -476,14 +530,14 @@
 
         function renderCategories() {
             categoryGrid.innerHTML = categories.map(cat => {
-                const count = catalogData[cat.id]?.length || 0;
+                const count = cat.id === 'vapes' ? vapeBrands.length : (catalogData[cat.id]?.length || 0);
                 return `
                 <div class="category-card" data-category="${cat.id}">
                     <div class="category-card-image">
                         ${cat.image ? `<img src="${cat.image}" alt="${cat.name}">` : `<span>${cat.icon}</span>`}
                     </div>
                     <div class="category-card-title">${cat.name}</div>
-                    <div class="category-card-sub">${count} шт.</div>
+                    <div class="category-card-sub">${cat.id === 'vapes' ? `${count} бренда` : `${count} шт.`}</div>
                 </div>
             `}).join('');
 
@@ -495,11 +549,55 @@
         function openCategory(categoryId) {
             currentCategoryId = categoryId;
             const category = categories.find(c => c.id === categoryId);
-            const entries = catalogData[categoryId] || [];
-
             brandPageTitle.textContent = category.name;
 
-            const promoText = categoryId === 'vapes' ? '<span class="promo-badge">🤑 скидка на жидкость</span>' : '';
+            if (categoryId === 'vapes') {
+                brandList.innerHTML = vapeBrands.map((b, bIdx) => `
+                    <div class="brand-group">
+                        <div class="brand-group-card" data-brand-idx="${bIdx}">
+                            <div class="brand-group-title">${b.brand}</div>
+                            <div class="brand-group-arrow">›</div>
+                        </div>
+                        <div class="brand-models-list" id="brandModels_${bIdx}">
+                            ${b.models.map((m, mIdx) => `
+                                <div class="product-card" data-model-target="colors_${bIdx}_${mIdx}">
+                                    <div class="product-thumb">
+                                        <img src="${m.image}" class="${m.isCover ? 'full-cover' : ''}" alt="${m.name}">
+                                    </div>
+                                    <div class="product-info">
+                                        <div class="product-title">${m.name} <span class="promo-badge">🤑 скидка на жидкость</span></div>
+                                        <div class="product-desc">${m.desc}</div>
+                                        <div class="product-price">${m.price} BYN</div>
+                                    </div>
+                                </div>
+                                <div class="model-colors-list" id="colors_${bIdx}_${mIdx}">
+                                    ${m.colors.map(c => `<div class="color-chip">${c}</div>`).join('')}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+
+                brandList.querySelectorAll('.brand-group-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const idx = card.dataset.brandIdx;
+                        card.classList.toggle('open');
+                        document.getElementById(`brandModels_${idx}`).classList.toggle('open');
+                    });
+                });
+
+                brandList.querySelectorAll('.product-card[data-model-target]').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const targetId = card.dataset.modelTarget;
+                        document.getElementById(targetId).classList.toggle('open');
+                    });
+                });
+
+                showPage('brand');
+                return;
+            }
+
+            const entries = catalogData[categoryId] || [];
 
             if (entries.length === 0) {
                 brandList.innerHTML = `<div class="empty-state">В этой категории пока нет товаров в наличии</div>`;
@@ -510,7 +608,7 @@
                             ${entry.image ? `<img src="${entry.image}" class="${entry.isCover ? 'full-cover' : ''}" alt="${entry.name}">` : `<span>${entry.icon}</span>`}
                         </div>
                         <div class="product-info">
-                            <div class="product-title">${entry.name} ${promoText}</div>
+                            <div class="product-title">${entry.name}</div>
                             <div class="product-desc">${entry.desc || ''}</div>
                             <div class="product-price">${entry.price} BYN</div>
                         </div>
