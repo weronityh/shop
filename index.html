@@ -4,699 +4,109 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#000000">
-    <title>WEGGEW</title>
+    <title>ПЕПЕЛЬНИК</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
-            --bg-dark: #000000;
-            --bg-card: #111111;
-            --bg-card-hover: #1a1a1a;
-            --text-white: #ffffff;
-            --text-gray: #888888;
-            --accent: #ffffff;
-            --border-dark: #222222;
-            --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        html, body {
-            height: 100%;
-            height: 100dvh;
-            overflow: hidden;
-            overscroll-behavior: none;
-        }
-
-        body {
-            font-family: var(--font-main);
-            background: var(--bg-dark);
-            color: var(--text-white);
-            display: flex;
-            flex-direction: column;
-            font-size: 15px;
-            line-height: 1.4;
-        }
-
-        .app {
-            flex: 1;
-            min-height: 0;
-            width: 100%;
-            max-width: 640px;
-            margin: 0 auto;
-            background: var(--bg-dark);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-        }
-
-        main {
-            flex: 1;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            position: relative;
-        }
-
-        .page {
-            display: none;
-            min-height: 100%;
-            flex-direction: column;
-        }
-
-        .page.active {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* ========== ЭКРАН 1: ПРИВЕТСТВИЕ ========== */
-        #welcomePage {
-            justify-content: center;
-            align-items: center;
-            padding: 40px 24px;
-            text-align: center;
-            background: radial-gradient(circle at center, #1a1a1a 0%, #000000 70%);
-            position: relative;
-            overflow: hidden;
-        }
-
-        #welcomePage::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.03"><path d="M50 0 L100 50 L50 100 L0 50 Z" fill="white"/></svg>');
-            background-size: 200px;
-            pointer-events: none;
-        }
-
-        .welcome-logo {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: var(--bg-card);
-            border: 2px solid var(--border-dark);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-            overflow: hidden;
-        }
-
-        .welcome-logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .welcome-title {
-            font-size: 32px;
-            font-weight: 800;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .welcome-subtitle {
-            font-size: 14px;
-            color: var(--text-gray);
-            margin-bottom: 40px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .welcome-subtitle span {
-            display: block;
-            font-size: 12px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-top: 4px;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 40px;
-            width: 100%;
-            max-width: 400px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .feature-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .feature-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            border: 1px solid var(--border-dark);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            background: rgba(255,255,255,0.03);
-        }
-
-        .feature-text {
-            font-size: 10px;
-            color: var(--text-gray);
-            text-transform: uppercase;
-            line-height: 1.2;
-            text-align: center;
-        }
-
-        .main-btn {
-            width: 100%;
-            max-width: 340px;
-            padding: 18px 24px;
-            border: 2px solid var(--accent);
-            border-radius: 40px;
-            background: transparent;
-            color: var(--text-white);
-            font-size: 14px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            position: relative;
-            z-index: 1;
-            transition: all 0.2s ease;
-        }
-
-        .main-btn:active {
-            background: var(--accent);
-            color: var(--bg-dark);
-        }
-
-        /* ========== ЭКРАН 2: ВЫБОР ТОЧКИ ========== */
-        #locationPage {
-            padding: 40px 24px;
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle at top, #1a1a1a 0%, #000000 60%);
-        }
-
-        .location-header {
-            text-align: center;
-            margin-bottom: 30px;
-            width: 100%;
-        }
-
-        .location-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-            opacity: 0.8;
-        }
-
-        .location-title {
-            font-size: 28px;
-            font-weight: 300;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-        }
-
-        .location-desc {
-            font-size: 13px;
-            color: var(--text-gray);
-            line-height: 1.5;
-            max-width: 300px;
-            margin: 0 auto;
-        }
-
-        .location-list {
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 30px;
-        }
-
-        .location-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-dark);
-            border-radius: 20px;
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            cursor: pointer;
-            transition: background 0.2s, border-color 0.2s;
-            text-align: left;
-        }
-
-        .location-card:active {
-            background: var(--bg-card-hover);
-        }
-
-        .location-card.selected {
-            border-color: var(--text-white);
-        }
-
-        .location-card-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.08);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        .location-card-content {
-            flex: 1;
-        }
-
-        .location-card-title {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-
-        .location-card-sub {
-            font-size: 12px;
-            color: var(--text-gray);
-        }
-
-        .location-card-arrow {
-            color: var(--text-gray);
-            font-size: 18px;
-        }
-
-        .legal-info {
-            text-align: center;
-            font-size: 11px;
-            color: #555;
-            line-height: 1.6;
-            margin-bottom: 30px;
-            max-width: 320px;
-        }
-
-        .legal-info p {
-            margin-bottom: 6px;
-        }
-
-        /* ========== ЭКРАН 3: КАТАЛОГ ========== */
-        #catalogPage {
-            padding: 20px 16px 100px;
-        }
-
-        .catalog-header {
-            margin-bottom: 20px;
-        }
-
-        .catalog-title {
-            font-size: 26px;
-            font-weight: 300;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 16px;
-        }
-
-        .search-bar {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-dark);
-            border-radius: 20px;
-            padding: 12px 16px;
-            margin-bottom: 16px;
-        }
-
-        .search-bar input {
-            background: transparent;
-            border: none;
-            outline: none;
-            color: var(--text-white);
-            font-size: 14px;
-            width: 100%;
-            font-family: inherit;
-        }
-
-        .search-bar input::placeholder {
-            color: var(--text-gray);
-        }
-
-        .search-bar svg {
-            width: 20px;
-            height: 20px;
-            stroke: var(--text-gray);
-            flex-shrink: 0;
-        }
-
-        .filters-row {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding-bottom: 8px;
-            scrollbar-width: none;
-            margin-bottom: 20px;
-        }
-
-        .filters-row::-webkit-scrollbar {
-            display: none;
-        }
-
-        .filter-chip {
-            background: var(--bg-card);
-            border: 1px solid var(--border-dark);
-            border-radius: 20px;
-            padding: 8px 16px;
-            font-size: 12px;
-            color: var(--text-white);
-            white-space: nowrap;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-shrink: 0;
-        }
-
-        .filter-chip.active {
-            background: var(--text-white);
-            color: var(--bg-dark);
-            border-color: var(--text-white);
-        }
-
-        .filter-chip .badge-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--text-white);
-            border-radius: 50%;
-        }
-
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-
-        .category-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-dark);
-            border-radius: 24px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 200px;
-            cursor: pointer;
-            transition: background 0.2s;
-            text-align: center;
-            position: relative;
-        }
-
-        .category-card:active {
-            background: var(--bg-card-hover);
-        }
-
-        .category-card-image {
-            width: 100px;
-            height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 12px;
-            font-size: 48px;
-        }
-
-        .category-card-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .category-card-title {
-            font-size: 16px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 4px;
-        }
-
-        .category-card-sub {
-            font-size: 12px;
-            color: var(--text-gray);
-        }
-
-        .scroll-hint {
-            position: absolute;
-            bottom: 90px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            color: var(--text-white);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            pointer-events: none;
-            animation: fadeInOut 3s infinite;
-        }
-
-        @keyframes fadeInOut {
-            0%, 100% { opacity: 0; }
-            50% { opacity: 1; }
-        }
-
-        /* ========== НИЖНЯЯ НАВИГАЦИЯ ========== */
-        .bottom-nav {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border-dark);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            height: calc(68px + env(safe-area-inset-bottom));
-            padding-bottom: env(safe-area-inset-bottom);
-            z-index: 100;
-        }
-
-        .nav-btn {
-            background: none;
-            border: none;
-            color: var(--text-gray);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            cursor: pointer;
-            padding: 8px 16px;
-            font-family: inherit;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: color 0.2s;
-        }
-
-        .nav-btn.active {
-            color: var(--text-white);
-        }
-
-        .nav-btn svg {
-            width: 22px;
-            height: 22px;
-            stroke: currentColor;
-            fill: none;
-        }
-
-        /* ========== СТРАНИЦА БРЕНДА ========== */
-        .sub-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            background: var(--bg-dark);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .back-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--bg-card);
-            border: 1px solid var(--border-dark);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: var(--text-white);
-        }
-
-        .sub-title {
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .product-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            padding: 0 16px 100px;
-        }
-
-        .product-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-dark);
-            border-radius: 20px;
-            padding: 14px;
-            display: flex;
-            gap: 14px;
-            align-items: center;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .product-card:active {
-            background: var(--bg-card-hover);
-        }
-
-        .product-thumb {
-            width: 80px;
-            height: 80px;
-            border-radius: 14px;
-            background: rgba(255,255,255,0.05);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            flex-shrink: 0;
-            overflow: hidden;
-        }
-
-        .product-thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .product-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .product-title {
-            font-size: 15px;
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-bottom: 4px;
-        }
-
-        .product-desc {
-            font-size: 12px;
-            color: var(--text-gray);
-            margin-bottom: 6px;
-            line-height: 1.3;
-        }
-
-        .product-price {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-white);
-        }
-
-        .product-price span {
-            font-size: 12px;
-            font-weight: 400;
-            color: var(--text-gray);
-            margin-left: 4px;
-        }
-
-        .promo-badge {
-            display: inline-block;
-            background: #ff9800;
-            color: #000;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 10px;
-            margin-left: 8px;
-            text-transform: uppercase;
-        }
-
-        /* ========== КОРЗИНА И ПРОФИЛЬ ========== */
-        #cartPage, #profilePage {
-            padding: 20px 16px 100px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-gray);
-        }
-
-        .section-title {
-            font-size: 22px;
-            font-weight: 300;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-        }
-
-        /* ========== TOAST ========== */
-        .toast {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%) translateY(20px);
-            background: var(--text-white);
-            color: var(--bg-dark);
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 600;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
+            --bg-dark: #000000; --bg-card: #111111; --bg-card-hover: #1a1a1a;
+            --text-white: #ffffff; --text-gray: #888888; --accent: #ffffff;
+            --border-dark: #222222; --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        html, body { height: 100%; height: 100dvh; overflow: hidden; overscroll-behavior: none; }
+        body { font-family: var(--font-main); background: var(--bg-dark); color: var(--text-white); display: flex; flex-direction: column; font-size: 15px; line-height: 1.4; }
+        .app { flex: 1; min-height: 0; width: 100%; max-width: 640px; margin: 0 auto; background: var(--bg-dark); display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; position: relative; }
+        .page { display: none; min-height: 100%; flex-direction: column; }
+        .page.active { display: flex; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* ЭКРАН 1: ПРИВЕТСТВИЕ */
+        #welcomePage { justify-content: center; align-items: center; padding: 40px 24px; text-align: center; background: radial-gradient(circle at center, #1a1a1a 0%, #000000 70%); position: relative; overflow: hidden; }
+        #welcomePage::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.03"><path d="M50 0 L100 50 L50 100 L0 50 Z" fill="white"/></svg>'); background-size: 200px; pointer-events: none; }
+        .welcome-logo { width: 120px; height: 120px; border-radius: 50%; background: var(--bg-card); border: 2px solid var(--border-dark); display: flex; align-items: center; justify-content: center; font-size: 48px; margin-bottom: 20px; position: relative; z-index: 1; overflow: hidden; }
+        .welcome-logo img { width: 100%; height: 100%; object-fit: cover; }
+        .welcome-title { font-size: 32px; font-weight: 800; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 8px; position: relative; z-index: 1; }
+        .welcome-subtitle { font-size: 14px; color: var(--text-gray); margin-bottom: 40px; position: relative; z-index: 1; }
+        .welcome-subtitle span { display: block; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
+        .features-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 40px; width: 100%; max-width: 400px; position: relative; z-index: 1; }
+        .feature-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .feature-icon { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--border-dark); display: flex; align-items: center; justify-content: center; font-size: 20px; background: rgba(255,255,255,0.03); }
+        .feature-text { font-size: 10px; color: var(--text-gray); text-transform: uppercase; line-height: 1.2; text-align: center; }
+        .main-btn { width: 100%; max-width: 340px; padding: 18px 24px; border: 2px solid var(--accent); border-radius: 40px; background: transparent; color: var(--text-white); font-size: 14px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; position: relative; z-index: 1; transition: all 0.2s ease; }
+        .main-btn:active { background: var(--accent); color: var(--bg-dark); }
+
+        /* ЭКРАН 2: ВЫБОР ТОЧКИ */
+        #locationPage { padding: 40px 24px; justify-content: center; align-items: center; background: radial-gradient(circle at top, #1a1a1a 0%, #000000 60%); }
+        .location-header { text-align: center; margin-bottom: 30px; width: 100%; }
+        .location-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.8; }
+        .location-title { font-size: 28px; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+        .location-desc { font-size: 13px; color: var(--text-gray); line-height: 1.5; max-width: 300px; margin: 0 auto; }
+        .location-list { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
+        .location-card { background: var(--bg-card); border: 1px solid var(--border-dark); border-radius: 20px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: background 0.2s, border-color 0.2s; text-align: left; }
+        .location-card:active { background: var(--bg-card-hover); }
+        .location-card.selected { border-color: var(--text-white); }
+        .location-card-icon { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .location-card-content { flex: 1; }
+        .location-card-title { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+        .location-card-sub { font-size: 12px; color: var(--text-gray); }
+        .location-card-arrow { color: var(--text-gray); font-size: 18px; }
+        .legal-info { text-align: center; font-size: 11px; color: #555; line-height: 1.6; margin-bottom: 30px; max-width: 320px; }
+        .legal-info p { margin-bottom: 6px; }
+
+        /* ЭКРАН 3: КАТАЛОГ */
+        #catalogPage { padding: 20px 16px 100px; }
+        .catalog-header { margin-bottom: 20px; }
+        .catalog-title { font-size: 26px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 16px; }
+        .search-bar { display: flex; align-items: center; gap: 10px; background: var(--bg-card); border: 1px solid var(--border-dark); border-radius: 20px; padding: 12px 16px; margin-bottom: 16px; }
+        .search-bar input { background: transparent; border: none; outline: none; color: var(--text-white); font-size: 14px; width: 100%; font-family: inherit; }
+        .search-bar input::placeholder { color: var(--text-gray); }
+        .search-bar svg { width: 20px; height: 20px; stroke: var(--text-gray); flex-shrink: 0; }
+        .filters-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; margin-bottom: 20px; }
+        .filters-row::-webkit-scrollbar { display: none; }
+        .filter-chip { background: var(--bg-card); border: 1px solid var(--border-dark); border-radius: 20px; padding: 8px 16px; font-size: 12px; color: var(--text-white); white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .filter-chip.active { background: var(--text-white); color: var(--bg-dark); border-color: var(--text-white); }
+        .filter-chip .badge-dot { width: 8px; height: 8px; background: var(--text-white); border-radius: 50%; }
+        .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .category-card { background: var(--bg-card); border: 1px solid var(--border-dark); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; cursor: pointer; transition: background 0.2s; text-align: center; position: relative; }
+        .category-card:active { background: var(--bg-card-hover); }
+        .category-card-image { width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 48px; }
+        .category-card-image img { width: 100%; height: 100%; object-fit: contain; }
+        .category-card-title { font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .category-card-sub { font-size: 12px; color: var(--text-gray); }
+        .scroll-hint { position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 8px 16px; border-radius: 20px; font-size: 12px; color: var(--text-white); display: flex; align-items: center; gap: 6px; pointer-events: none; animation: fadeInOut 3s infinite; }
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+
+        /* НИЖНЯЯ НАВИГАЦИЯ */
+        .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(20px); border-top: 1px solid var(--border-dark); display: flex; justify-content: space-around; align-items: center; height: calc(68px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); z-index: 100; }
+        .nav-btn { background: none; border: none; color: var(--text-gray); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; padding: 8px 16px; font-family: inherit; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; transition: color 0.2s; }
+        .nav-btn.active { color: var(--text-white); }
+        .nav-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; }
+
+        /* СТРАНИЦА БРЕНДА */
+        .sub-header { display: flex; align-items: center; gap: 12px; padding: 16px; margin-bottom: 16px; background: var(--bg-dark); position: sticky; top: 0; z-index: 10; }
+        .back-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-dark); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-white); }
+        .sub-title { font-size: 18px; font-weight: 600; }
+        .product-list { display: flex; flex-direction: column; gap: 12px; padding: 0 16px 100px; }
+        .product-card { background: var(--bg-card); border: 1px solid var(--border-dark); border-radius: 20px; padding: 14px; display: flex; gap: 14px; align-items: center; cursor: pointer; transition: background 0.2s; }
+        .product-card:active { background: var(--bg-card-hover); }
+        .product-thumb { width: 80px; height: 80px; border-radius: 14px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 32px; flex-shrink: 0; overflow: hidden; }
+        .product-thumb img { width: 100%; height: 100%; object-fit: contain; }
+        .product-info { flex: 1; min-width: 0; }
+        .product-title { font-size: 15px; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+        .product-desc { font-size: 12px; color: var(--text-gray); margin-bottom: 6px; line-height: 1.3; }
+        .product-price { font-size: 16px; font-weight: 700; color: var(--text-white); }
+        .product-price span { font-size: 12px; font-weight: 400; color: var(--text-gray); margin-left: 4px; }
+        .promo-badge { display: inline-block; background: #ff9800; color: #000; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px; text-transform: uppercase; }
+
+        /* КОРЗИНА И ПРОФИЛЬ */
+        #cartPage, #profilePage { padding: 20px 16px 100px; }
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-gray); }
+        .section-title { font-size: 22px; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; }
+
+        /* TOAST */
+        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text-white); color: var(--bg-dark); padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 1000; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body>
@@ -705,28 +115,14 @@
             <!-- ЭКРАН 1: ПРИВЕТСТВИЕ -->
             <div class="page active" id="welcomePage">
                 <div class="welcome-logo">👶</div>
-                <div class="welcome-title">WEGGEW</div>
-                <div class="welcome-subtitle">БОЛЬШЕ ЧЕМ ПРОСТО ЗАКАЗ<span>WEGGEW MARKET</span></div>
-
+                <div class="welcome-title">ПЕПЕЛЬНИК</div>
+                <div class="welcome-subtitle">БОЛЬШЕ ЧЕМ ПРОСТО ЗАКАЗ<span>ПЕПЕЛЬНИК MARKET</span></div>
                 <div class="features-grid">
-                    <div class="feature-item">
-                        <div class="feature-icon">🛡️</div>
-                        <div class="feature-text">Оригинал<br>и качество</div>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-icon">💬</div>
-                        <div class="feature-text">Удобный<br>выбор</div>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-icon">📦</div>
-                        <div class="feature-text">Актуальные<br>новинки</div>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-icon">❤️</div>
-                        <div class="feature-text">Приятная<br>упаковка</div>
-                    </div>
+                    <div class="feature-item"><div class="feature-icon">🛡️</div><div class="feature-text">Оригинал<br>и качество</div></div>
+                    <div class="feature-item"><div class="feature-icon">💬</div><div class="feature-text">Удобный<br>выбор</div></div>
+                    <div class="feature-item"><div class="feature-icon">📦</div><div class="feature-text">Актуальные<br>новинки</div></div>
+                    <div class="feature-item"><div class="feature-icon">❤️</div><div class="feature-text">Приятная<br>упаковка</div></div>
                 </div>
-
                 <button class="main-btn" id="goToLocationBtn">ПЕРЕЙТИ В КАТАЛОГ →</button>
             </div>
 
@@ -737,7 +133,6 @@
                     <div class="location-title">ГДЕ ЗАБРАТЬ<br>ЗАКАЗ?</div>
                     <div class="location-desc">Каталог и наличие зависят от точки. Выберите, откуда вам удобно забрать.</div>
                 </div>
-
                 <div class="location-list">
                     <div class="location-card" data-location="novobelitsky">
                         <div class="location-card-icon">📍</div>
@@ -756,14 +151,12 @@
                         <div class="location-card-arrow">›</div>
                     </div>
                 </div>
-
                 <div class="legal-info">
                     <p>УНП ЕЕ8821178</p>
                     <p>Деятельность осуществляется в рамках законодательства Республики Беларусь</p>
                     <p>Согласно ст. 12.26, а также ст. 13.11 ч. 4</p>
                     <p>Входя в приложение вы подтверждаете свое совершеннолетие.</p>
                 </div>
-
                 <button class="main-btn" id="goToCatalogBtn">ПРОДОЛЖИТЬ →</button>
             </div>
 
@@ -772,9 +165,7 @@
                 <div class="catalog-header">
                     <div class="catalog-title">КАТАЛОГ</div>
                     <div class="search-bar">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
                         <input type="text" placeholder="Поиск товаров..." id="searchInput">
                     </div>
                     <div class="filters-row">
@@ -783,21 +174,15 @@
                         <div class="filter-chip">НОВОСТИ <span class="badge-dot"></span></div>
                     </div>
                 </div>
-
-                <div class="category-grid" id="categoryGrid">
-                    <!-- Карточки будут добавлены через JS -->
-                </div>
-
+                <div class="category-grid" id="categoryGrid"></div>
                 <div class="scroll-hint" id="scrollHint">Листайте вниз ↓</div>
             </div>
 
-            <!-- СТРАНИЦА БРЕНДА (список товаров) -->
+            <!-- СТРАНИЦА БРЕНДА -->
             <div class="page" id="brandPage">
                 <div class="sub-header">
                     <button class="back-btn" id="backToCatalog">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.4" stroke="currentColor" style="width:20px;height:20px;">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.4" stroke="currentColor" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
                     </button>
                     <div class="sub-title" id="brandPageTitle">Бренд</div>
                 </div>
@@ -817,30 +202,21 @@
             </div>
         </main>
 
-        <!-- НИЖНЯЯ НАВИГАЦИЯ -->
         <nav class="bottom-nav" id="bottomNav" style="display: none;">
             <button class="nav-btn" data-tab="home" aria-label="Главная">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
                 <span>Главная</span>
             </button>
             <button class="nav-btn active" data-tab="catalog" aria-label="Каталог">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>
                 <span>Каталог</span>
             </button>
             <button class="nav-btn" data-tab="cart" aria-label="Корзина">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" /></svg>
                 <span>Корзина</span>
             </button>
             <button class="nav-btn" data-tab="profile" aria-label="Профиль">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
                 <span>Профиль</span>
             </button>
         </nav>
@@ -849,6 +225,8 @@
     <div class="toast" id="toast">Добавлено</div>
 
     <script>
+        // --- ВСТАВЬТЕ СЮДА ВАШУ ССЫЛКУ НА CSV ---
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKsclp9BNO6AGdBL3JalqHSfz4nmyZV_osjJX_Vhn4QxdS5SNb2sR1HQltEUKJruEvvvou9K3-Y3Y/pub?gid=0&single=true&output=csv';
         // --- ДАННЫЕ ---
         const categories = [
             { id: 'winter', name: 'ЗИМНИЙ ЗАПАС', sub: '1 вариант', icon: '❄️', image: '' },
@@ -957,6 +335,71 @@
             window._toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
         }
 
+        // --- ПАРСИНГ CSV ---
+        function parseCSV(text) {
+            const rows = [];
+            let row = [], cell = '', inQuotes = false;
+            for (let i = 0; i < text.length; i++) {
+                const ch = text[i], next = text[i + 1];
+                if (ch === '"' && inQuotes && next === '"') { cell += '"'; i++; }
+                else if (ch === '"') { inQuotes = !inQuotes; }
+                else if (ch === ',' && !inQuotes) { row.push(cell.trim()); cell = ''; }
+                else if ((ch === '\n' || ch === '\r') && !inQuotes) {
+                    if (cell.length || row.length) { row.push(cell.trim()); rows.push(row); row = []; cell = ''; }
+                } else { cell += ch; }
+            }
+            if (cell.length || row.length) { row.push(cell.trim()); rows.push(row); }
+            return rows;
+        }
+
+        // --- ОБНОВЛЕНИЕ ЦЕН ИЗ ТАБЛИЦЫ ---
+        async function updatePricesFromSheet() {
+            try {
+                const res = await fetch(`${SHEET_CSV_URL}&t=${Date.now()}`);
+                const csvText = await res.text();
+                const rows = parseCSV(csvText);
+                
+                if (rows.length < 2) return;
+
+                const headers = rows[0].map(h => h.toLowerCase());
+                const idxName = headers.indexOf('name');
+                const idxPrice = headers.indexOf('price');
+
+                if (idxName === -1 || idxPrice === -1) {
+                    console.warn('В таблице должны быть столбцы "name" и "price"');
+                    return;
+                }
+
+                const priceMap = {};
+                for (let i = 1; i < rows.length; i++) {
+                    const name = rows[i][idxName];
+                    const price = Number(rows[i][idxPrice]);
+                    if (name && !isNaN(price)) {
+                        priceMap[name.toLowerCase()] = price;
+                    }
+                }
+
+                // Обновляем цены в локальных данных
+                Object.keys(catalogData).forEach(catId => {
+                    catalogData[catId].forEach(item => {
+                        const key = item.name.toLowerCase();
+                        if (priceMap[key] !== undefined) {
+                            item.price = priceMap[key];
+                        }
+                    });
+                });
+
+                console.log('Цены обновлены из таблицы');
+                
+                // Если открыта страница бренда, перерисовываем её
+                if (currentCategoryId && pages.brand.classList.contains('active')) {
+                    openCategory(currentCategoryId);
+                }
+            } catch (err) {
+                console.error('Ошибка загрузки таблицы:', err);
+            }
+        }
+
         function renderCategories() {
             categoryGrid.innerHTML = categories.map(cat => `
                 <div class="category-card" data-category="${cat.id}">
@@ -980,7 +423,6 @@
 
             brandPageTitle.textContent = category.name;
 
-            // Добавляем акцию для категории ВЕЙПЫ
             const promoText = categoryId === 'vapes' ? '<span class="promo-badge">🤑 скидка на жидкость</span>' : '';
 
             brandList.innerHTML = entries.map(entry => `
@@ -1031,7 +473,7 @@
             });
         });
 
-        // Инициализация Telegram
+        // --- ИНИЦИАЛИЗАЦИЯ ---
         if (window.Telegram && window.Telegram.WebApp) {
             const tg = window.Telegram.WebApp;
             tg.ready();
@@ -1039,6 +481,10 @@
             if (tg.setHeaderColor) tg.setHeaderColor('#000000');
             if (tg.setBackgroundColor) tg.setBackgroundColor('#000000');
         }
+
+        // Загружаем цены при старте и обновляем каждые 30 секунд (можно изменить интервал)
+        updatePricesFromSheet();
+        setInterval(updatePricesFromSheet, 30000);
     </script>
 </body>
 </html>
