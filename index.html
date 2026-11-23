@@ -1079,7 +1079,6 @@
             const canvas = document.getElementById('smokeCanvas');
             if (!canvas || !canvas.getContext) return;
             const ctx = canvas.getContext('2d');
-            const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
             let width = 0, height = 0, dpr = 1;
             let puffs = [];
 
@@ -1113,10 +1112,10 @@
                         y: height * 0.65 + Math.random() * height * 0.35,
                         r: 100 + Math.random() * 180,
                         vx: (Math.random() - 0.5) * 0.18,
-                        vy: -0.12 - Math.random() * 0.18,
+                        vy: -0.45 - Math.random() * 0.55,
                         rot: (Math.random() - 0.5) * 1.8,
                         vr: (Math.random() - 0.5) * 0.001,
-                        alpha: 0.12 + Math.random() * 0.14,
+                        alpha: 0.14 + Math.random() * 0.14,
                         phase: Math.random() * Math.PI * 2,
                         stretch: 1.4 + Math.random() * 1.2
                     });
@@ -1131,14 +1130,12 @@
                 ctx.fillRect(0, 0, width, height);
                 ctx.globalCompositeOperation = 'lighter';
                 for (const p of puffs) {
-                    if (!reduceMotion) {
-                        p.x += p.vx + Math.sin(time / 3500 + p.phase) * 0.18;
-                        p.y += p.vy;
-                        p.rot += p.vr;
-                        if (p.y + p.r * p.stretch < 0) {
-                            p.y = height + p.r;
-                            p.x = width * 0.15 + Math.random() * width * 0.7;
-                        }
+                    p.x += p.vx + Math.sin(time / 3500 + p.phase) * 0.18;
+                    p.y += p.vy;
+                    p.rot += p.vr;
+                    if (p.y + p.r * p.stretch < 0) {
+                        p.y = height + p.r;
+                        p.x = width * 0.15 + Math.random() * width * 0.7;
                     }
                     ctx.save();
                     ctx.translate(p.x, p.y);
@@ -1149,11 +1146,7 @@
                 }
                 ctx.globalCompositeOperation = 'source-over';
                 ctx.globalAlpha = 1;
-                if (!reduceMotion) {
-                    rafId = requestAnimationFrame(draw);
-                } else {
-                    rafId = 0;
-                }
+                rafId = requestAnimationFrame(draw);
             }
 
             resize();
@@ -1161,17 +1154,11 @@
             window.addEventListener('resize', function () {
                 resize();
                 createPuffs();
-                if (reduceMotion) {
-                    draw(performance.now());
-                } else if (!rafId) {
+                if (!rafId) {
                     rafId = requestAnimationFrame(draw);
                 }
             });
-            if (reduceMotion) {
-                draw(performance.now());
-            } else {
-                rafId = requestAnimationFrame(draw);
-            }
+            rafId = requestAnimationFrame(draw);
         })();
 
         // --- ИНИЦИАЛИЗАЦИЯ ---
