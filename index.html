@@ -125,7 +125,7 @@
         .product-card:active { background: var(--bg-card-hover); }
         .product-thumb { width: 80px; height: 80px; border-radius: 14px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 32px; flex-shrink: 0; overflow: hidden; }
         .product-thumb img { width: 100%; height: 100%; object-fit: contain; }
-        .product-thumb img.full-cover { object-fit: cover; }
+        .product-thumb img.full-cover { object-fit: cover; transform: scale(1.25); }
         .product-info { flex: 1; min-width: 0; }
         .product-title { font-size: 15px; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
         .product-desc { font-size: 12px; color: var(--text-gray); margin-bottom: 6px; line-height: 1.3; }
@@ -278,7 +278,7 @@
             winter: [ { id: 'w1', name: 'ЗИМНИЙ НАБОР', desc: 'Подарочный набор', price: 50, icon: '❄️', image: '' } ],
             vapes: [
                 { id: 'v1', name: 'XROS 6', desc: 'Под-система', price: 85, icon: '📱', image: 'vape.png' },
-                { id: 'v2', name: 'XROS 6 mini', desc: 'Под-система', price: 65, icon: '📱', image: 'xros6mini.png' },
+                { id: 'v2', name: 'XROS 6 mini', desc: 'Под-система', price: 65, icon: '📱', image: 'xros6mini.png', isCover: true },
                 { id: 'v3', name: 'XROS 5 mini', desc: 'Под-система', price: 60, icon: '📱', image: 'vape.png' },
                 { id: 'v4', name: 'XROS 5 mini CE', desc: 'Под-система', price: 65, icon: '📱', image: 'vape.png' },
                 { id: 'v5', name: 'XROS CUBE', desc: 'Под-система', price: 50, icon: '📱', image: 'vape.png' },
