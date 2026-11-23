@@ -225,9 +225,10 @@
     <div class="toast" id="toast">Добавлено</div>
 
     <script>
-        // --- ВСТАВЬТЕ СЮДА ВАШУ ССЫЛКУ НА CSV ---
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKsclp9BNO6AGdBL3JalqHSfz4nmyZV_osjJX_Vhn4QxdS5SNb2sR1HQltEUKJruEvvvou9K3-Y3Y/pub?gid=0&single=true&output=csv';
-        // --- ДАННЫЕ ---
+        // --- ВАША ССЫЛКА НА CSV ---
+        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKsclp9BNO6AGdBL3JalqHSfz4nmyZV_osjJX_Vhn4QxdS5SNb2sR1HQltEUKJruEvvvou9K3-Y3Y/pub?gid=0&single=true&output=csv';
+
+        // --- ДАННЫЕ (запасные, если таблица не загрузится) ---
         const categories = [
             { id: 'winter', name: 'ЗИМНИЙ ЗАПАС', sub: '1 вариант', icon: '❄️', image: '' },
             { id: 'vapes', name: 'ВЕЙПЫ', sub: '3 бренда', icon: '📱', image: 'vape.png' },
@@ -238,9 +239,7 @@ const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKsclp9B
         ];
 
         const catalogData = {
-            winter: [
-                { id: 'w1', name: 'ЗИМНИЙ НАБОР', desc: 'Подарочный набор', price: 50, icon: '❄️', image: '' }
-            ],
+            winter: [ { id: 'w1', name: 'ЗИМНИЙ НАБОР', desc: 'Подарочный набор', price: 50, icon: '❄️', image: '' } ],
             vapes: [
                 { id: 'v1', name: 'XROS 6', desc: 'Под-система', price: 85, icon: '📱', image: 'vape.png' },
                 { id: 'v2', name: 'XROS 6 mini', desc: 'Под-система', price: 65, icon: '📱', image: 'vape.png' },
@@ -290,7 +289,6 @@ const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKsclp9B
             ]
         };
 
-        // --- СОСТОЯНИЕ ---
         let currentLocation = null;
         let currentCategoryId = null;
 
@@ -310,7 +308,6 @@ const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKsclp9B
         const brandPageTitle = document.getElementById('brandPageTitle');
         const toast = document.getElementById('toast');
 
-        // --- ФУНКЦИИ ---
         function showPage(name) {
             Object.values(pages).forEach(p => p.classList.remove('active'));
             pages[name].classList.add('active');
@@ -352,8 +349,8 @@ const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKsclp9B
             return rows;
         }
 
-        // --- ОБНОВЛЕНИЕ ЦЕН ИЗ ТАБЛИЦЫ ---
-        async function updatePricesFromSheet() {
+        // --- СИНХРОНИЗАЦИЯ С ТАБЛИЦЕЙ ---
+        async function syncWithSheet() {
             try {
                 const res = await fetch(`${SHEET_CSV_URL}&t=${Date.now()}`);
                 const csvText = await res.text();
@@ -361,35 +358,75 @@ const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKsclp9B
                 
                 if (rows.length < 2) return;
 
-                const headers = rows[0].map(h => h.toLowerCase());
+                const headers = rows[0].map(h => h.toLowerCase().trim());
+                const idxCat = headers.indexOf('category');
                 const idxName = headers.indexOf('name');
                 const idxPrice = headers.indexOf('price');
+                const idxStock = headers.indexOf('stock');
 
                 if (idxName === -1 || idxPrice === -1) {
-                    console.warn('В таблице должны быть столбцы "name" и "price"');
+                    console.warn('В таблице не найдены столбцы name или price');
                     return;
                 }
 
-                const priceMap = {};
+                // Сопоставление категорий из таблицы с категориями на сайте
+                const catMapping = {
+                    'devices': 'vapes',
+                    'consumables': 'consumables',
+                    'snus': 'snus',
+                    'liquids': 'liquids',
+                    'disposables': 'disposables'
+                };
+
+                // Временный объект для новых данных
+                const newData = {
+                    winter: [...catalogData.winter], // Зимний запас не трогаем, его нет в таблице
+                    vapes: [],
+                    snus: [],
+                    liquids: [],
+                    disposables: [],
+                    consumables: []
+                };
+
+                // Проходим по всем строкам таблицы
                 for (let i = 1; i < rows.length; i++) {
-                    const name = rows[i][idxName];
-                    const price = Number(rows[i][idxPrice]);
-                    if (name && !isNaN(price)) {
-                        priceMap[name.toLowerCase()] = price;
+                    const r = rows[i];
+                    if (!r[idxName] || r[idxName].trim() === '') continue;
+
+                    const rawCat = idxCat !== -1 ? r[idxCat].trim() : '';
+                    const siteCat = catMapping[rawCat] || rawCat; 
+                    
+                    const name = r[idxName].trim();
+                    const price = Number(r[idxPrice]) || 0;
+                    const stock = idxStock !== -1 ? (Number(r[idxStock]) || 0) : 99;
+
+                    // Если товара нет в наличии (stock <= 0), пропускаем его
+                    if (stock <= 0) continue;
+
+                    // Проверяем, есть ли категория на сайте
+                    if (newData[siteCat]) {
+                        // Ищем, есть ли уже такой товар в нашем запасном списке, чтобы взять иконку и картинку
+                        const existingItem = catalogData[siteCat]?.find(item => item.name.toLowerCase() === name.toLowerCase());
+                        
+                        newData[siteCat].push({
+                            id: existingItem ? existingItem.id : `auto_${i}`,
+                            name: name,
+                            desc: existingItem ? existingItem.desc : '',
+                            price: price,
+                            icon: existingItem ? existingItem.icon : '📦',
+                            image: existingItem ? existingItem.image : 'vape.png' // Дефолтная картинка
+                        });
                     }
                 }
 
-                // Обновляем цены в локальных данных
-                Object.keys(catalogData).forEach(catId => {
-                    catalogData[catId].forEach(item => {
-                        const key = item.name.toLowerCase();
-                        if (priceMap[key] !== undefined) {
-                            item.price = priceMap[key];
-                        }
-                    });
+                // Обновляем глобальные данные
+                Object.keys(newData).forEach(key => {
+                    if (newData[key].length > 0 || key === 'winter') {
+                        catalogData[key] = newData[key];
+                    }
                 });
 
-                console.log('Цены обновлены из таблицы');
+                console.log('Данные успешно синхронизированы с таблицей');
                 
                 // Если открыта страница бренда, перерисовываем её
                 if (currentCategoryId && pages.brand.classList.contains('active')) {
@@ -401,15 +438,18 @@ const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKsclp9B
         }
 
         function renderCategories() {
-            categoryGrid.innerHTML = categories.map(cat => `
+            categoryGrid.innerHTML = categories.map(cat => {
+                // Считаем количество товаров в категории для подписи
+                const count = catalogData[cat.id]?.length || 0;
+                return `
                 <div class="category-card" data-category="${cat.id}">
                     <div class="category-card-image">
                         ${cat.image ? `<img src="${cat.image}" alt="${cat.name}">` : `<span>${cat.icon}</span>`}
                     </div>
                     <div class="category-card-title">${cat.name}</div>
-                    <div class="category-card-sub">${cat.sub}</div>
+                    <div class="category-card-sub">${count} шт.</div>
                 </div>
-            `).join('');
+            `}).join('');
 
             categoryGrid.querySelectorAll('.category-card').forEach(card => {
                 card.addEventListener('click', () => openCategory(card.dataset.category));
@@ -425,18 +465,22 @@ const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKsclp9B
 
             const promoText = categoryId === 'vapes' ? '<span class="promo-badge">🤑 скидка на жидкость</span>' : '';
 
-            brandList.innerHTML = entries.map(entry => `
-                <div class="product-card" data-entry-id="${entry.id}">
-                    <div class="product-thumb">
-                        ${entry.image ? `<img src="${entry.image}" alt="${entry.name}">` : `<span>${entry.icon}</span>`}
+            if (entries.length === 0) {
+                brandList.innerHTML = `<div class="empty-state">В этой категории пока нет товаров в наличии</div>`;
+            } else {
+                brandList.innerHTML = entries.map(entry => `
+                    <div class="product-card" data-entry-id="${entry.id}">
+                        <div class="product-thumb">
+                            ${entry.image ? `<img src="${entry.image}" alt="${entry.name}">` : `<span>${entry.icon}</span>`}
+                        </div>
+                        <div class="product-info">
+                            <div class="product-title">${entry.name} ${promoText}</div>
+                            <div class="product-desc">${entry.desc || ''}</div>
+                            <div class="product-price">${entry.price} BYN</div>
+                        </div>
                     </div>
-                    <div class="product-info">
-                        <div class="product-title">${entry.name} ${promoText}</div>
-                        <div class="product-desc">${entry.desc}</div>
-                        <div class="product-price">${entry.price} BYN</div>
-                    </div>
-                </div>
-            `).join('');
+                `).join('');
+            }
 
             showPage('brand');
         }
@@ -452,11 +496,13 @@ const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKsclp9B
             });
         });
 
-        document.getElementById('goToCatalogBtn').addEventListener('click', () => {
+        document.getElementById('goToCatalogBtn').addEventListener('click', async () => {
             if (!currentLocation) {
                 showToast('Выберите точку выдачи');
                 return;
             }
+            // Ждем загрузки данных перед показом каталога
+            await syncWithSheet();
             renderCategories();
             showPage('catalog');
         });
@@ -482,9 +528,8 @@ const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKsclp9B
             if (tg.setBackgroundColor) tg.setBackgroundColor('#000000');
         }
 
-        // Загружаем цены при старте и обновляем каждые 30 секунд (можно изменить интервал)
-        updatePricesFromSheet();
-        setInterval(updatePricesFromSheet, 30000);
+        // Автообновление цен и наличия каждые 30 секунд
+        setInterval(syncWithSheet, 30000);
     </script>
 </body>
 </html>
