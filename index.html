@@ -92,6 +92,10 @@
         .product-card:active { background: var(--bg-card-hover); }
         .product-thumb { width: 80px; height: 80px; border-radius: 14px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 32px; flex-shrink: 0; overflow: hidden; }
         .product-thumb img { width: 100%; height: 100%; object-fit: contain; }
+        
+        /* Новый класс для заполнения всего квадратика */
+        .product-thumb img.full-cover { object-fit: cover; }
+        
         .product-info { flex: 1; min-width: 0; }
         .product-title { font-size: 15px; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
         .product-desc { font-size: 12px; color: var(--text-gray); margin-bottom: 6px; line-height: 1.3; }
@@ -403,8 +407,11 @@
                         const existingItem = catalogData[siteCat]?.find(item => item.name.toLowerCase() === name.toLowerCase());
                         
                         let img = existingItem ? existingItem.image : 'vape.png';
+                        let isCover = false; // Флаг для заполнения картинкой
+
                         if (name.toLowerCase() === 'xros 6 mini') {
                             img = 'xros6mini.png';
+                            isCover = true; // Включаем заполнение для этой картинки
                         }
 
                         newData[siteCat].push({
@@ -413,7 +420,8 @@
                             desc: existingItem ? existingItem.desc : '',
                             price: price,
                             icon: existingItem ? existingItem.icon : '📦',
-                            image: img 
+                            image: img,
+                            isCover: isCover // Сохраняем флаг в объекте товара
                         });
                     }
                 }
@@ -467,7 +475,7 @@
                 brandList.innerHTML = entries.map(entry => `
                     <div class="product-card" data-entry-id="${entry.id}">
                         <div class="product-thumb">
-                            ${entry.image ? `<img src="${entry.image}" alt="${entry.name}">` : `<span>${entry.icon}</span>`}
+                            ${entry.image ? `<img src="${entry.image}" class="${entry.isCover ? 'full-cover' : ''}" alt="${entry.name}">` : `<span>${entry.icon}</span>`}
                         </div>
                         <div class="product-info">
                             <div class="product-title">${entry.name} ${promoText}</div>
