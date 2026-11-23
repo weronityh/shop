@@ -343,6 +343,26 @@
             text-shadow: 0 2px 24px rgba(0,0,0,0.65);
             position: relative;
             z-index: 1;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0;
+        }
+        .title-char {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(14px) scale(0.96);
+            filter: blur(6px);
+            animation: charReveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation-delay: calc(var(--i) * 0.5s);
+            will-change: opacity, transform, filter;
+        }
+        @keyframes charReveal {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0);
+            }
         }
         .welcome-divider {
             width: 46px;
@@ -351,6 +371,14 @@
             margin: clamp(12px, 2vh, 18px) auto;
             position: relative;
             z-index: 1;
+            transform: scaleX(0);
+            transform-origin: center;
+            animation: dividerReveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation-delay: 3.2s;
+            will-change: transform;
+        }
+        @keyframes dividerReveal {
+            to { transform: scaleX(1); }
         }
         .welcome-subtitle {
             font-size: clamp(11px, 3.2vw, 13px);
@@ -363,6 +391,19 @@
             position: relative;
             z-index: 1;
         }
+        .subtitle-line {
+            display: block;
+            opacity: 0;
+            transform: translateY(10px);
+            filter: blur(4px);
+            animation: subtitleReveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            will-change: opacity, transform, filter;
+        }
+        .subtitle-line:first-child { animation-delay: 3.3s; }
+        .subtitle-line:last-child { animation-delay: 3.5s; }
+        @keyframes subtitleReveal {
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
         .welcome-hint {
             font-size: clamp(11px, 2.8vw, 12px);
             font-weight: 400;
@@ -373,6 +414,15 @@
             margin-bottom: clamp(16px, 2.5vh, 22px);
             position: relative;
             z-index: 1;
+            opacity: 0;
+            transform: translateY(8px);
+            filter: blur(4px);
+            animation: hintReveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation-delay: 3.9s;
+            will-change: opacity, transform, filter;
+        }
+        @keyframes hintReveal {
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
         .main-btn {
             width: 100%;
@@ -519,9 +569,19 @@
                     </div>
                 </div>
                 <div class="welcome-bottom">
-                    <div class="welcome-title">WEGGEW</div>
+                    <div class="welcome-title" aria-label="WEGGEW">
+                        <span class="title-char" style="--i:0">W</span>
+                        <span class="title-char" style="--i:1">E</span>
+                        <span class="title-char" style="--i:2">G</span>
+                        <span class="title-char" style="--i:3">G</span>
+                        <span class="title-char" style="--i:4">E</span>
+                        <span class="title-char" style="--i:5">W</span>
+                    </div>
                     <div class="welcome-divider"></div>
-                    <div class="welcome-subtitle">ВЕЙПЫ | ЖИДКОСТИ<br>ГОМЕЛЬ</div>
+                    <div class="welcome-subtitle">
+                        <span class="subtitle-line">ВЕЙПЫ | ЖИДКОСТИ</span><br>
+                        <span class="subtitle-line">ГОМЕЛЬ</span>
+                    </div>
                     <div class="welcome-hint">ЗАЙДИ И ВЫБЕРИ СВОЙ ВКУС ЗА 30 СЕКУНД</div>
                     <button class="main-btn" id="goToLocationBtn">ПЕРЕЙТИ В КАТАЛОГ →</button>
                 </div>
@@ -791,6 +851,8 @@
                     catImg.classList.remove('loaded');
                     requestAnimationFrame(() => catImg.classList.add('loaded'));
                 }
+                // Restart entrance animations
+                restartWelcomeAnimations();
             }
 
             if (name === 'catalog' || name === 'cart' || name === 'profile' || name === 'brand') {
@@ -802,6 +864,21 @@
             const tabMap = { catalog: 'catalog', brand: 'catalog', cart: 'cart', profile: 'profile' };
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.tab === (tabMap[name] || ''));
+            });
+        }
+
+        function restartWelcomeAnimations() {
+            const titleChars = document.querySelectorAll('.title-char');
+            const divider = document.querySelector('.welcome-divider');
+            const subtitleLines = document.querySelectorAll('.subtitle-line');
+            const hint = document.querySelector('.welcome-hint');
+
+            [divider, hint, ...subtitleLines, ...titleChars].forEach(el => {
+                if (el) {
+                    el.style.animation = 'none';
+                    el.offsetHeight; // force reflow
+                    el.style.animation = '';
+                }
             });
         }
 
