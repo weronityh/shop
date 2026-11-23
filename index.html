@@ -27,6 +27,7 @@
             --accent-light: #e7f1ff;
             --border: #e5ebf5;
             --shadow-card: 0 2px 10px rgba(13, 110, 253, 0.06);
+            --price-color: #d32f2f;
         }
 
         html, body {
@@ -86,6 +87,7 @@
             padding: 14px 14px 24px;
         }
 
+        /* Верхняя белая шапка */
         .sub-header {
             position: sticky;
             top: 0;
@@ -135,6 +137,7 @@
             text-overflow: ellipsis;
         }
 
+        /* Главная: Избранное + сетка */
         .favorites-banner {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -260,6 +263,7 @@
             line-height: 1.25;
         }
 
+        /* --- НОВЫЕ КАРТОЧКИ (КАК НА ФОТО) --- */
         .showcase-list {
             display: flex;
             flex-direction: column;
@@ -268,28 +272,27 @@
 
         .showcase-wrap {
             background: var(--bg-card);
-            border: 1px solid var(--border);
             border-radius: 22px;
             box-shadow: var(--shadow-card);
             overflow: hidden;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            border: none; /* Убрал рамку для чистоты как на фото */
         }
 
         .showcase-card {
-            padding: 14px;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 14px;
             cursor: pointer;
-            transition: background 0.15s ease;
         }
 
-        .showcase-card:active {
-            background: var(--bg-input);
-        }
-
+        /* Квадратная картинка как на фото */
         .showcase-thumb {
-            width: 82px;
-            height: 82px;
+            width: 90px;
+            height: 90px;
             border-radius: 16px;
             border: 1px solid var(--border);
             background: var(--bg-primary);
@@ -298,7 +301,8 @@
             justify-content: center;
             flex-shrink: 0;
             overflow: hidden;
-            padding: 6px;
+            padding: 4px;
+            position: relative;
         }
 
         .showcase-thumb img {
@@ -308,20 +312,22 @@
         }
 
         .showcase-thumb-icon {
-            font-size: 34px;
+            font-size: 40px;
         }
 
+        /* Контент справа */
         .showcase-content {
             flex: 1;
             min-width: 0;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            gap: 5px;
+            gap: 4px;
+            padding-top: 4px;
         }
 
         .showcase-title {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 800;
             color: var(--text-primary);
             text-transform: uppercase;
@@ -329,24 +335,45 @@
             line-height: 1.2;
         }
 
-        .showcase-desc {
-            font-size: 12.5px;
+        .showcase-sub {
+            font-size: 13px;
             color: var(--text-secondary);
-            line-height: 1.3;
+            font-weight: 500;
         }
 
-        .showcase-sub {
-            font-size: 11.5px;
+        /* Рейтинг и отзывы как на фото */
+        .reviews-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        
+        .reviews-row .star {
+            color: var(--price-color);
+            font-size: 14px;
+        }
+        
+        .reviews-row .count {
+            color: var(--text-muted);
+        }
+
+        .reviews-row .link {
             color: var(--accent);
             font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
         }
 
+        /* Кнопка Избранное (белая с контуром) */
         .fav-pill-btn {
-            margin-top: 4px;
+            margin-top: 6px;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 6px 12px;
+            padding: 6px 14px;
             border-radius: 999px;
             border: 1px solid var(--border);
             background: var(--bg-card);
@@ -368,6 +395,7 @@
             height: 14px;
         }
 
+        /* Круглая кнопка со стрелкой */
         .circle-arrow-btn {
             width: 34px;
             height: 34px;
@@ -380,46 +408,44 @@
             justify-content: center;
             flex-shrink: 0;
             cursor: pointer;
-            transition: transform 0.25s ease, background 0.15s ease;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
         }
 
         .circle-arrow-btn svg {
             width: 16px;
             height: 16px;
-            transition: transform 0.25s ease;
         }
 
-        .circle-arrow-btn.open {
-            background: var(--accent-light);
-            color: var(--accent);
+        /* Цена внизу карточки как на фото */
+        .price-block {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--price-color);
+            display: flex;
+            align-items: center;
         }
 
-        .circle-arrow-btn.open svg {
-            transform: rotate(90deg);
-        }
-
+        /* Выпадающий список вкусов (внутри карточки, если нужно) */
         .tastes-drawer {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease;
             background: var(--bg-input);
-            border-top: 0 solid var(--border);
+            border-radius: 12px;
+            margin-top: 8px;
         }
 
         .tastes-drawer.open {
             max-height: 900px;
-            border-top-width: 1px;
+            border: 1px solid var(--border);
         }
 
         .tastes-inner {
-            padding: 12px;
-        }
-
-        .tastes-caption {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
+            padding: 10px;
         }
 
         .tastes-grid {
@@ -431,35 +457,20 @@
         .taste-chip {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 10px 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 4px;
+            border-radius: 10px;
+            padding: 8px;
+            font-size: 12px;
+            text-align: center;
             cursor: pointer;
-            text-align: left;
+            font-weight: 500;
         }
 
         .taste-chip:active {
-            transform: scale(0.97);
-            border-color: var(--accent);
             background: var(--accent-light);
+            border-color: var(--accent);
         }
 
-        .taste-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-primary);
-            line-height: 1.25;
-        }
-
-        .taste-action {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--accent);
-        }
-
+        /* Сетка моделей */
         .models-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -543,6 +554,7 @@
             margin-top: auto;
         }
 
+        /* Корзина и Профиль */
         .section-title {
             font-size: 22px;
             font-weight: 700;
@@ -654,6 +666,7 @@
             font-size: 14px;
         }
 
+        /* Нижняя панель */
         .bottom-nav {
             flex-shrink: 0;
             width: 100%;
@@ -758,6 +771,7 @@
 <body>
     <div class="app">
         <main id="mainScroll">
+            <!-- Главная -->
             <div class="page active" id="homePage">
                 <div class="page-body">
                     <div class="favorites-banner" id="openFavoritesBtn">
@@ -774,6 +788,7 @@
                 </div>
             </div>
 
+            <!-- Список линеек/позиций -->
             <div class="page" id="brandPage">
                 <div class="sub-header">
                     <button class="sub-back-btn" id="backToHome" aria-label="Назад">
@@ -788,6 +803,7 @@
                 </div>
             </div>
 
+            <!-- Модели внутри бренда -->
             <div class="page" id="modelsPage">
                 <div class="sub-header">
                     <button class="sub-back-btn" id="backToCategory" aria-label="Назад">
@@ -802,6 +818,7 @@
                 </div>
             </div>
 
+            <!-- Избранное -->
             <div class="page" id="favoritesPage">
                 <div class="sub-header">
                     <button class="sub-back-btn" id="backFromFavs" aria-label="Назад">
@@ -816,6 +833,7 @@
                 </div>
             </div>
 
+            <!-- Корзина -->
             <div class="page" id="cartPage">
                 <div class="page-body">
                     <h1 class="section-title">Корзина</h1>
@@ -824,6 +842,7 @@
                 </div>
             </div>
 
+            <!-- Профиль -->
             <div class="page" id="profilePage">
                 <div class="page-body">
                     <h1 class="section-title">Профиль</h1>
@@ -861,70 +880,126 @@
 
     <script>
        const categories = [
-    { id: 'liquids', name: 'Жижа', icon: '💧', image: 'zhizha.jpg', badge: 'СКИДКИ' },
-    { id: 'consumables', name: 'Расходники', icon: '🔧', image: 'rashodniki.jpg', badge: '' },
-    { id: 'devices', name: 'Вейпы', icon: '📱', image: 'vape.png', badge: '' },
-    { id: 'disposables', name: 'Одноразки', icon: '🚬', image: 'odnorazki.jpg', badge: 'СКИДКИ' },
-    { id: 'snus', name: 'Снюс', icon: '📦', image: 'snus.jpg', badge: '' }
-];
+            { id: 'liquids', name: 'Жижа', icon: '💧', image: 'zhizha.jpg', badge: 'СКИДКИ' },
+            { id: 'consumables', name: 'Расходники', icon: '🔧', image: 'rashodniki.jpg', badge: '' },
+            { id: 'devices', name: 'Вейпы', icon: '📱', image: 'vape.png', badge: '' },
+            { id: 'disposables', name: 'Одноразки', icon: '🚬', image: 'odnorazki.jpg', badge: 'СКИДКИ' },
+            { id: 'snus', name: 'Снюс', icon: '📦', image: 'snus.jpg', badge: '' }
+        ];
 
         const catalogData = {
             devices: [
-                { id: 'xros', name: 'VAPORESSO XROS', desc: 'Идеальные повседневные устройства для вкусопередачи и умеренной крепости', icon: '📱', image: '', mode: 'page', items: [] },
-                { id: 'geekvape', name: 'GEEKVAPE AEGIS', desc: 'Устройства с упором на мощность, крепость и обильность пара', icon: '🔋', image: '', mode: 'page', items: [] },
-                { id: 'smoant', name: 'SMOANT PASITO', desc: 'Мощные и автономные под-моды с яркой передачей вкуса', icon: '⚡', image: '', mode: 'page', items: [] }
+                {
+                    id: 'xros',
+                    name: 'VAPORESSO XROS',
+                    desc: 'Идеальные повседневные устройства для вкусопередачи и умеренной крепости',
+                    icon: '📱',
+                    image: '',
+                    mode: 'page',
+                    items: [
+                        { name: 'XROS 6', price: 85, image: '' },
+                        { name: 'XROS 6 mini', price: 65, image: '' },
+                        { name: 'XROS 5 mini', price: 60, image: '' },
+                        { name: 'XROS 5 mini CE', price: 65, image: '' },
+                        { name: 'XROS CUBE', price: 50, image: '' },
+                        { name: 'XROS PRO 2', price: 90, image: '' }
+                    ]
+                },
+                {
+                    id: 'geekvape',
+                    name: 'GEEKVAPE AEGIS',
+                    desc: 'Устройства с упором на мощность, крепость и обильность пара',
+                    icon: '🔋',
+                    image: '',
+                    mode: 'page',
+                    items: [
+                        { name: 'AEGIS HERO CRYSTAL', price: 85, image: '' },
+                        { name: 'AEGIS HERO 3', price: 85, image: '' },
+                        { name: 'AEGIS HERO 5', price: 95, image: '' },
+                        { name: 'AEGIS BOOST 3', price: 100, image: '' }
+                    ]
+                },
+                {
+                    id: 'smoant',
+                    name: 'SMOANT PASITO',
+                    desc: 'Мощные и автономные под-моды с яркой передачей вкуса',
+                    icon: '⚡',
+                    image: '',
+                    mode: 'page',
+                    items: [
+                        { name: 'PASITO 3', price: 110, image: '' }
+                    ]
+                }
             ],
             liquids: [
-                { id: 'bjorn-headshot', name: 'BJORN HEADSHOT', strength: '100MG', desc: 'Максимальная крепость и яркие насыщенные миксы', icon: '💧', image: '', mode: 'tastes', price: 0, flavors: [] },
-                { id: 'bjorn-zloy-long', name: 'BJORN ZLOY LONG', strength: '80MG', desc: 'Крепкая линейка с холодком и фруктовыми вкусами', icon: '💧', image: '', mode: 'tastes', price: 0, flavors: [] },
-                { id: 'bjorn-don-oro', name: 'BJORN DON ORO', strength: '80MG', desc: 'Премиальные насыщенные сочетания на каждый день', icon: '💧', image: '', mode: 'tastes', price: 0, flavors: [] },
-                { id: 'bjorn-son', name: 'BJORN СОН ПРИЗРАКА', strength: '80MG', desc: 'Необычные авторские миксы с высокой крепостью', icon: '💧', image: '', mode: 'tastes', price: 0, flavors: [] },
-                { id: 'bjorn-zloy-v12', name: 'BJORN ZLOY V1/V2', strength: '50MG', desc: 'Классическая сбалансированная крепость 50MG', icon: '💧', image: '', mode: 'tastes', price: 0, flavors: [] },
-                { id: 'bjorn-vmed', name: 'BJORN VMЁD', strength: '50MG', desc: 'Мягкая подача и сладкие десертно-фруктовые вкусы', icon: '💧', image: '', mode: 'tastes', price: 0, flavors: [] },
-                { id: 'bjorn-joker', name: 'BJORN JOKER', strength: '20MG', desc: 'Лёгкая крепость с акцентом на чистый вкус', icon: '💧', image: '', mode: 'tastes', price: 0, flavors: [] },
-                { id: 'elfiq', name: 'ELFIQ', strength: '50MG', desc: 'Популярные вкусы как в одноразках Elf Bar', icon: '💧', image: '', mode: 'tastes', price: 0, flavors: [] },
-                { id: 'annima-love', name: 'ANNIMA LOVE', strength: '50MG', desc: 'Сочные кисло-сладкие ягодные и тропические миксы', icon: '💧', image: '', mode: 'tastes', price: 0, flavors: [] },
-                { id: 'podonki', name: 'PODONKI PODGON', strength: '50MG', desc: 'Яркий вкус и мощный удар, топ продаж', icon: '💧', image: '', mode: 'tastes', price: 0, flavors: [] },
-                { id: 'rick-morty', name: 'РИК И МОРТИ', strength: '50MG', desc: 'Сочные фруктовые миксы в культовом стиле', icon: '💧', image: '', mode: 'tastes', price: 0, flavors: [] },
-                { id: 'hotspot', name: 'HOTSPOT', strength: '50MG', desc: 'Холодные кислые и сладкие вкусы на любой под', icon: '💧', image: '', mode: 'tastes', price: 0, flavors: [] }
+                { id: 'bjorn-headshot', name: 'BJORN HEADSHOT', strength: '100MG', desc: 'Максимальная крепость и яркие насыщенные миксы', icon: '💧', image: '', mode: 'tastes', price: 17, flavors: ['Ледяной арбуз', 'Кислое яблоко', 'Ягодный микс'] },
+                { id: 'bjorn-zloy-long', name: 'BJORN ZLOY LONG', strength: '80MG', desc: 'Крепкая линейка с холодком и фруктовыми вкусами', icon: '💧', image: '', mode: 'tastes', price: 17, flavors: ['Клубника-киви', 'Виноград-лёд', 'Маракуйя'] },
+                { id: 'bjorn-don-oro', name: 'BJORN DON ORO', strength: '80MG', desc: 'Премиальные насыщенные сочетания на каждый день', icon: '💧', image: '', mode: 'tastes', price: 18, flavors: ['Манго-персик', 'Черника-мята', 'Цитрус'] },
+                { id: 'bjorn-son', name: 'BJORN СОН ПРИЗРАКА', strength: '80MG', desc: 'Необычные авторские миксы с высокой крепостью', icon: '💧', image: '', mode: 'tastes', price: 18, flavors: ['Лесные ягоды', 'Энергетик-лёд', 'Вишня'] },
+                { id: 'bjorn-zloy-v12', name: 'BJORN ZLOY V1/V2', strength: '50MG', desc: 'Классическая сбалансированная крепость 50MG', icon: '💧', image: '', mode: 'tastes', price: 17, flavors: ['Малина-лимон', 'Арбуз-дыня', 'Хвоя-ягоды'] },
+                { id: 'bjorn-vmed', name: 'BJORN VMЁD', strength: '50MG', desc: 'Мягкая подача и сладкие десертно-фруктовые вкусы', icon: '💧', image: '', mode: 'tastes', price: 17, flavors: ['Медовая дыня', 'Персик', 'Клубничный джем'] },
+                { id: 'bjorn-joker', name: 'BJORN JOKER', strength: '20MG', desc: 'Лёгкая крепость с акцентом на чистый вкус', icon: '💧', image: '', mode: 'tastes', price: 16, flavors: ['Яблоко', 'Банан-клубника', 'Мохито'] },
+                { id: 'elfiq', name: 'ELFIQ', strength: '50MG', desc: 'Популярные вкусы как в одноразках Elf Bar', icon: '💧', image: '', mode: 'tastes', price: 17, flavors: ['Черника-кислая малина', 'Арбуз', 'Розовый лимонад'] },
+                { id: 'annima-love', name: 'ANNIMA LOVE', strength: '50MG', desc: 'Сочные кисло-сладкие ягодные и тропические миксы', icon: '💧', image: '', mode: 'tastes', price: 17, flavors: ['Киви-маракуйя', 'Вишня-кола', 'Ананас-лёд'] },
+                { id: 'podonki', name: 'PODONKI PODGON', strength: '50MG', desc: 'Яркий вкус и мощный удар, топ продаж', icon: '💧', image: '', mode: 'tastes', price: 17, flavors: ['Ежевичный лимонад', 'Яблочный сок', 'Грейпфрут'] },
+                { id: 'rick-morty', name: 'РИК И МОРТИ', strength: '50MG', desc: 'Сочные фруктовые миксы в культовом стиле', icon: '💧', image: '', mode: 'tastes', price: 17, flavors: ['Ледяная жвачка', 'Тропик', 'Смородина'] },
+                { id: 'hotspot', name: 'HOTSPOT', strength: '50MG', desc: 'Холодные кислые и сладкие вкусы на любой под', icon: '💧', image: '', mode: 'tastes', price: 17, flavors: ['Кислое яблоко', 'Кислый ананас', 'Ягодный энергетик'] }
             ],
             snus: [
-                { id: 'drymost', name: 'DRYMOST', strength: '75/150/175/200MG', desc: 'Белые сухие пластинки разной крепости', icon: '📦', image: '', mode: 'tastes', price: 0, flavors: [] },
-                { id: 'iceburn', name: 'ICEBURN', strength: '75/150MG', desc: 'Сильный холодок и насыщенный вкус', icon: '📦', image: '', mode: 'tastes', price: 0, flavors: [] },
-                { id: 'glich', name: 'GLICH POUCHES', strength: '75MG', desc: 'Комфортные паучи со сбалансированной крепостью', icon: '📦', image: '', mode: 'tastes', price: 0, flavors: [] }
+                { id: 'drymost', name: 'DRYMOST', strength: '75/150/175/200MG', desc: 'Белые сухие пластинки разной крепости', icon: '📦', image: '', mode: 'tastes', price: 15, flavors: ['Холодная мята', 'Ягода', 'Цитрус', 'Кола'] },
+                { id: 'iceburn', name: 'ICEBURN', strength: '75/150MG', desc: 'Сильный холодок и насыщенный вкус', icon: '📦', image: '', mode: 'tastes', price: 15, flavors: ['Toffifee', 'Ледяная мята', 'Арбуз'] },
+                { id: 'glich', name: 'GLICH POUCHES', strength: '75MG', desc: 'Комфортные паучи со сбалансированной крепостью', icon: '📦', image: '', mode: 'tastes', price: 15, flavors: ['Мята-эвкалипт', 'Тропик', 'Лесные ягоды'] }
             ],
             disposables: [
-                { id: 'puffup', name: 'PUFFUP', strength: '5k затяжек', desc: 'Компактная одноразка с яркой вкусопередачей', icon: '🚬', image: '', mode: 'tastes', price: 0, flavors: [] },
-                { id: 'elfbar', name: 'ELFBAR', strength: '40k затяжек', desc: 'Регулировка мощности и огромный запас затяжек', icon: '🚬', image: '', mode: 'tastes', price: 0, flavors: [] },
-                { id: 'vozol', name: 'VOZOL', strength: '40k затяжек', desc: 'Мощная одноразка с экраном и быстрой зарядкой', icon: '🚬', image: '', mode: 'tastes', price: 0, flavors: [] },
-                { id: 'bjorn-tron', name: 'BJORN TRON', strength: '55k затяжек', desc: 'Рекордный объём и фирменные насыщенные вкусы', icon: '🚬', image: '', mode: 'tastes', price: 0, flavors: [] }
+                { id: 'puffup', name: 'PUFFUP', strength: '5k затяжек', desc: 'Компактная одноразка с яркой вкусопередачей', icon: '🚬', image: '', mode: 'tastes', price: 25, flavors: ['Арбуз-лёд', 'Клубника-банан', 'Черника'] },
+                { id: 'elfbar', name: 'ELFBAR', strength: '40k затяжек', desc: 'Регулировка мощности и огромный запас затяжек', icon: '🚬', image: '', mode: 'tastes', price: 35, flavors: ['Черника-малина', 'Персик-манго', 'Кислое яблоко'] },
+                { id: 'vozol', name: 'VOZOL', strength: '40k затяжек', desc: 'Мощная одноразка с экраном и быстрой зарядкой', icon: '🚬', image: '', mode: 'tastes', price: 35, flavors: ['Виноград-лёд', 'Мята', 'Тропические фрукты'] },
+                { id: 'bjorn-tron', name: 'BJORN TRON', strength: '55k затяжек', desc: 'Рекордный объём и фирменные насыщенные вкусы', icon: '🚬', image: '', mode: 'tastes', price: 40, flavors: ['Энергетик', 'Вишня-лёд', 'Двойное яблоко'] }
             ],
             consumables: [
-                { id: 'xros-pods', name: 'XROS КАРТРИДЖИ', desc: 'Оригинальные картриджи для всей линейки Vaporesso XROS', icon: '🔧', image: '', mode: 'page', items: [] },
-                { id: 'aegis-coils', name: 'AEGIS HERO / BOOST', desc: 'Сменные испарители серии B для отличного вкуса и навала', icon: '🔧', image: '', mode: 'page', items: [] },
-                { id: 'pasito-coils', name: 'PASITO / KNIGHT', desc: 'Испарители и картриджи для Smoant Pasito и Knight', icon: '🔧', image: '', mode: 'page', items: [] }
+                {
+                    id: 'xros-pods',
+                    name: 'XROS КАРТРИДЖИ',
+                    desc: 'Оригинальные картриджи для всей линейки Vaporesso XROS',
+                    icon: '🔧',
+                    image: '',
+                    mode: 'page',
+                    items: [
+                        { name: 'XROS 0.6 Ом 2ml', price: 12, image: '' },
+                        { name: 'XROS 0.6 Ом 3ml', price: 12, image: '' },
+                        { name: 'XROS 0.4 Ом 3ml', price: 13, image: '' }
+                    ]
+                },
+                {
+                    id: 'aegis-coils',
+                    name: 'AEGIS HERO / BOOST',
+                    desc: 'Сменные испарители серии B для отличного вкуса и навала',
+                    icon: '🔧',
+                    image: '',
+                    mode: 'page',
+                    items: [
+                        { name: 'Aegis hero/boost (0.3)', price: 10, image: '' }
+                    ]
+                },
+                {
+                    id: 'pasito-coils',
+                    name: 'PASITO / KNIGHT',
+                    desc: 'Испарители и картриджи для Smoant Pasito и Knight',
+                    icon: '🔧',
+                    image: '',
+                    mode: 'page',
+                    items: [
+                        { name: 'Pasito 2/knight 55-65Ватт', price: 12, image: '' },
+                        { name: 'Pasito 2/knight 70-90Ватт', price: 12, image: '' },
+                        { name: 'Картридж Pasito 3 (без испар)', price: 8, image: '' }
+                    ]
+                }
             ]
         };
 
-        // ===== Состояние с сохранением в localStorage =====
         let cart = [];
         let favorites = [];
         let currentCategoryId = null;
-
-        try {
-            cart = JSON.parse(localStorage.getItem('vape_cart') || '[]');
-            favorites = JSON.parse(localStorage.getItem('vape_favs') || '[]');
-        } catch (e) {
-            cart = [];
-            favorites = [];
-        }
-
-        function persistState() {
-            try {
-                localStorage.setItem('vape_cart', JSON.stringify(cart));
-                localStorage.setItem('vape_favs', JSON.stringify(favorites));
-            } catch (e) {}
-        }
 
         const pages = {
             home: document.getElementById('homePage'),
@@ -986,21 +1061,18 @@
                 favorites.splice(idx, 1);
                 if (btnEl) {
                     btnEl.classList.remove('active');
-                    const svg = btnEl.querySelector('svg');
-                    if (svg) svg.setAttribute('fill', 'none');
+                    btnEl.querySelector('svg').setAttribute('fill', 'none');
                 }
                 showToast('Убрано из избранного');
             } else {
                 favorites.push(favObj);
                 if (btnEl) {
                     btnEl.classList.add('active');
-                    const svg = btnEl.querySelector('svg');
-                    if (svg) svg.setAttribute('fill', 'currentColor');
+                    btnEl.querySelector('svg').setAttribute('fill', 'currentColor');
                 }
                 showToast('Добавлено в избранное');
             }
             updateFavCount();
-            persistState();
         }
 
         function addToCart(name, sub, price) {
@@ -1012,7 +1084,6 @@
                 cart.push({ key, name, sub, price: price || 0, qty: 1 });
             }
             updateCartBadge();
-            persistState();
             showToast(`${name} добавлен в корзину`);
         }
 
@@ -1032,6 +1103,7 @@
             });
         }
 
+        // --- НОВАЯ ФУНКЦИЯ РЕНДЕРА КАРТОЧЕК (КАК НА ФОТО) ---
         function openCategory(categoryId) {
             currentCategoryId = categoryId;
             const category = categories.find(c => c.id === categoryId);
@@ -1042,32 +1114,29 @@
             brandList.innerHTML = entries.map((entry, idx) => {
                 const favKey = `entry_${entry.id}`;
                 const favActive = isFav(favKey);
-                const tastesHtml = entry.mode === 'tastes' ? `
-                    <div class="tastes-drawer" id="drawer-${entry.id}">
-                        <div class="tastes-inner">
-                            <div class="tastes-caption">Доступные вкусы (нажмите, чтобы добавить в корзину):</div>
-                            <div class="tastes-grid">
-                                ${entry.flavors.map((taste, tIdx) => `
-                                    <button class="taste-chip" data-entry-idx="${idx}" data-taste-idx="${tIdx}">
-                                        <span class="taste-name">${taste}</span>
-                                        <span class="taste-action">+ В корзину</span>
-                                    </button>
-                                `).join('')}
-                            </div>
-                        </div>
-                    </div>
-                ` : '';
-
+                
+                // Для режима 'tastes' мы скрываем кнопку стрелки, т.к. на фото для жижи она не нужна (или ведет на отдельную страницу, но мы сделаем раскрытие)
+                // Но чтобы было как на фото - стрелка есть. Сделаем её для перехода, если mode='page', иначе просто для декора/раскрытия.
+                const isPageMode = entry.mode === 'page';
+                
                 return `
-                    <div class="showcase-wrap">
+                    <div class="showcase-wrap" data-entry-idx="${idx}">
                         <div class="showcase-card" data-entry-idx="${idx}">
                             <div class="showcase-thumb">
                                 ${entry.image ? `<img src="${entry.image}" alt="${entry.name}">` : `<span class="showcase-thumb-icon">${entry.icon}</span>`}
                             </div>
                             <div class="showcase-content">
                                 <div class="showcase-title">${entry.name}</div>
-                                ${entry.strength ? `<div class="showcase-sub">Крепость / объём: ${entry.strength}</div>` : ''}
-                                <div class="showcase-desc">${entry.desc || entry.info || ''}</div>
+                                ${entry.strength ? `<div class="showcase-sub">Крепость ${entry.strength}</div>` : ''}
+                                
+                                <!-- Блок с отзывами как на фото -->
+                                <div class="reviews-row">
+                                    <span class="star">★</span>
+                                    <span>5 (12)</span>
+                                    <span class="link">посмотреть отзывы</span>
+                                </div>
+                                
+                                <!-- Кнопка Избранное -->
                                 <button class="fav-pill-btn ${favActive ? 'active' : ''}" data-fav-idx="${idx}">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="${favActive ? 'currentColor' : 'none'}" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
@@ -1075,17 +1144,38 @@
                                     Избранное
                                 </button>
                             </div>
+                            
+                            <!-- Круглая стрелка -->
                             <button class="circle-arrow-btn" id="arrow-${entry.id}" aria-label="Открыть">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.4" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                                 </svg>
                             </button>
                         </div>
-                        ${tastesHtml}
+                        
+                        <!-- Блок цены (внизу как на фото) -->
+                        <div class="price-block">${entry.price > 0 ? entry.price + ' BYN' : ''}</div>
+
+                        <!-- Выпадающий список вкусов (если нужно) -->
+                        ${entry.mode === 'tastes' ? `
+                            <div class="tastes-drawer" id="drawer-${entry.id}">
+                                <div class="tastes-inner">
+                                    <div class="tastes-caption">Доступные вкусы:</div>
+                                    <div class="tastes-grid">
+                                        ${entry.flavors.map((taste, tIdx) => `
+                                            <button class="taste-chip" data-entry-idx="${idx}" data-taste-idx="${tIdx}">
+                                                ${taste}
+                                            </button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
                     </div>
                 `;
             }).join('');
 
+            // Обработчики
             brandList.querySelectorAll('.showcase-card').forEach(card => {
                 card.addEventListener('click', (e) => {
                     const idx = Number(card.dataset.entryIdx);
@@ -1106,16 +1196,23 @@
                     if (entry.mode === 'page') {
                         openModelsPage(entry);
                     } else {
+                        // Раскрываем список вкусов
                         const drawer = document.getElementById(`drawer-${entry.id}`);
                         const arrow = document.getElementById(`arrow-${entry.id}`);
                         const isOpen = drawer.classList.toggle('open');
                         arrow.classList.toggle('open', isOpen);
+                        if (isOpen) {
+                            arrow.style.transform = 'translateY(-50%) rotate(90deg)';
+                        } else {
+                            arrow.style.transform = 'translateY(-50%) rotate(0deg)';
+                        }
                     }
                 });
             });
 
             brandList.querySelectorAll('.taste-chip').forEach(chip => {
-                chip.addEventListener('click', () => {
+                chip.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     const entry = entries[Number(chip.dataset.entryIdx)];
                     const taste = entry.flavors[Number(chip.dataset.tasteIdx)];
                     addToCart(`${entry.name} (${taste})`, entry.strength || category.name, entry.price || 0);
@@ -1185,7 +1282,6 @@
                     btn.addEventListener('click', () => {
                         favorites.splice(Number(btn.dataset.removeFav), 1);
                         updateFavCount();
-                        persistState();
                         renderFavorites();
                     });
                 });
@@ -1230,7 +1326,6 @@
                         if (cart[idx].qty <= 0) cart.splice(idx, 1);
                     }
                     updateCartBadge();
-                    persistState();
                     renderCart();
                 });
             });
@@ -1243,10 +1338,6 @@
                     try { Telegram.WebApp.sendData(JSON.stringify({ items: cart, total })); } catch (e) {}
                 }
                 showToast('Заказ сформирован!');
-                cart = [];
-                persistState();
-                updateCartBadge();
-                renderCart();
             });
         }
 
@@ -1286,11 +1377,7 @@
             if (tg.setBackgroundColor) tg.setBackgroundColor('#0d6efd');
         }
 
-        // ===== ИСТОЧНИК ДАННЫХ =====
-        const SPREADSHEET_ID = '1oGNpgqPZJaPN1mG-Hh0-FcR2foh9Dj8qGwWzacJJqd4';
-        const SHEET_GID = '0';
-        const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=${SHEET_GID}&tqx=out:csv`;
-
+        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKsclp9BNO6AGdBL3JalqHSfz4nmyZV_osjJX_Vhn4QxdS5SNb2sR1HQltEUKJruEvvvou9K3-Y3Y/pub?gid=0&single=true&output=csv';
         function parseCSV(text) {
             const rows = [];
             let row = [], cell = '', inQuotes = false;
@@ -1325,7 +1412,6 @@
             const idxCat = headers.indexOf('category');
             const idxBrand = headers.indexOf('brand_id');
             const idxName = headers.indexOf('name');
-            const idxInfo = headers.indexOf('info'); // Новое
             const idxPrice = headers.indexOf('price');
             const idxStock = headers.indexOf('stock');
 
@@ -1336,7 +1422,6 @@
                 const key = `${r[idxCat]}__${r[idxBrand]}__${r[idxName].toLowerCase()}`;
                 map[key] = {
                     name: r[idxName],
-                    info: r[idxInfo] || '',
                     price: Number(r[idxPrice]) || 0,
                     stock: Number(r[idxStock]) || 0
                 };
@@ -1345,20 +1430,6 @@
             Object.keys(catalogData).forEach(catId => {
                 catalogData[catId] = catalogData[catId].filter(entry => {
                     if (entry.mode === 'page') {
-                        // Инициализируем items для page режима, если их нет
-                        if (!entry.items) entry.items = [];
-                        // Пытаемся найти совпадения в таблице
-                        Object.entries(map).forEach(([key, val]) => {
-                            if (key.startsWith(`${catId}__${entry.id}__`)) {
-                                const existingItem = entry.items.find(it => it.name.toLowerCase() === val.name.toLowerCase());
-                                if (existingItem) {
-                                    existingItem.price = val.price;
-                                } else if (val.stock > 0) {
-                                    entry.items.push({ name: val.name, price: val.price, image: '' });
-                                }
-                            }
-                        });
-
                         entry.items = entry.items.filter(item => {
                             const key = `${catId}__${entry.id}__${item.name.toLowerCase()}`;
                             if (!(key in map)) return true;
@@ -1375,9 +1446,8 @@
                         if (tableFlavors.length > 0) {
                             const available = tableFlavors.filter(([, v]) => v.stock > 0);
                             entry.flavors = available.map(([, v]) => v.name);
-                            if (available.length > 0) {
-                                if (available[0][1].price > 0) entry.price = available[0][1].price;
-                                if (available[0][1].info) entry.info = available[0][1].info;
+                            if (available.length > 0 && available[0][1].price > 0) {
+                                entry.price = available[0][1].price;
                             }
                         }
                         return entry.flavors.length > 0;
@@ -1387,61 +1457,18 @@
             });
         }
 
-        // ===== ЗАГРУЗКА ДАННЫХ С АВТООБНОВЛЕНИЕМ =====
-        let lastCsvHash = '';
-        let refreshTimer = null;
-
-        function simpleHash(str) {
-            let h = 0;
-            for (let i = 0; i < str.length; i++) {
-                h = ((h << 5) - h + str.charCodeAt(i)) | 0;
-            }
-            return String(h);
-        }
-
-        async function loadSheetData(showErrorToast = false) {
-            try {
-                const res = await fetch(`${SHEET_CSV_URL}&t=${Date.now()}`, { cache: 'no-store' });
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const csvText = await res.text();
-                const hash = simpleHash(csvText);
-
-                if (hash === lastCsvHash) return false;
-
-                lastCsvHash = hash;
-                applyStockData(parseCSV(csvText));
-
-                if (pages.brand.classList.contains('active') && currentCategoryId) {
-                    openCategory(currentCategoryId);
-                } else if (pages.models.classList.contains('active')) {
-                    showPage('brand');
-                } else if (pages.cart.classList.contains('active')) {
-                    renderCart();
-                } else if (pages.favorites.classList.contains('active')) {
-                    renderFavorites();
-                } else if (pages.home.classList.contains('active')) {
-                    renderCategories();
-                }
-                return true;
-            } catch (err) {
-                console.error('Ошибка загрузки таблицы:', err);
-                if (showErrorToast) showToast('Не удалось обновить данные, показаны последние');
-                return false;
-            }
-        }
-
         async function initApp() {
             renderCategories();
-            updateCartBadge();
-            updateFavCount();
-            await loadSheetData(true);
-
-            if (refreshTimer) clearInterval(refreshTimer);
-            refreshTimer = setInterval(() => loadSheetData(false), 60000);
-
-            document.addEventListener('visibilitychange', () => {
-                if (!document.hidden) loadSheetData(false);
-            });
+            try {
+                const res = await fetch(`${SHEET_CSV_URL}&t=${Date.now()}`);
+                const csvText = await res.text();
+                applyStockData(parseCSV(csvText));
+                if (currentCategoryId && pages.brand.classList.contains('active')) {
+                    openCategory(currentCategoryId);
+                }
+            } catch (err) {
+                console.error('Ошибка загрузки таблицы:', err);
+            }
         }
 
         initApp();
