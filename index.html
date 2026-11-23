@@ -15,8 +15,34 @@
         }
         html, body { height: 100%; height: 100dvh; overflow: hidden; overscroll-behavior: none; }
         body { font-family: var(--font-main); background: var(--bg-dark); color: var(--text-white); display: flex; flex-direction: column; font-size: 15px; line-height: 1.4; }
-        .app { flex: 1; min-height: 0; width: 100%; max-width: 640px; margin: 0 auto; background: transparent; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-        main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; position: relative; z-index: 2; }
+.smoke-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .smoke-shade {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(circle at 50% 35%, transparent 0%, rgba(0, 0, 0, 0.45) 100%);
+        }
+        .app {
+            flex: 1;
+            min-height: 0;
+            width: 100%;
+            max-width: 640px;
+            margin: 0 auto;
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }        main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; position: relative; z-index: 2; }
         .page { display: none; min-height: 100%; flex-direction: column; }
         .page.active { display: flex; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
