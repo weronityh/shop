@@ -403,19 +403,25 @@
                     // Если товара нет в наличии (stock <= 0), пропускаем его
                     if (stock <= 0) continue;
 
-                    // Проверяем, есть ли категория на сайте
-                    if (newData[siteCat]) {
-                        // Ищем, есть ли уже такой товар в нашем запасном списке, чтобы взять иконку и картинку
-                        const existingItem = catalogData[siteCat]?.find(item => item.name.toLowerCase() === name.toLowerCase());
-                        
-                        newData[siteCat].push({
-                            id: existingItem ? existingItem.id : `auto_${i}`,
-                            name: name,
-                            desc: existingItem ? existingItem.desc : '',
-                            price: price,
-                            icon: existingItem ? existingItem.icon : '📦',
-                            image: existingItem ? existingItem.image : 'vape.png' // Дефолтная картинка
-                        });
+                    // Ищем, есть ли уже такой товар в нашем запасном списке, чтобы взять иконку и картинку
+const existingItem = catalogData[siteCat]?.find(item => item.name.toLowerCase() === name.toLowerCase());
+
+// Определяем картинку: по умолчанию берем из базы или ставим vape.png
+let finalImage = existingItem ? existingItem.image : 'vape.png';
+
+// Если название товара — XROS 6 mini, принудительно ставим нужную картинку
+if (name.toLowerCase() === 'xros 6 mini') {
+    finalImage = 'xros6mini.png';
+}
+
+newData[siteCat].push({
+    id: existingItem ? existingItem.id : `auto_${i}`,
+    name: name,
+    desc: existingItem ? existingItem.desc : '',
+    price: price,
+    icon: existingItem ? existingItem.icon : '📦',
+    image: finalImage // <--- Используем нашу новую переменную
+});
                     }
                 }
 
