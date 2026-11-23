@@ -226,9 +226,9 @@
 
     <script>
         // --- ВАША ССЫЛКА НА CSV ---
-        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKscpIo9BNO6AGdBL3JaIqHSfz4nmyZV_osjJX_Vhn4QxdS5SNb2sR1HQltEUKJruEvvvou9K3-Y3Y/pub?gid=0&single=true&output=csv';
+        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKsclp9BNO6AGdBL3JalqHSfz4nmyZV_osjJX_Vhn4QxdS5SNb2sR1HQltEUKJruEvvvou9K3-Y3Y/pub?gid=0&single=true&output=csv';
 
-        // --- ДАННЫЕ (запасные, если таблица не загрузится) ---
+        // --- ДАННЫЕ ---
         const categories = [
             { id: 'winter', name: 'ЗИМНИЙ ЗАПАС', sub: '1 вариант', icon: '❄️', image: '' },
             { id: 'vapes', name: 'ВЕЙПЫ', sub: '3 бренда', icon: '📱', image: 'vape.png' },
@@ -242,7 +242,7 @@
             winter: [ { id: 'w1', name: 'ЗИМНИЙ НАБОР', desc: 'Подарочный набор', price: 50, icon: '❄️', image: '' } ],
             vapes: [
                 { id: 'v1', name: 'XROS 6', desc: 'Под-система', price: 85, icon: '📱', image: 'vape.png' },
-                { id: 'v2', name: 'XROS 6 mini', desc: 'Под-система', price: 65, icon: '📱', image: 'vape.png' },
+                { id: 'v2', name: 'XROS 6 mini', desc: 'Под-система', price: 65, icon: '📱', image: 'xros6mini.png' }, // Уже прописано
                 { id: 'v3', name: 'XROS 5 mini', desc: 'Под-система', price: 60, icon: '📱', image: 'vape.png' },
                 { id: 'v4', name: 'XROS 5 mini CE', desc: 'Под-система', price: 65, icon: '📱', image: 'vape.png' },
                 { id: 'v5', name: 'XROS CUBE', desc: 'Под-система', price: 50, icon: '📱', image: 'vape.png' },
@@ -369,7 +369,6 @@
                     return;
                 }
 
-                // Сопоставление категорий из таблицы с категориями на сайте
                 const catMapping = {
                     'devices': 'vapes',
                     'consumables': 'consumables',
@@ -378,9 +377,8 @@
                     'disposables': 'disposables'
                 };
 
-                // Временный объект для новых данных
                 const newData = {
-                    winter: [...catalogData.winter], // Зимний запас не трогаем, его нет в таблице
+                    winter: [...catalogData.winter],
                     vapes: [],
                     snus: [],
                     liquids: [],
@@ -388,7 +386,6 @@
                     consumables: []
                 };
 
-                // Проходим по всем строкам таблицы
                 for (let i = 1; i < rows.length; i++) {
                     const r = rows[i];
                     if (!r[idxName] || r[idxName].trim() === '') continue;
@@ -400,41 +397,35 @@
                     const price = Number(r[idxPrice]) || 0;
                     const stock = idxStock !== -1 ? (Number(r[idxStock]) || 0) : 99;
 
-                    // Если товара нет в наличии (stock <= 0), пропускаем его
                     if (stock <= 0) continue;
 
-                    // Ищем, есть ли уже такой товар в нашем запасном списке, чтобы взять иконку и картинку
-const existingItem = catalogData[siteCat]?.find(item => item.name.toLowerCase() === name.toLowerCase());
+                    if (newData[siteCat]) {
+                        const existingItem = catalogData[siteCat]?.find(item => item.name.toLowerCase() === name.toLowerCase());
+                        
+                        let img = existingItem ? existingItem.image : 'vape.png';
+                        if (name.toLowerCase() === 'xros 6 mini') {
+                            img = 'xros6mini.png';
+                        }
 
-// Определяем картинку: по умолчанию берем из базы или ставим vape.png
-let finalImage = existingItem ? existingItem.image : 'vape.png';
-
-// Если название товара — XROS 6 mini, принудительно ставим нужную картинку
-if (name.toLowerCase() === 'xros 6 mini') {
-    finalImage = 'xros6mini.png';
-}
-
-newData[siteCat].push({
-    id: existingItem ? existingItem.id : `auto_${i}`,
-    name: name,
-    desc: existingItem ? existingItem.desc : '',
-    price: price,
-    icon: existingItem ? existingItem.icon : '📦',
-    image: finalImage // <--- Используем нашу новую переменную
-});
+                        newData[siteCat].push({
+                            id: existingItem ? existingItem.id : `auto_${i}`,
+                            name: name,
+                            desc: existingItem ? existingItem.desc : '',
+                            price: price,
+                            icon: existingItem ? existingItem.icon : '📦',
+                            image: img 
+                        });
                     }
                 }
 
-                // Обновляем глобальные данные
                 Object.keys(newData).forEach(key => {
                     if (newData[key].length > 0 || key === 'winter') {
                         catalogData[key] = newData[key];
                     }
                 });
 
-                console.log('Данные успешно синхронизированы с таблицей');
+                console.log('Данные синхронизированы');
                 
-                // Если открыта страница бренда, перерисовываем её
                 if (currentCategoryId && pages.brand.classList.contains('active')) {
                     openCategory(currentCategoryId);
                 }
@@ -445,7 +436,6 @@ newData[siteCat].push({
 
         function renderCategories() {
             categoryGrid.innerHTML = categories.map(cat => {
-                // Считаем количество товаров в категории для подписи
                 const count = catalogData[cat.id]?.length || 0;
                 return `
                 <div class="category-card" data-category="${cat.id}">
@@ -507,7 +497,6 @@ newData[siteCat].push({
                 showToast('Выберите точку выдачи');
                 return;
             }
-            // Ждем загрузки данных перед показом каталога
             await syncWithSheet();
             renderCategories();
             showPage('catalog');
@@ -534,7 +523,6 @@ newData[siteCat].push({
             if (tg.setBackgroundColor) tg.setBackgroundColor('#000000');
         }
 
-        // Автообновление цен и наличия каждые 30 секунд
         setInterval(syncWithSheet, 30000);
     </script>
 </body>
