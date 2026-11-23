@@ -594,7 +594,7 @@
                         <span class="subtitle-line">ВЕЙПЫ | ЖИДКОСТИ</span><br>
                         <span class="subtitle-line">ГОМЕЛЬ</span>
                     </div>
-                    <div class="welcome-hint">ЗДЕСЬ ЧТО-ТО БОЛЬШЕЕ ЧЕМ ПРОСТО ПАР</div>
+                    <div class="welcome-hint">ЗАЙДИ И ВЫБЕРИ СВОЙ ВКУС ЗА 30 СЕКУНД</div>
                     <button class="main-btn" id="goToCatalogBtn">ПЕРЕЙТИ В КАТАЛОГ →</button>
                 </div>
             </div>
@@ -1261,13 +1261,17 @@
             `;
             document.body.appendChild(modal);
 
+            let selectedDay = 'Сегодня';
             const timeSelect = modal.querySelector('#deliveryTime');
-            const timeOptions = [
-                '10:00', '10:30', '11:00', '11:30', '12:00', '12:30',
-                '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
-                '16:00', '16:30', '17:00', '17:30', '18:00', '18:30',
-                '19:00', '19:30', '20:00', '20:30'
-            ];
+            const timeOptions = ['10:00', '12:00', '15:00', '17:00', '19:00', '21:00'];
+            
+            const defaultOpt = document.createElement('option');
+            defaultOpt.value = '';
+            defaultOpt.textContent = 'Выберите время...';
+            defaultOpt.disabled = true;
+            defaultOpt.selected = true;
+            timeSelect.appendChild(defaultOpt);
+
             timeOptions.forEach(t => {
                 const opt = document.createElement('option');
                 opt.value = t;
@@ -1277,20 +1281,16 @@
 
             modal.querySelectorAll('.delivery-option').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const day = btn.dataset.day;
-                    if (day === 'today') {
-                        sendOrder('Сегодня', 'Как можно быстрее');
-                        modal.remove();
-                    } else {
-                        modal.querySelector('.delivery-options').style.display = 'none';
-                        modal.querySelector('.time-picker').style.display = 'block';
-                        modal.querySelector('h3').textContent = 'ВРЕМЯ НА ЗАВТРА';
-                    }
+                    selectedDay = btn.dataset.day === 'today' ? 'Сегодня' : 'Завтра';
+                    modal.querySelector('.delivery-options').style.display = 'none';
+                    modal.querySelector('.time-picker').style.display = 'block';
+                    modal.querySelector('h3').textContent = selectedDay === 'Сегодня' ? 'ВРЕМЯ НА СЕГОДНЯ' : 'ВРЕМЯ НА ЗАВТРА';
                 });
             });
 
-            modal.querySelector('#deliveryTime').addEventListener('change', (e) => {
-                sendOrder('Завтра', e.target.value);
+            timeSelect.addEventListener('change', (e) => {
+                if (!e.target.value) return;
+                sendOrder(selectedDay, e.target.value);
                 modal.remove();
             });
 
