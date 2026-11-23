@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#000000">
-    <title>ПЕПЕЛЬНИК</title>
+    <title>WEGGEW</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -21,93 +21,276 @@
         .page.active { display: flex; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- ДЫМ НА ФОНЕ --- */
-        .smoke-bg {
+        /* --- ДЫМ НА ФОНЕ (canvas) --- */
+        .smoke-canvas {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
             z-index: 0;
             pointer-events: none;
-            overflow: hidden;
+            filter: blur(16px);
+            opacity: 0.9;
             background: #000;
         }
-        .smoke-bg::before, .smoke-bg::after {
-            content: "";
-            position: absolute;
-            width: 200vw;
-            height: 200vh;
-            background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 60%);
-            border-radius: 50%;
-            animation: smokeMove 20s infinite linear;
-        }
-        .smoke-bg::before {
-            top: -50%; left: -50%;
-            animation-duration: 25s;
-        }
-        .smoke-bg::after {
-            bottom: -50%; right: -50%;
-            background: radial-gradient(circle, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0) 60%);
-            animation-duration: 30s;
-            animation-direction: reverse;
-        }
-        @keyframes smokeMove {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(5vw, 5vh) rotate(10deg); }
-            100% { transform: translate(0, 0) rotate(0deg); }
+        .smoke-shade {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background:
+                radial-gradient(85% 68% at 82% 18%, rgba(0,0,0,0.96) 0%, rgba(0,0,0,0.72) 42%, rgba(0,0,0,0) 72%),
+                linear-gradient(180deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.12) 32%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.28) 100%);
         }
 
         /* ЭКРАН 1: ПРИВЕТСТВИЕ */
         #welcomePage {
-            justify-content: flex-end;
+            justify-content: space-between;
             align-items: center;
-            padding: 24px 20px 36px;
+            padding: calc(env(safe-area-inset-top, 0px) + 8px) 18px calc(env(safe-area-inset-bottom, 0px) + 18px);
             text-align: center;
             position: relative;
             overflow: hidden;
+            height: 100%;
+            max-height: 100%;
+            min-height: 100%;
         }
         .welcome-hero {
             width: 100%;
-            max-width: 320px;
-            flex: 1;
-            min-height: 180px;
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 52%, rgba(0,0,0,0.92) 66%, rgba(0,0,0,0.6) 80%, rgba(0,0,0,0.22) 92%, transparent 100%);
+            mask-image: linear-gradient(180deg, #000 0%, #000 52%, rgba(0,0,0,0.92) 66%, rgba(0,0,0,0.6) 80%, rgba(0,0,0,0.22) 92%, transparent 100%);
+        }
+        .phone-mask {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .phone {
+            position: relative;
+            flex-shrink: 0;
+            width: 25.5em;
+            aspect-ratio: 9 / 19.4;
+            margin-top: 0.35em;
+            font-size: clamp(6px, min(2.5vw, 1.62vh), 12.5px);
+            border: 0.12em solid #333333;
+            border-radius: 3.6em;
+            background: linear-gradient(150deg, #3a3a3a 0%, #121212 8%, #000 30%, #000 100%);
+            box-shadow:
+                0 2em 4em rgba(0,0,0,0.9),
+                0 0 0 0.12em #050505,
+                inset 0 0 0 0.16em #0a0a0a,
+                inset 0 0 1.4em rgba(255,255,255,0.08);
+            transform: rotate(8deg) translateZ(0);
+            transform-origin: 50% 35%;
+            color: #ffffff;
+        }
+        .phone::before,
+        .phone::after {
+            content: "";
+            position: absolute;
+            right: -0.2em;
+            width: 0.18em;
+            border-radius: 0.2em;
+            background: linear-gradient(180deg, #2d2d2d, #111111);
+        }
+        .phone::before { top: 17%; height: 4.6em; }
+        .phone::after { top: 31%; height: 8.6em; }
+        .phone-left-btn {
+            position: absolute;
+            left: -0.17em;
+            top: 23%;
+            width: 0.13em;
+            height: 3.2em;
+            border-radius: 0.2em;
+            background: #222222;
+        }
+        .phone-left-btn.two { top: 31%; height: 5.2em; }
+        .phone-screen {
+            position: absolute;
+            inset: 0.3em;
+            display: flex;
+            flex-direction: column;
+            padding: 0.75em 1em 0;
+            border-radius: 3.35em;
+            background: #080808;
+            overflow: hidden;
+            box-shadow: inset 0 0 1.5em rgba(0,0,0,0.9);
+        }
+        .phone-screen::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 20% 15%, rgba(255,255,255,0.032), transparent 30%),
+                radial-gradient(circle at 80% 45%, rgba(255,255,255,0.026), transparent 35%);
+        }
+        .tg-island {
+            position: absolute;
+            top: 0.55em;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4.6em;
+            height: 1.15em;
+            border-radius: 1em;
+            background: #000000;
+            box-shadow: 0 0 0 0.06em rgba(255,255,255,0.05);
+            z-index: 3;
+        }
+        .tg-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.25em 0.65em 0;
+            font-size: 0.82em;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+        .tg-status-icons { display: flex; align-items: center; gap: 0.3em; }
+        .tg-status-icons svg { width: 1.25em; height: 1.25em; }
+        .tg-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.9em 0.4em 0.2em;
+            color: #bdbdbd;
+            position: relative;
+            z-index: 1;
+        }
+        .tg-back { font-size: 1.9em; line-height: 0.9; font-weight: 300; color: #c9c9c9; }
+        .tg-more { font-size: 1.1em; font-weight: 700; letter-spacing: 0.08em; color: #c9c9c9; }
+        .tg-avatar {
+            width: 7.15em;
+            height: 7.15em;
+            margin: 0.5em auto 0.1em;
+            border-radius: 50%;
+            background: radial-gradient(circle at 50% 28%, #7a7a7a 0%, #3a3a3a 42%, #141414 100%);
+            border: 0.12em solid rgba(255,255,255,0.08);
+            box-shadow: 0 0.5em 1.4em rgba(0,0,0,0.6), inset 0 0.2em 0.8em rgba(255,255,255,0.12);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+        .tg-avatar svg { width: 86%; height: 86%; display: block; opacity: 0.9; }
+        .tg-name {
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 10px;
+            gap: 0.25em;
+            margin-top: 0.55em;
+            font-size: 2.02em;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: 0.01em;
             position: relative;
             z-index: 1;
         }
-        .welcome-hero img {
+        .tg-verified {
+            width: 1em;
+            height: 1em;
+            border-radius: 50%;
+            background: #2f9cf5;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 0.08em 0.3em rgba(47,156,245,0.5);
+        }
+        .tg-verified svg { width: 0.64em; height: 0.64em; display: block; }
+        .tg-lastseen { margin-top: 0.55em; text-align: center; font-size: 0.82em; color: #8f8f8f; position: relative; z-index: 1; }
+        .tg-actions { display: flex; gap: 0.55em; margin-top: 1.1em; position: relative; z-index: 1; }
+        .tg-action {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4em;
+            padding: 0.75em 0.15em 0.55em;
+            border-radius: 0.85em;
+            background: linear-gradient(180deg, #242424, #1a1a1a);
+            box-shadow: inset 0 0.06em 0 rgba(255,255,255,0.05);
+        }
+        .tg-action svg { width: 1.5em; height: 1.5em; stroke: #e8e8e8; fill: none; stroke-width: 1.7; }
+        .tg-action span { font-size: 0.68em; color: #d2d2d2; }
+        .tg-note { margin-top: 1.1em; text-align: center; font-size: 0.76em; color: #8f8f8f; position: relative; z-index: 1; }
+        .tg-note b { color: #bdbdbd; font-weight: 600; }
+        .tg-card {
+            margin-top: 0.85em;
+            background: #222222;
+            border-radius: 0.85em;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+        .tg-row { padding: 0.65em 0.85em 0.7em; border-bottom: 1px solid rgba(255,255,255,0.055); }
+        .tg-row:last-child { border-bottom: 0; }
+        .tg-label { margin-bottom: 0.18em; font-size: 0.68em; color: #7f7f7f; }
+        .tg-value { font-size: 1.05em; font-weight: 500; color: #ededed; }
+        .tg-bio { font-size: 0.82em; line-height: 1.3; color: #a8a8a8; font-weight: 400; }
+        @media (max-height: 700px) {
+            #welcomePage { padding-top: calc(env(safe-area-inset-top, 0px) + 4px); }
+            .welcome-title { font-size: clamp(24px, 7.2vw, 32px); }
+            .welcome-divider { margin: 8px auto; }
+            .welcome-subtitle { margin-bottom: 12px; font-size: 11px; line-height: 1.6; }
+            .features-grid { margin-bottom: 12px; }
+            .feature-item { gap: 6px; }
+            .feature-text { font-size: 8px; }
+            .main-btn { padding-top: 13px; padding-bottom: 13px; }
+        }
+        .welcome-bottom {
             width: 100%;
-            max-height: 340px;
-            object-fit: contain;
-            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.8));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 2;
         }
         .welcome-title {
-            font-size: 30px;
-            font-weight: 300;
-            letter-spacing: 10px;
+            font-size: clamp(30px, 8.6vw, 42px);
+            font-weight: 200;
+            letter-spacing: clamp(10px, 3.6vw, 18px);
             text-transform: uppercase;
-            color: #e5e5e5;
+            color: #ededed;
+            line-height: 1;
+            padding-left: clamp(10px, 3.6vw, 18px);
+            text-shadow: 0 2px 24px rgba(0,0,0,0.65);
             position: relative;
             z-index: 1;
-            padding-left: 10px;
         }
         .welcome-divider {
-            width: 44px;
+            width: 46px;
             height: 1px;
-            background: rgba(255,255,255,0.35);
-            margin: 16px auto;
+            background: rgba(255,255,255,0.38);
+            margin: clamp(12px, 2vh, 18px) auto;
             position: relative;
             z-index: 1;
         }
         .welcome-subtitle {
-            font-size: 13px;
+            font-size: clamp(11px, 3.2vw, 13px);
             font-weight: 300;
-            letter-spacing: 5px;
-            line-height: 1.8;
-            color: #cccccc;
+            letter-spacing: clamp(3px, 1.25vw, 5px);
+            line-height: 1.85;
+            color: #cfcfcf;
             text-transform: uppercase;
-            margin-bottom: 32px;
+            margin-bottom: clamp(20px, 3.4vh, 32px);
             position: relative;
             z-index: 1;
         }
@@ -116,7 +299,7 @@
             grid-template-columns: repeat(4, 1fr);
             width: 100%;
             max-width: 420px;
-            margin-bottom: 32px;
+            margin-bottom: clamp(20px, 3.4vh, 32px);
             position: relative;
             z-index: 1;
         }
@@ -124,48 +307,49 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
-            padding: 4px 6px;
-            border-right: 1px solid rgba(255,255,255,0.12);
+            gap: 9px;
+            padding: 2px 6px;
+            border-right: 1px solid rgba(255,255,255,0.14);
         }
         .feature-item:last-child {
             border-right: none;
         }
         .feature-icon {
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #ffffff;
         }
         .feature-icon svg {
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             stroke: currentColor;
             fill: none;
-            stroke-width: 1.5;
+            stroke-width: 1.35;
         }
         .feature-text {
-            font-size: 9px;
-            color: var(--text-gray);
+            font-size: clamp(8px, 2.4vw, 10px);
+            color: #bdbdbd;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            line-height: 1.3;
+            letter-spacing: 0.55px;
+            line-height: 1.35;
             text-align: center;
         }
         .main-btn {
             width: 100%;
-            max-width: 360px;
-            padding: 18px 24px;
+            max-width: 100%;
+            padding: clamp(16px, 2.6vh, 20px) 24px;
             border: 1px solid rgba(255,255,255,0.4);
             border-radius: 40px;
             background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             color: var(--text-white);
-            font-size: 13px;
+            font-size: clamp(11px, 3.1vw, 13px);
             font-weight: 500;
-            letter-spacing: 3px;
+            letter-spacing: clamp(2px, 0.8vw, 3px);
             text-transform: uppercase;
             cursor: pointer;
             display: flex;
@@ -283,45 +467,119 @@
 </head>
 <body>
     <!-- ФОН С ДЫМОМ -->
-    <div class="smoke-bg"></div>
+    <canvas id="smokeCanvas" class="smoke-canvas" aria-hidden="true"></canvas>
+    <div class="smoke-shade" aria-hidden="true"></div>
 
     <div class="app">
         <main id="mainScroll">
             <!-- ЭКРАН 1: ПРИВЕТСТВИЕ -->
             <div class="page active" id="welcomePage">
                 <div class="welcome-hero">
-                    <img src="welcome.png" alt="ПЕПЕЛЬНИК" onerror="this.style.display='none'">
+                    <div class="phone-mask">
+                        <div class="phone">
+                            <span class="phone-left-btn"></span>
+                            <span class="phone-left-btn two"></span>
+                            <div class="phone-screen">
+                                <span class="tg-island"></span>
+                                <div class="tg-status">
+                                    <span>19:06</span>
+                                    <span class="tg-status-icons">
+                                        <svg viewBox="0 0 22 14" aria-hidden="true"><rect x="1" y="10" width="3" height="3" rx="1" fill="#fff"/><rect x="5.5" y="8" width="3" height="5" rx="1" fill="#fff"/><rect x="10" y="5.5" width="3" height="7.5" rx="1" fill="#fff"/><rect x="14.5" y="3" width="3" height="10" rx="1" fill="#fff"/></svg>
+                                        <svg viewBox="0 0 20 15" aria-hidden="true"><path d="M1.5 5.2C6.2 1 13.8 1 18.5 5.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><path d="M4.6 8.4c3.1-2.5 7.7-2.5 10.8 0" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><path d="M7.7 11.6c1.3-1 3.3-1 4.6 0" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="10" cy="13.7" r="1" fill="#fff"/></svg>
+                                        <svg viewBox="0 0 26 14" aria-hidden="true"><rect x="1" y="1.5" width="21" height="11" rx="3" fill="none" stroke="#fff" stroke-width="1.4" opacity=".8"/><rect x="3" y="3.5" width="15" height="7" rx="1.6" fill="#fff"/><rect x="23.4" y="5" width="1.8" height="4" rx="0.9" fill="#fff" opacity=".8"/></svg>
+                                    </span>
+                                </div>
+                                <div class="tg-topbar">
+                                    <span class="tg-back">‹</span>
+                                    <span class="tg-more">•••</span>
+                                </div>
+                                <div class="tg-avatar">
+                                    <svg viewBox="0 0 100 100" aria-hidden="true">
+                                        <defs>
+                                            <linearGradient id="avatarTone" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0" stop-color="#a3a3a3"/>
+                                                <stop offset="1" stop-color="#464646"/>
+                                            </linearGradient>
+                                        </defs>
+                                        <circle cx="51" cy="40" r="19" fill="url(#avatarTone)"/>
+                                        <path d="M13 100c2-22 18-34 37-34s35 12 37 34z" fill="url(#avatarTone)"/>
+                                        <path d="M20 58C16 38 30 20 49 20c18 0 32 17 29 37-7-12-17-18-29-18s-22 6-29 19z" fill="#161616" opacity=".92"/>
+                                        <path d="M36 44c2.5 2.5 5.5 2.5 8 0M56 44c2.5 2.5 5.5 2.5 8 0" stroke="#303030" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                                        <path d="M46 54c3 2 6 2 9 0" stroke="#303030" stroke-width="1.8" fill="none" stroke-linecap="round" opacity=".9"/>
+                                        <path d="M12 100c1-14 5-24 13-31-4 12-5 23-4 31z" fill="#131313" opacity=".9"/>
+                                    </svg>
+                                </div>
+                                <div class="tg-name">WEGGEW
+                                    <span class="tg-verified">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.4 4.4L19 7.6" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    </span>
+                                </div>
+                                <div class="tg-lastseen">был(а) только что</div>
+                                <div class="tg-actions">
+                                    <div class="tg-action">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 3.6l2.5 2.5c.4.4.5 1 .2 1.5l-1 1.7c-.2.3-.2.7 0 1 1 1.7 2.5 3.2 4.2 4.2.3.2.7.2 1 0l1.7-1c.5-.3 1.1-.2 1.5.2l2.5 2.5c.5.5.5 1.3 0 1.8l-1 1c-1.2 1.2-3 1.5-4.6.8-3-1.3-5.7-3.4-7.7-6.1-1.3-1.7-2-3.6-2-5.5 0-1.2.5-2.3 1.4-3.2l.5-.5c.5-.5 1.3-.5 1.8.1z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                        <span>звонок</span>
+                                    </div>
+                                    <div class="tg-action">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3l4 3.5v-12L7 9.5H4z" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 8.5c1.4 1.8 1.4 5.2 0 7M17.5 6c2.4 3.1 2.4 8.9 0 12" stroke-linecap="round"/></svg>
+                                        <span>звук</span>
+                                    </div>
+                                    <div class="tg-action">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6" stroke-linecap="round"/><path d="M15 15l4.5 4.5" stroke-linecap="round"/></svg>
+                                        <span>поиск</span>
+                                    </div>
+                                    <div class="tg-action">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="#e8e8e8" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="#e8e8e8" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="#e8e8e8" stroke="none"/></svg>
+                                        <span>ещё</span>
+                                    </div>
+                                </div>
+                                <div class="tg-note">♫ <b>заправка</b> · madkid ›</div>
+                                <div class="tg-card">
+                                    <div class="tg-row">
+                                        <div class="tg-label">имя пользователя</div>
+                                        <div class="tg-value">@weggewpod</div>
+                                    </div>
+                                    <div class="tg-row">
+                                        <div class="tg-label">о себе</div>
+                                        <div class="tg-value tg-bio">И мы любим курить, цвета и всё такое.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="welcome-title">ПЕПЕЛЬНИК</div>
-                <div class="welcome-divider"></div>
-                <div class="welcome-subtitle">БОЛЬШЕ ЧЕМ<br>ПРОСТО ЗАКАЗ</div>
-                <div class="features-grid">
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+                <div class="welcome-bottom">
+                    <div class="welcome-title">WEGGEW</div>
+                    <div class="welcome-divider"></div>
+                    <div class="welcome-subtitle">ВЕЙПЫ | ЖИДКОСТИ<br>ГОМЕЛЬ</div>
+                    <div class="features-grid">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+                            </div>
+                            <div class="feature-text">Оригинал<br>и качество</div>
                         </div>
-                        <div class="feature-text">Оригинал<br>и качество</div>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/></svg>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/></svg>
+                            </div>
+                            <div class="feature-text">Удобный<br>выбор</div>
                         </div>
-                        <div class="feature-text">Удобный<br>выбор</div>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/></svg>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/></svg>
+                            </div>
+                            <div class="feature-text">Актуальные<br>новинки</div>
                         </div>
-                        <div class="feature-text">Актуальные<br>новинки</div>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
+                            </div>
+                            <div class="feature-text">Приятная<br>упаковка</div>
                         </div>
-                        <div class="feature-text">Приятная<br>упаковка</div>
                     </div>
+                    <button class="main-btn" id="goToLocationBtn">ПЕРЕЙТИ В КАТАЛОГ →</button>
                 </div>
-                <button class="main-btn" id="goToLocationBtn">ПЕРЕЙТИ В КАТАЛОГ →</button>
             </div>
 
             <!-- ЭКРАН 2: ВЫБОР ТОЧКИ -->
@@ -861,6 +1119,110 @@
                 if (tab === 'profile') showPage('profile');
             });
         });
+
+        // --- АНИМИРОВАННЫЙ ДЫМ (canvas) ---
+        (function initSmoke() {
+            const canvas = document.getElementById('smokeCanvas');
+            if (!canvas || !canvas.getContext) return;
+            const ctx = canvas.getContext('2d');
+            const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            let width = 0, height = 0, dpr = 1;
+            let puffs = [];
+
+            // Мягкая «клякса» дыма рисуется один раз в offscreen-канвас
+            const puff = document.createElement('canvas');
+            puff.width = puff.height = 256;
+            const pctx = puff.getContext('2d');
+            const grad = pctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+            grad.addColorStop(0, 'rgba(255,255,255,0.62)');
+            grad.addColorStop(0.35, 'rgba(236,240,245,0.28)');
+            grad.addColorStop(0.7, 'rgba(220,226,232,0.08)');
+            grad.addColorStop(1, 'rgba(255,255,255,0)');
+            pctx.fillStyle = grad;
+            pctx.fillRect(0, 0, 256, 256);
+
+            function resize() {
+                dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = Math.max(1, Math.round(width * dpr));
+                canvas.height = Math.max(1, Math.round(height * dpr));
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+
+            function createPuffs() {
+                const count = width < 480 ? 11 : 16;
+                puffs = [];
+                for (let i = 0; i < count; i++) {
+                    const leftSide = i < count * 0.78;
+                    puffs.push({
+                        x: leftSide ? -width * 0.16 + Math.random() * width * 0.7 : Math.random() * width,
+                        y: leftSide
+                            ? height * 0.28 + Math.random() * height * 0.95
+                            : height * 0.62 + Math.random() * height * 0.62,
+                        r: 120 + Math.random() * 210,
+                        vx: (leftSide ? 0.05 : 0.02) + Math.random() * 0.09,
+                        vy: -0.05 - Math.random() * 0.12,
+                        rot: (Math.random() - 0.5) * 1.4,
+                        vr: (Math.random() - 0.5) * 0.0006,
+                        alpha: 0.10 + Math.random() * 0.16,
+                        phase: Math.random() * Math.PI * 2,
+                        stretch: 1.6 + Math.random() * 1.5
+                    });
+                }
+            }
+
+            let rafId = 0;
+
+            function draw(time) {
+                ctx.clearRect(0, 0, width, height);
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(0, 0, width, height);
+                ctx.globalCompositeOperation = 'lighter';
+                for (const p of puffs) {
+                    if (!reduceMotion) {
+                        p.x += p.vx + Math.sin(time / 6500 + p.phase) * 0.045;
+                        p.y += p.vy;
+                        p.rot += p.vr;
+                        if (p.y + p.r * p.stretch < 0) {
+                            p.y = height + p.r;
+                            p.x = Math.random() * width * 0.9;
+                        }
+                        if (p.x - p.r > width) p.x = -p.r;
+                    }
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rot);
+                    ctx.globalAlpha = p.alpha;
+                    ctx.drawImage(puff, -p.r, -p.r * p.stretch, p.r * 2, p.r * 2 * p.stretch);
+                    ctx.restore();
+                }
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.globalAlpha = 1;
+                if (!reduceMotion) {
+                    rafId = requestAnimationFrame(draw);
+                } else {
+                    rafId = 0;
+                }
+            }
+
+            resize();
+            createPuffs();
+            window.addEventListener('resize', function () {
+                resize();
+                createPuffs();
+                if (reduceMotion) {
+                    draw(performance.now());
+                } else if (!rafId) {
+                    rafId = requestAnimationFrame(draw);
+                }
+            });
+            if (reduceMotion) {
+                draw(performance.now());
+            } else {
+                rafId = requestAnimationFrame(draw);
+            }
+        })();
 
         // --- ИНИЦИАЛИЗАЦИЯ ---
         if (window.Telegram && window.Telegram.WebApp) {
