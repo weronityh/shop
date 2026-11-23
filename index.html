@@ -329,6 +329,50 @@
                 ]
             }
         ];
+        const liquidBrands = [
+            {
+                brand: 'BJORN',
+                flavors: [
+                    { name: 'BJORN HEADSHOT', desc: '100MG', price: 17 },
+                    { name: 'BJORN ZLOY LONG', desc: '80MG', price: 17 },
+                    { name: 'BJORN DON ORO', desc: '80MG', price: 17 },
+                    { name: 'BJORN СОН ПРИЗРАКА', desc: '80MG', price: 17 },
+                    { name: 'BJORN ZLOY V1/V2', desc: '50MG', price: 17 },
+                    { name: 'BJORN VMЁD', desc: '50MG', price: 17 },
+                    { name: 'BJORN JOKER', desc: '20MG', price: 17 }
+                ]
+            },
+            {
+                brand: 'ELFIQ',
+                flavors: [
+                    { name: 'ELFIQ 50MG', desc: '50MG', price: 17 }
+                ]
+            },
+            {
+                brand: 'ANNIMA LOVE',
+                flavors: [
+                    { name: 'ANNIMA LOVE 50MG', desc: '50MG', price: 17 }
+                ]
+            },
+            {
+                brand: 'PODONKI PODGON',
+                flavors: [
+                    { name: 'PODONKI PODGON 50MG', desc: '50MG', price: 17 }
+                ]
+            },
+            {
+                brand: 'РИК И МОРТИ',
+                flavors: [
+                    { name: 'РИК И МОРТИ 50MG', desc: '50MG', price: 17 }
+                ]
+            },
+            {
+                brand: 'HOTSPOT',
+                flavors: [
+                    { name: 'HOTSPOT 50MG', desc: '50MG', price: 17 }
+                ]
+            }
+        ];
 
         const catalogData = {
             vapes: [
@@ -596,7 +640,39 @@
                 showPage('brand');
                 return;
             }
+            if (categoryId === 'liquids') {
+                brandList.innerHTML = liquidBrands.map((b, bIdx) => `
+                    <div class="brand-group">
+                        <div class="brand-group-card" data-brand-idx="${bIdx}">
+                            <div class="brand-group-title">${b.brand}</div>
+                            <div class="brand-group-arrow">›</div>
+                        </div>
+                        <div class="brand-models-list" id="liquidFlavors_${bIdx}">
+                            ${b.flavors.map(f => `
+                                <div class="product-card">
+                                    <div class="product-info">
+                                        <div class="product-title">${f.name}</div>
+                                        <div class="product-desc">${f.desc || ''}</div>
+                                        <div class="product-price">${f.price} BYN</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
 
+                brandList.querySelectorAll('.brand-group-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const idx = card.dataset.brandIdx;
+                        card.classList.toggle('open');
+                        document.getElementById(`liquidFlavors_${idx}`).classList.toggle('open');
+                    });
+                });
+
+                showPage('brand');
+                return;
+            }
+            
             const entries = catalogData[categoryId] || [];
 
             if (entries.length === 0) {
