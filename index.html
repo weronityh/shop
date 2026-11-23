@@ -20,8 +20,15 @@
             inset: 0;
             width: 100%;
             height: 100%;
+            height: 100dvh;
+            height: 100lvh;
+            min-height: 100vh;
             pointer-events: none;
-            z-index: 2;
+            z-index: 4;
+            transition: opacity 0.4s ease;
+        }
+        body.subtle-smoke .smoke-canvas {
+            opacity: 0.25;
         }
         .smoke-shade {
             position: fixed;
@@ -595,29 +602,16 @@
                     <div class="location-desc">Каталог и наличие зависят от точки. Выберите, откуда вам удобно забрать.</div>
                 </div>
                 <div class="location-list">
-                    <div class="location-card" data-location="novobelitsky">
+                    <div class="location-card selected" data-location="vokzal">
                         <div class="location-card-icon">📍</div>
                         <div class="location-card-content">
-                            <div class="location-card-title">Новобелицкий район</div>
-                            <div class="location-card-sub">г. Гомель</div>
-                        </div>
-                        <div class="location-card-arrow">›</div>
-                    </div>
-                    <div class="location-card" data-location="central">
-                        <div class="location-card-icon">📍</div>
-                        <div class="location-card-content">
-                            <div class="location-card-title">Центральный район</div>
+                            <div class="location-card-title">Вокзал</div>
                             <div class="location-card-sub">г. Гомель</div>
                         </div>
                         <div class="location-card-arrow">›</div>
                     </div>
                 </div>
-                <div class="legal-info">
-                    <p>УНП ЕЕ8821178</p>
-                    <p>Деятельность осуществляется в рамках законодательства Республики Беларусь</p>
-                    <p>Согласно ст. 12.26, а также ст. 13.11 ч. 4</p>
-                    <p>Входя в приложение вы подтверждаете свое совершеннолетие.</p>
-                </div>
+               
                 <button class="main-btn" id="goToCatalogBtn">ПРОДОЛЖИТЬ →</button>
             </div>
 
@@ -630,7 +624,7 @@
                         <input type="text" placeholder="Поиск товаров..." id="searchInput">
                     </div>
                     <div class="filters-row">
-                        <div class="filter-chip">📍 Новобелицки... <span>⌄</span></div>
+                        <div class="filter-chip">📍 Вокзал <span>⌄</span></div>
                         <div class="filter-chip">АКЦИИ</div>
                         <div class="filter-chip">НОВОСТИ <span class="badge-dot"></span></div>
                     </div>
@@ -821,7 +815,7 @@
             ]
         };
 
-        let currentLocation = null;
+        let currentLocation = 'vokzal';
         let currentCategoryId = null;
 
         const pages = {
@@ -854,6 +848,9 @@
                 // Restart entrance animations
                 restartWelcomeAnimations();
             }
+
+            // Subtle smoke on location page
+            document.body.classList.toggle('subtle-smoke', name === 'location');
 
             if (name === 'catalog' || name === 'cart' || name === 'profile' || name === 'brand') {
                 bottomNav.style.display = 'flex';
