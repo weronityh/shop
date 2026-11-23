@@ -644,6 +644,18 @@
             margin-left: 4px;
         }
 
+        .promo-badge {
+            display: inline-block;
+            background: #ff9800;
+            color: #000;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 8px;
+            text-transform: uppercase;
+        }
+
         /* ========== КОРЗИНА И ПРОФИЛЬ ========== */
         #cartPage, #profilePage {
             padding: 20px 16px 100px;
@@ -805,7 +817,7 @@
             </div>
         </main>
 
-        <!-- НИЖНЯЯ НАВИГАЦИЯ (появляется только в каталоге) -->
+        <!-- НИЖНЯЯ НАВИГАЦИЯ -->
         <nav class="bottom-nav" id="bottomNav" style="display: none;">
             <button class="nav-btn" data-tab="home" aria-label="Главная">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2">
@@ -840,34 +852,63 @@
         // --- ДАННЫЕ ---
         const categories = [
             { id: 'winter', name: 'ЗИМНИЙ ЗАПАС', sub: '1 вариант', icon: '❄️', image: '' },
-            { id: 'pods', name: 'POD-СИСТЕМЫ', sub: '3 бренда', icon: '📱', image: '' },
-            { id: 'snus', name: 'СНЮС', sub: '4 бренда', icon: '📦', image: '' },
-            { id: 'liquids', name: 'ЖИДКОСТИ', sub: '29 брендов', icon: '💧', image: '' },
-            { id: 'disposables', name: 'ОДНОРАЗКИ', sub: '12 брендов', icon: '🚬', image: '' },
-            { id: 'consumables', name: 'РАСХОДНИКИ', sub: '5 брендов', icon: '🔧', image: '' }
+            { id: 'vapes', name: 'ВЕЙПЫ', sub: '3 бренда', icon: '📱', image: 'vape.png' },
+            { id: 'snus', name: 'СНЮС', sub: '4 бренда', icon: '📦', image: 'snus.jpg' },
+            { id: 'liquids', name: 'ЖИДКОСТИ', sub: '29 брендов', icon: '💧', image: 'zhizha.jpg' },
+            { id: 'disposables', name: 'ОДНОРАЗКИ', sub: '12 брендов', icon: '🚬', image: 'odnorazki.jpg' },
+            { id: 'consumables', name: 'РАСХОДНИКИ', sub: '5 брендов', icon: '🔧', image: 'rashodniki.jpg' }
         ];
 
         const catalogData = {
             winter: [
                 { id: 'w1', name: 'ЗИМНИЙ НАБОР', desc: 'Подарочный набор', price: 50, icon: '❄️', image: '' }
             ],
-            pods: [
-                { id: 'p1', name: 'VAPORESSO XROS', desc: 'Под-система', price: 85, icon: '📱', image: '' },
-                { id: 'p2', name: 'GEEKVAPE AEGIS', desc: 'Под-система', price: 95, icon: '🔋', image: '' }
+            vapes: [
+                { id: 'v1', name: 'XROS 6', desc: 'Под-система', price: 85, icon: '📱', image: 'vape.png' },
+                { id: 'v2', name: 'XROS 6 mini', desc: 'Под-система', price: 65, icon: '📱', image: 'vape.png' },
+                { id: 'v3', name: 'XROS 5 mini', desc: 'Под-система', price: 60, icon: '📱', image: 'vape.png' },
+                { id: 'v4', name: 'XROS 5 mini CE', desc: 'Под-система', price: 65, icon: '📱', image: 'vape.png' },
+                { id: 'v5', name: 'XROS CUBE', desc: 'Под-система', price: 50, icon: '📱', image: 'vape.png' },
+                { id: 'v6', name: 'XROS PRO 2', desc: 'Под-система', price: 90, icon: '📱', image: 'vape.png' },
+                { id: 'v7', name: 'AEGIS HERO CRYSTAL', desc: 'Под-система', price: 85, icon: '🔋', image: 'vape.png' },
+                { id: 'v8', name: 'AEGIS HERO 3', desc: 'Под-система', price: 85, icon: '🔋', image: 'vape.png' },
+                { id: 'v9', name: 'AEGIS HERO 5', desc: 'Под-система', price: 95, icon: '🔋', image: 'vape.png' },
+                { id: 'v10', name: 'AEGIS BOOST 3', desc: 'Под-система', price: 100, icon: '🔋', image: 'vape.png' },
+                { id: 'v11', name: 'PASITO 3', desc: 'Под-система', price: 110, icon: '⚡', image: 'vape.png' }
             ],
             snus: [
-                { id: 's1', name: 'ICEBERG', desc: 'Снюс', price: 15, icon: '📦', image: '' },
-                { id: 's2', name: 'DRYMOST', desc: 'Снюс', price: 15, icon: '📦', image: '' }
+                { id: 's1', name: 'DRYMOST', desc: '75/150/175/200MG', price: 15, icon: '📦', image: 'snus.jpg' },
+                { id: 's2', name: 'ICEBURN', desc: '75/150MG', price: 15, icon: '📦', image: 'snus.jpg' },
+                { id: 's3', name: 'GLICH POUCHES', desc: '75MG', price: 15, icon: '📦', image: 'snus.jpg' }
             ],
             liquids: [
-                { id: 'l1', name: 'BJORN HEADSHOT', desc: 'Жидкость 100MG', price: 17, icon: '💧', image: '' },
-                { id: 'l2', name: 'PODONKI', desc: 'Жидкость 50MG', price: 17, icon: '💧', image: '' }
+                { id: 'l1', name: 'BJORN HEADSHOT', desc: '100MG', price: 17, icon: '💧', image: 'zhizha.jpg' },
+                { id: 'l2', name: 'BJORN ZLOY LONG', desc: '80MG', price: 17, icon: '💧', image: 'zhizha.jpg' },
+                { id: 'l3', name: 'BJORN DON ORO', desc: '80MG', price: 17, icon: '💧', image: 'zhizha.jpg' },
+                { id: 'l4', name: 'BJORN СОН ПРИЗРАКА', desc: '80MG', price: 17, icon: '💧', image: 'zhizha.jpg' },
+                { id: 'l5', name: 'BJORN ZLOY V1/V2', desc: '50MG', price: 17, icon: '💧', image: 'zhizha.jpg' },
+                { id: 'l6', name: 'BJORN VMЁD', desc: '50MG', price: 17, icon: '💧', image: 'zhizha.jpg' },
+                { id: 'l7', name: 'BJORN JOKER', desc: '20MG', price: 17, icon: '💧', image: 'zhizha.jpg' },
+                { id: 'l8', name: 'ELFIQ', desc: '50MG', price: 17, icon: '💧', image: 'zhizha.jpg' },
+                { id: 'l9', name: 'ANNIMA LOVE', desc: '50MG', price: 17, icon: '💧', image: 'zhizha.jpg' },
+                { id: 'l10', name: 'PODONKI PODGON', desc: '50MG', price: 17, icon: '💧', image: 'zhizha.jpg' },
+                { id: 'l11', name: 'РИК И МОРТИ', desc: '50MG', price: 17, icon: '💧', image: 'zhizha.jpg' },
+                { id: 'l12', name: 'HOTSPOT', desc: '50MG', price: 17, icon: '💧', image: 'zhizha.jpg' }
             ],
             disposables: [
-                { id: 'd1', name: 'ELFBAR', desc: 'Одноразка', price: 35, icon: '🚬', image: '' }
+                { id: 'd1', name: 'PUFFUP 5k', desc: 'Одноразка', price: 25, icon: '🚬', image: 'odnorazki.jpg' },
+                { id: 'd2', name: 'ELFBAR 40k', desc: 'Одноразка', price: 35, icon: '🚬', image: 'odnorazki.jpg' },
+                { id: 'd3', name: 'VOZOL 40k', desc: 'Одноразка', price: 35, icon: '🚬', image: 'odnorazki.jpg' },
+                { id: 'd4', name: 'BJORN TRON 55k', desc: 'Одноразка', price: 40, icon: '🚬', image: 'odnorazki.jpg' }
             ],
             consumables: [
-                { id: 'c1', name: 'XROS КАРТРИДЖИ', desc: 'Картриджи', price: 12, icon: '🔧', image: '' }
+                { id: 'c1', name: 'XROS 0.6 Ом 2ml', desc: 'Картридж', price: 12, icon: '🔧', image: 'rashodniki.jpg' },
+                { id: 'c2', name: 'XROS 0.6 Ом 3ml', desc: 'Картридж', price: 12, icon: '🔧', image: 'rashodniki.jpg' },
+                { id: 'c3', name: 'XROS 0.4 Ом 3ml', desc: 'Картридж', price: 13, icon: '🔧', image: 'rashodniki.jpg' },
+                { id: 'c4', name: 'Aegis hero/boost (0.3)', desc: 'Испаритель', price: 10, icon: '🔧', image: 'rashodniki.jpg' },
+                { id: 'c5', name: 'Pasito 2/knight 55-65Ватт', desc: 'Испаритель', price: 12, icon: '🔧', image: 'rashodniki.jpg' },
+                { id: 'c6', name: 'Pasito 2/knight 70-90Ватт', desc: 'Испаритель', price: 12, icon: '🔧', image: 'rashodniki.jpg' },
+                { id: 'c7', name: 'Картридж Pasito 3 (без испар)', desc: 'Картридж', price: 8, icon: '🔧', image: 'rashodniki.jpg' }
             ]
         };
 
@@ -897,14 +938,12 @@
             pages[name].classList.add('active');
             mainScroll.scrollTop = 0;
 
-            // Показываем навигацию только в каталоге, корзине, профиле и бренде
             if (name === 'catalog' || name === 'cart' || name === 'profile' || name === 'brand') {
                 bottomNav.style.display = 'flex';
             } else {
                 bottomNav.style.display = 'none';
             }
 
-            // Подсветка активной вкладки
             const tabMap = { catalog: 'catalog', brand: 'catalog', cart: 'cart', profile: 'profile' };
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.tab === (tabMap[name] || ''));
@@ -941,13 +980,16 @@
 
             brandPageTitle.textContent = category.name;
 
+            // Добавляем акцию для категории ВЕЙПЫ
+            const promoText = categoryId === 'vapes' ? '<span class="promo-badge">🤑 скидка на жидкость</span>' : '';
+
             brandList.innerHTML = entries.map(entry => `
                 <div class="product-card" data-entry-id="${entry.id}">
                     <div class="product-thumb">
                         ${entry.image ? `<img src="${entry.image}" alt="${entry.name}">` : `<span>${entry.icon}</span>`}
                     </div>
                     <div class="product-info">
-                        <div class="product-title">${entry.name}</div>
+                        <div class="product-title">${entry.name} ${promoText}</div>
                         <div class="product-desc">${entry.desc}</div>
                         <div class="product-price">${entry.price} BYN</div>
                     </div>
