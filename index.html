@@ -44,6 +44,14 @@
             z-index: 0;
             background: radial-gradient(ellipse 80% 60% at 50% 25%, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.55) 70%, #000 100%);
         }
+        body.catalog-bg::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: url('zadniufon.jpg') center center / cover no-repeat;
+            z-index: 0;
+            pointer-events: none;
+        }
         .app {
             flex: 1;
             min-height: 0;
@@ -818,6 +826,7 @@
 
             // Subtle smoke on location page
             document.body.classList.toggle('subtle-smoke', name === 'location');
+            document.body.classList.toggle('catalog-bg', name === 'catalog');
 
             // Show bottom nav for main pages only
             if (name === 'catalog' || name === 'cart' || name === 'profile' || name === 'brand') {
