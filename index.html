@@ -643,6 +643,44 @@
         /* TOAST */
         .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text-white); color: var(--bg-dark); padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 1000; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+/* ПРОФИЛЬ */
+        .profile-cards { display: flex; flex-direction: column; gap: 12px; }
+        .profile-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-card);
+            border-radius: 20px;
+            padding: 18px;
+            box-shadow: var(--shadow-card);
+        }
+        .profile-user { display: flex; align-items: center; gap: 14px; }
+        .profile-avatar {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; font-weight: 700; flex-shrink: 0;
+        }
+        .profile-username { font-size: 17px; font-weight: 700; }
+        .profile-sub { font-size: 12px; color: var(--text-gray); margin-top: 2px; }
+        .profile-card-title { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+        .profile-list { list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #dcdcdc; }
+        .profile-love { margin-top: 10px; font-size: 13px; font-weight: 600; color: var(--text-white); }
+        .profile-btn {
+            width: 100%; padding: 14px 16px; border-radius: 14px;
+            border: 1px solid var(--border-card);
+            background: rgba(255,255,255,0.08);
+            color: var(--text-white); font-size: 13px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            cursor: pointer; text-align: center; text-decoration: none; display: block;
+        }
+        .profile-btn.primary { background: var(--text-white); color: var(--bg-dark); border-color: var(--text-white); }
+        .profile-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .roulette-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 999px; overflow: hidden; margin: 10px 0; }
+        .roulette-fill { height: 100%; background: var(--text-white); width: 0%; transition: width 0.3s ease; }
+        .roulette-note { font-size: 11px; color: var(--text-gray); margin-top: 8px; line-height: 1.4; }
+        .roulette-result { margin-top: 10px; font-size: 14px; font-weight: 700; color: #ff9800; }
     </style>
 </head>
 <body>
@@ -736,7 +774,7 @@
             <!-- ПРОФИЛЬ -->
             <div class="page" id="profilePage">
                 <h1 class="section-title">ПРОФИЛЬ</h1>
-                <div class="empty-state" id="profileCard"></div>
+                <div class="profile-cards" id="profileCard"></div>
             </div>
         </main>
 
@@ -1382,6 +1420,90 @@
             }
             showDeliveryModal();
         }
+function renderProfile() {
+            const container = document.getElementById('profileCard');
+            if (!container) return;
+
+            const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+            const username = tgUser?.username ? `@${tgUser.username}` : (tgUser?.first_name || 'Гость');
+            const avatarLetter = (tgUser?.first_name || tgUser?.username || 'W')[0].toUpperCase();
+
+            let purchases = Number(localStorage.getItem('weggew_purchases') || 0);
+            const canSpin = purchases >= 10;
+
+            container.innerHTML = `
+                <div class="profile-card">
+                    <div class="profile-user">
+                        <div class="profile-avatar">${avatarLetter}</div>
+                        <div>
+                            <div class="profile-username">${username}</div>
+                            <div class="profile-sub">Ваш профиль Telegram</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-card">
+                    <div class="profile-card-title">Мы созданы друг для друга !</div>
+                    <ul class="profile-list">
+                        <li>• только качественный и оригинальный товар</li>
+                        <li>• брак ? (заменим !)</li>
+                        <li>• скидки ? (конечно !)</li>
+                        <li>• акции ? (да !)</li>
+                        <li>• быстрые встречи</li>
+                        <li>• приятная упаковка</li>
+                    </ul>
+                    <div class="profile-love">с любовью для каждого ❤️</div>
+                </div>
+
+                <div class="profile-card">
+                    <div class="profile-card-title">Время работы</div>
+                    <div style="font-size: 16px; font-weight: 700;">11:00 - 23:00</div>
+                </div>
+
+                <div class="profile-card">
+                    <div class="profile-card-title">Только честные отзывы</div>
+                    <a href="https://t.me/Seregablatnou" target="_blank" class="profile-btn" id="reviewsBtn">Перейти к отзывам →</a>
+                </div>
+
+                <div class="profile-card">
+                    <div class="profile-card-title">Рулетка при покупке от 10 шт</div>
+                    <div style="font-size: 13px; color: #dcdcdc;">Накоплено: <b id="rouletteCount">${Math.min(purchases, 10)}</b> / 10 шт.</div>
+                    <div class="roulette-bar"><div class="roulette-fill" style="width: ${Math.min(purchases, 10) * 10}%"></div></div>
+                    <div style="font-size: 12px; color: var(--text-gray); margin-bottom: 10px;">
+                        После покупки 10-го товара можно прокрутить рулетку 1 раз. Призы: 5%, 10%, 15% или бесплатная жидкость.
+                    </div>
+                    <button class="profile-btn primary" id="spinRouletteBtn" ${canSpin ? '' : 'disabled'}>
+                        ${canSpin ? 'Крутить рулетку 🎰' : `Осталось ${10 - Math.min(purchases, 10)} шт.`}
+                    </button>
+                    <div class="roulette-result" id="rouletteResult"></div>
+                    <div class="roulette-note">* скидка действует на все товары, на одну единицу</div>
+                </div>
+
+                <div class="profile-card">
+                    <div class="profile-card-title">Обратная связь</div>
+                    <button class="profile-btn" id="feedbackBtn">Написать в Telegram (@Seregablatnou)</button>
+                </div>
+            `;
+
+            document.getElementById('feedbackBtn').addEventListener('click', () => {
+                const url = 'https://t.me/Seregablatnou';
+                if (window.Telegram?.WebApp?.openTelegramLink) {
+                    window.Telegram.WebApp.openTelegramLink(url);
+                } else {
+                    window.open(url, '_blank');
+                }
+            });
+
+            document.getElementById('spinRouletteBtn').addEventListener('click', () => {
+                const prizes = ['Скидка 5%', 'Скидка 10%', 'Скидка 15%', 'Бесплатная жидкость'];
+                const win = prizes[Math.floor(Math.random() * prizes.length)];
+                localStorage.setItem('weggew_purchases', '0');
+                document.getElementById('rouletteResult').textContent = `🎉 Ваш приз: ${win}!`;
+                document.getElementById('spinRouletteBtn').disabled = true;
+                document.getElementById('spinRouletteBtn').textContent = 'Использовано';
+                showToast(`Вы выиграли: ${win}`);
+            });
+        }
 
         function showDeliveryModal() {
             const modal = document.createElement('div');
@@ -1525,7 +1647,7 @@
                 if (tab === 'home') showPage('welcome');
                 if (tab === 'catalog') showPage('catalog');
                 if (tab === 'cart') { showPage('cart'); renderCart(); }
-                if (tab === 'profile') showPage('profile');
+                if (tab === 'profile') { showPage('profile'); renderProfile(); }
             });
         });
 
