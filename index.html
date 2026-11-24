@@ -568,6 +568,65 @@
             box-shadow: var(--shadow-card);
         }
 
+        /* БРЕНДЫ СПИСОК (с миниатюрами) */
+        .brand-card {
+            background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-card); border-radius: 20px;
+            padding: 16px; display: flex; align-items: center; gap: 16px;
+            cursor: pointer; transition: background 0.2s, border-color 0.2s;
+            box-shadow: var(--shadow-card);
+        }
+        .brand-card:active { background: var(--bg-card-hover); }
+        .brand-card-thumb {
+            width: 56px; height: 56px; border-radius: 12px;
+            background: var(--border-card); display: flex; align-items: center; justify-content: center;
+            overflow: hidden; flex-shrink: 0; border: 1px solid var(--border-card);
+        }
+        .brand-card-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .brand-card-info { flex: 1; min-width: 0; }
+        .brand-card-name { font-size: 16px; font-weight: 700; text-transform: uppercase; }
+        .brand-card-count { font-size: 12px; color: var(--text-gray); margin-top: 2px; }
+        .brand-card-arrow { color: var(--text-gray); font-size: 20px; }
+
+        /* СТРАНИЦА МОДЕЛЕЙ БРЕНДА */
+        .product-detail-header { display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-card); position: sticky; top: 0; z-index: 10; box-shadow: var(--shadow-card); }
+        .product-detail-title { font-size: 18px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* СТРАНИЦА ТОВАРА */
+        .product-detail-content { padding: 20px 16px; display: flex; flex-direction: column; align-items: center; }
+        .product-detail-image-wrap { width: 100%; max-width: 320px; aspect-ratio: 1; margin-bottom: 20px; border-radius: 24px; overflow: hidden; background: var(--bg-dark); position: relative; }
+        .product-detail-image { width: 100%; height: 100%; object-fit: contain; transition: opacity 0.2s ease; }
+        .product-detail-category { font-size: 12px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .product-detail-name { font-size: 22px; font-weight: 900; text-transform: uppercase; text-align: center; margin-bottom: 6px; }
+        .product-detail-price { font-size: 20px; font-weight: 700; color: var(--text-white); margin-bottom: 4px; }
+        .product-detail-desc { font-size: 14px; color: var(--text-gray); text-align: center; margin-bottom: 24px; line-height: 1.4; }
+
+        .color-selector { width: 100%; max-width: 360px; margin-bottom: 20px; }
+        .color-selector-label { font-size: 12px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+        .color-selector-label span { color: var(--text-white); font-weight: 600; }
+        .color-thumbs { display: flex; gap: 10px; overflow-x: auto; padding: 4px 4px 8px; scrollbar-width: none; }
+        .color-thumbs::-webkit-scrollbar { display: none; }
+        .color-thumb {
+            width: 64px; height: 64px; border-radius: 12px; overflow: hidden; flex-shrink: 0;
+            border: 2px solid transparent; cursor: pointer; transition: border-color 0.2s, transform 0.1s;
+            background: var(--border-card); position: relative;
+        }
+        .color-thumb:active { transform: scale(0.95); }
+        .color-thumb.selected { border-color: var(--text-white); }
+        .color-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .color-thumb-name { position: absolute; bottom: 0; left: 0; right: 0; padding: 4px; font-size: 9px; text-align: center; background: linear-gradient(180deg, transparent, rgba(0,0,0,0.8)); color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .product-detail-footer { position: fixed; bottom: 0; left: 0; right: 0; padding: 16px; padding-bottom: calc(16px + env(safe-area-inset-bottom)); background: linear-gradient(180deg, transparent, var(--bg-dark) 30%, var(--bg-dark)); z-index: 50; }
+        .purchase-panel { max-width: 640px; margin: 0 auto; background: var(--bg-card); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border-card); border-radius: 20px; padding: 16px; box-shadow: var(--shadow-card); }
+        .quantity-selector { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+        .quantity-selector-label { font-size: 12px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; min-width: 60px; }
+        .quantity-control { display: flex; align-items: center; gap: 0; background: var(--bg-dark); border: 1px solid var(--border-card); border-radius: 14px; overflow: hidden; }
+        .qty-btn { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; color: var(--text-white); font-size: 20px; font-weight: 700; cursor: pointer; transition: background 0.1s; }
+        .qty-btn:active { background: rgba(255,255,255,0.1); }
+        .qty-value { min-width: 48px; text-align: center; font-size: 18px; font-weight: 700; color: var(--text-white); }
+        .add-to-cart-main { width: 100%; height: 56px; background: var(--text-white); color: var(--bg-dark); border: none; border-radius: 16px; font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: background 0.1s, transform 0.1s; }
+        .add-to-cart-main:active { background: #e0e0e0; transform: scale(0.98); }
+
         /* КОРЗИНА И ПРОФИЛЬ */
         #cartPage, #profilePage { padding: 20px 16px 100px; }
         .empty-state { text-align: center; padding: 60px 20px; color: var(--text-gray); }
@@ -642,6 +701,29 @@
                 <div class="product-list" id="brandList"></div>
             </div>
 
+            <!-- СТРАНИЦА МОДЕЛЕЙ БРЕНДА (для вейпов) -->
+            <div class="page" id="brandModelsPage">
+                <div class="sub-header">
+                    <button class="back-btn" id="backToBrands">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.4" stroke="currentColor" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                    </button>
+                    <div class="sub-title" id="brandModelsTitle">Модели</div>
+                </div>
+                <div class="product-list" id="brandModelsList"></div>
+            </div>
+
+            <!-- СТРАНИЦА ТОВАРА (для вейпов) -->
+            <div class="page" id="productDetailPage">
+                <div class="product-detail-header">
+                    <button class="back-btn" id="backToModels">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.4" stroke="currentColor" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                    </button>
+                    <div class="product-detail-title" id="productDetailTitle">Модель</div>
+                </div>
+                <div class="product-detail-content" id="productDetailContent"></div>
+                <div class="product-detail-footer" id="productDetailFooter"></div>
+            </div>
+
             <!-- КОРЗИНА -->
             <div class="page" id="cartPage">
                 <h1 class="section-title">КОРЗИНА</h1>
@@ -680,7 +762,8 @@
 
     <script>
         // --- ВАША ССЫЛКА НА CSV ---
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS9xjVn31NafFzNqA_aXeHhSeuvGcRiR3bf1pnfGD4HtEBAMuB6bS6j9ivHrR7zkzhGGtyk_R1PEc0V/pub?gid=0&single=true&output=csv';
+        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKsclp9BNO6AGdBL3JalqHSfz4nmyZV_osjJX_Vhn4QxdS5SNb2sR1HQltEUKJruEvvvou9K3-Y3Y/pub?gid=0&single=true&output=csv';
+
         // --- ДАННЫЕ ---
         const categories = [
             { id: 'vapes', name: 'ВЕЙПЫ', sub: '3 бренда', icon: '📱', image: 'vape.png' },
@@ -702,11 +785,15 @@ const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS9xjVn31
         let liquidBrands = [];
         let cart = [];
         let currentCategoryId = null;
+        let currentBrandIdx = null;
+        let currentModelIdx = null;
 
         const pages = {
             welcome: document.getElementById('welcomePage'),
             catalog: document.getElementById('catalogPage'),
             brand: document.getElementById('brandPage'),
+            brandModels: document.getElementById('brandModelsPage'),
+            productDetail: document.getElementById('productDetailPage'),
             cart: document.getElementById('cartPage'),
             profile: document.getElementById('profilePage')
         };
@@ -737,13 +824,14 @@ const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS9xjVn31
             // Subtle smoke on location page
             document.body.classList.toggle('subtle-smoke', name === 'location');
 
+            // Show bottom nav for main pages only
             if (name === 'catalog' || name === 'cart' || name === 'profile' || name === 'brand') {
                 bottomNav.style.display = 'flex';
             } else {
                 bottomNav.style.display = 'none';
             }
 
-            const tabMap = { catalog: 'catalog', brand: 'catalog', cart: 'cart', profile: 'profile' };
+            const tabMap = { catalog: 'catalog', brand: 'catalog', brandModels: 'catalog', productDetail: 'catalog', cart: 'cart', profile: 'profile' };
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.tab === (tabMap[name] || ''));
             });
@@ -964,44 +1052,26 @@ const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS9xjVn31
             brandPageTitle.textContent = category.name;
 
             if (categoryId === 'vapes') {
-                brandList.innerHTML = vapeBrands.map((b, bIdx) => `
-                    <div class="brand-group">
-                        <div class="brand-group-card" data-brand-idx="${bIdx}">
-                            <div class="brand-group-title">${b.brand}</div>
-                            <div class="brand-group-arrow">›</div>
+                brandList.innerHTML = vapeBrands.map((b, bIdx) => {
+                    const firstModel = b.models[0];
+                    return `
+                    <div class="brand-card" data-brand-idx="${bIdx}">
+                        <div class="brand-card-thumb">
+                            ${firstModel.image ? `<img src="${firstModel.image}" alt="${firstModel.name}">` : `<span>📱</span>`}
                         </div>
-                        <div class="brand-models-list" id="brandModels_${bIdx}">
-                            ${b.models.map((m, mIdx) => `
-                                <div class="product-card" data-model-target="colors_${bIdx}_${mIdx}">
-                                    <div class="product-thumb">
-                                        <img src="${m.image}" class="${m.isCover ? 'full-cover' : ''}" alt="${m.name}">
-                                    </div>
-                                    <div class="product-info">
-                                        <div class="product-title">${m.name} <span class="promo-badge">🤑 скидка на жидкость</span></div>
-                                        <div class="product-desc">${m.desc}</div>
-                                        <div class="product-price">${m.price} BYN</div>
-                                    </div>
-                                </div>
-                                <div class="model-colors-list" id="colors_${bIdx}_${mIdx}">
-                                    ${m.colors.map(c => `<div class="color-chip">${c}</div>`).join('')}
-                                </div>
-                            `).join('')}
+                        <div class="brand-card-info">
+                            <div class="brand-card-name">${b.brand}</div>
+                            <div class="brand-card-count">${b.models.length} моделей</div>
                         </div>
+                        <div class="brand-card-arrow">›</div>
                     </div>
-                `).join('');
+                    `;
+                }).join('');
 
-                brandList.querySelectorAll('.brand-group-card').forEach(card => {
+                brandList.querySelectorAll('.brand-card').forEach(card => {
                     card.addEventListener('click', () => {
                         const idx = card.dataset.brandIdx;
-                        card.classList.toggle('open');
-                        document.getElementById(`brandModels_${idx}`).classList.toggle('open');
-                    });
-                });
-
-                brandList.querySelectorAll('.product-card[data-model-target]').forEach(card => {
-                    card.addEventListener('click', () => {
-                        const targetId = card.dataset.modelTarget;
-                        document.getElementById(targetId).classList.toggle('open');
+                        openBrandModels(idx);
                     });
                 });
 
@@ -1063,6 +1133,135 @@ const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS9xjVn31
             }
 
             showPage('brand');
+        }
+
+        // Открыть модели бренда (для вейпов)
+        function openBrandModels(brandIdx) {
+            currentBrandIdx = brandIdx;
+            const brand = vapeBrands[brandIdx];
+            if (!brand) return;
+            
+            document.getElementById('brandModelsTitle').textContent = brand.brand;
+            const modelsList = document.getElementById('brandModelsList');
+            modelsList.innerHTML = brand.models.map((m, mIdx) => `
+                <div class="product-card" data-model-idx="${mIdx}">
+                    <div class="product-thumb">
+                        <img src="${m.image}" class="${m.isCover ? 'full-cover' : ''}" alt="${m.name}">
+                    </div>
+                    <div class="product-info">
+                        <div class="product-title">${m.name} <span class="promo-badge">🤑 скидка на жидкость</span></div>
+                        <div class="product-desc">${m.desc}</div>
+                        <div class="product-price">${m.price} BYN</div>
+                    </div>
+                </div>
+            `).join('');
+
+            modelsList.querySelectorAll('.product-card[data-model-idx]').forEach(card => {
+                card.addEventListener('click', () => {
+                    const mIdx = parseInt(card.dataset.modelIdx, 10);
+                    openProductDetail(brandIdx, mIdx);
+                });
+            });
+
+            showPage('brandModels');
+        }
+
+        // Открыть детальную страницу товара (для вейпов)
+        function openProductDetail(brandIdx, modelIdx) {
+            currentBrandIdx = brandIdx;
+            currentModelIdx = modelIdx;
+            const brand = vapeBrands[brandIdx];
+            const model = brand?.models[modelIdx];
+            if (!model) return;
+
+            const content = document.getElementById('productDetailContent');
+            const footer = document.getElementById('productDetailFooter');
+            document.getElementById('productDetailTitle').textContent = model.name.toUpperCase();
+
+            // Default to first color
+            let selectedColorIdx = 0;
+            const colors = model.colors && model.colors.length > 0 ? model.colors : ['Чёрный'];
+
+            function renderContent() {
+                const selectedColor = colors[selectedColorIdx];
+                const colorImages = model.colorImages || {};
+                const imageSrc = colorImages[selectedColor] || model.image;
+
+                content.innerHTML = `
+                    <div class="product-detail-image-wrap">
+                        <img class="product-detail-image" id="productMainImage" src="${imageSrc}" alt="${model.name}">
+                    </div>
+                    <div class="product-detail-category">POD-СИСТЕМЫ</div>
+                    <div class="product-detail-name">${model.name}</div>
+                    <div class="product-detail-price">${model.price} BYN</div>
+                    <div class="product-detail-desc">${model.desc || 'Под-система'}</div>
+
+                    <div class="color-selector">
+                        <div class="color-selector-label">ЦВЕТ: <span id="selectedColorName">${selectedColor}</span></div>
+                        <div class="color-thumbs" id="colorThumbs">
+                            ${colors.map((c, ci) => {
+                                const cImg = colorImages[c] || model.image;
+                                return `<div class="color-thumb ${ci === selectedColorIdx ? 'selected' : ''}" data-color-idx="${ci}">
+                                    <img src="${cImg}" alt="${c}">
+                                    <div class="color-thumb-name">${c}</div>
+                                </div>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+
+                footer.innerHTML = `
+                    <div class="purchase-panel">
+                        <div class="quantity-selector">
+                            <span class="quantity-selector-label">КОЛИЧЕСТВО</span>
+                            <div class="quantity-control">
+                                <button class="qty-btn" id="qtyDecrease">−</button>
+                                <span class="qty-value" id="qtyValue">1</span>
+                                <button class="qty-btn" id="qtyIncrease">+</button>
+                            </div>
+                        </div>
+                        <button class="add-to-cart-main" id="addToCartMain">В КОРЗИНУ</button>
+                    </div>
+                `;
+
+                // Color selection
+                document.querySelectorAll('#colorThumbs .color-thumb').forEach(thumb => {
+                    thumb.addEventListener('click', () => {
+                        selectedColorIdx = parseInt(thumb.dataset.colorIdx, 10);
+                        renderContent();
+                    });
+                });
+
+                // Quantity controls
+                let qty = 1;
+                const qtyValue = document.getElementById('qtyValue');
+                document.getElementById('qtyDecrease').addEventListener('click', () => {
+                    if (qty > 1) {
+                        qty--;
+                        qtyValue.textContent = qty;
+                    }
+                });
+                document.getElementById('qtyIncrease').addEventListener('click', () => {
+                    qty++;
+                    qtyValue.textContent = qty;
+                });
+
+                // Add to cart
+                document.getElementById('addToCartMain').addEventListener('click', () => {
+                    const selectedColor = colors[selectedColorIdx];
+                    addToCart({
+                        name: model.name,
+                        price: model.price,
+                        desc: model.desc || 'Под-система',
+                        color: selectedColor,
+                        image: model.colorImages?.[selectedColor] || model.image
+                    });
+                    showToast(`${model.name} (${selectedColor}) × ${qty} добавлено в корзину`);
+                });
+            }
+
+            renderContent();
+            showPage('productDetail');
         }
 
         // --- КОРЗИНА ---
@@ -1303,6 +1502,9 @@ const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS9xjVn31
         });
 
         document.getElementById('backToCatalog').addEventListener('click', () => showPage('catalog'));
+
+        document.getElementById('backToBrands').addEventListener('click', () => showPage('brand'));
+        document.getElementById('backToModels').addEventListener('click', () => showPage('brandModels'));
 
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', () => {
