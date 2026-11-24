@@ -680,14 +680,9 @@
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
                         <input type="text" placeholder="Поиск товаров..." id="searchInput">
                     </div>
-                    <div class="filters-row">
-                        <div class="filter-chip">📍 Вокзал <span>⌄</span></div>
-                        <div class="filter-chip">АКЦИИ</div>
-                        <div class="filter-chip">НОВОСТИ <span class="badge-dot"></span></div>
-                    </div>
+                   
                 </div>
                 <div class="category-grid" id="categoryGrid"></div>
-                <div class="scroll-hint" id="scrollHint">Листайте вниз ↓</div>
             </div>
 
             <!-- СТРАНИЦА БРЕНДА -->
@@ -1434,7 +1429,16 @@
 
             let selectedDay = 'Сегодня';
             const timeSelect = modal.querySelector('#deliveryTime');
-            const timeOptions = ['10:00', '12:00', '15:00', '17:00', '19:00', '21:00'];
+            const timeOptions = [
+    '09:00 - 11:00',
+    '11:00 - 13:00',
+    '13:00 - 15:00',
+    '15:00 - 17:00',
+    '17:00 - 19:00',
+    '19:00 - 21:00',
+    '21:00 - 23:00',
+    'как можно быстрее'
+];
             
             const defaultOpt = document.createElement('option');
             defaultOpt.value = '';
