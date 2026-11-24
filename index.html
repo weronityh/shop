@@ -1264,6 +1264,10 @@
             currentBrandIdx = brandIdx;
             const brand = vapeBrands[brandIdx];
             if (!brand) return;
+            if (brand.models.length === 1) {
+                openProductDetail(brandIdx, 0);
+                return;
+            }
             
             document.getElementById('brandModelsTitle').textContent = brand.brand;
             const modelsList = document.getElementById('brandModelsList');
@@ -1731,7 +1735,11 @@ function renderProfile() {
         document.getElementById('backToCatalog').addEventListener('click', () => showPage('catalog'));
 
         document.getElementById('backToBrands').addEventListener('click', () => showPage('brand'));
-        document.getElementById('backToModels').addEventListener('click', () => showPage('brandModels'));
+        document.getElementById('backToModels').addEventListener('click', () => {
+            const brand = vapeBrands[currentBrandIdx];
+            if (brand && brand.models.length === 1) showPage('brand');
+            else showPage('brandModels');
+        });
 
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', () => {
