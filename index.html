@@ -9,9 +9,16 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
-            --bg-dark: #000000; --bg-card: #111111; --bg-card-hover: #1a1a1a;
-            --text-white: #ffffff; --text-gray: #888888; --accent: #ffffff;
-            --border-dark: #222222; --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --bg-dark: #000000;
+            --bg-card: rgba(14, 14, 14, 0.88);
+            --bg-card-hover: rgba(24, 24, 24, 0.94);
+            --text-white: #ffffff;
+            --text-gray: #8a8a8a;
+            --accent: #ffffff;
+            --border-dark: rgba(255, 255, 255, 0.1);
+            --border-card: rgba(255, 255, 255, 0.1);
+            --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
         html, body { height: 100%; height: 100dvh; overflow: hidden; overscroll-behavior: none; }
         body { font-family: var(--font-main); background: var(--bg-dark); color: var(--text-white); display: flex; flex-direction: column; font-size: 15px; line-height: 1.4; }
@@ -24,7 +31,7 @@
             height: 100lvh;
             min-height: 100vh;
             pointer-events: none;
-            z-index: 2;
+            z-index: 1;
             transition: opacity 0.4s ease;
         }
         body.subtle-smoke .smoke-canvas {
@@ -48,6 +55,7 @@
             flex-direction: column;
             overflow: hidden;
             position: relative;
+            z-index: 2;
         }
         main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; position: relative; }
         .page { display: none; min-height: 100%; flex-direction: column; }
@@ -466,7 +474,7 @@
         .location-title { font-size: 28px; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
         .location-desc { font-size: 13px; color: var(--text-gray); line-height: 1.5; max-width: 300px; margin: 0 auto; }
         .location-list { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
-        .location-card { background: var(--bg-card); border: 1px solid var(--border-dark); border-radius: 20px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: background 0.2s, border-color 0.2s; text-align: left; position: relative; z-index: 1; }
+        .location-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: background 0.2s, border-color 0.2s; text-align: left; position: relative; z-index: 1; box-shadow: var(--shadow-card); }
         .location-card:active { background: var(--bg-card-hover); }
         .location-card.selected { border-color: var(--text-white); }
         .location-card-icon { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
@@ -481,17 +489,17 @@
         #catalogPage { padding: 20px 16px 100px; }
         .catalog-header { margin-bottom: 20px; }
         .catalog-title { font-size: 26px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 16px; }
-        .search-bar { display: flex; align-items: center; gap: 10px; background: var(--bg-card); border: 1px solid var(--border-dark); border-radius: 20px; padding: 12px 16px; margin-bottom: 16px; }
+        .search-bar { display: flex; align-items: center; gap: 10px; background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 12px 16px; margin-bottom: 16px; box-shadow: var(--shadow-card); }
         .search-bar input { background: transparent; border: none; outline: none; color: var(--text-white); font-size: 14px; width: 100%; font-family: inherit; }
         .search-bar input::placeholder { color: var(--text-gray); }
         .search-bar svg { width: 20px; height: 20px; stroke: var(--text-gray); flex-shrink: 0; }
         .filters-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; margin-bottom: 20px; }
         .filters-row::-webkit-scrollbar { display: none; }
-        .filter-chip { background: var(--bg-card); border: 1px solid var(--border-dark); border-radius: 20px; padding: 8px 16px; font-size: 12px; color: var(--text-white); white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .filter-chip { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 8px 16px; font-size: 12px; color: var(--text-white); white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 6px; flex-shrink: 0; box-shadow: var(--shadow-card); }
         .filter-chip.active { background: var(--text-white); color: var(--bg-dark); border-color: var(--text-white); }
         .filter-chip .badge-dot { width: 8px; height: 8px; background: var(--text-white); border-radius: 50%; }
         .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .category-card { background: var(--bg-card); border: 1px solid var(--border-dark); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; cursor: pointer; transition: background 0.2s; text-align: center; position: relative; z-index: 1; }
+        .category-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; cursor: pointer; transition: background 0.2s; text-align: center; position: relative; z-index: 1; box-shadow: var(--shadow-card); }
         .category-card:active { background: var(--bg-card-hover); }
         .category-card-image { width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 48px; }
         .category-card-image img { width: 100%; height: 100%; object-fit: contain; }
@@ -501,19 +509,19 @@
         @keyframes fadeInOut { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
 
         /* НИЖНЯЯ НАВИГАЦИЯ */
-        .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(20px); border-top: 1px solid var(--border-dark); display: flex; justify-content: space-around; align-items: center; height: calc(68px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); z-index: 100; }
+        .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; background: var(--bg-card); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border-card); display: flex; justify-content: space-around; align-items: center; height: calc(68px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); z-index: 100; box-shadow: var(--shadow-card); }
         .nav-btn { position: relative; background: none; border: none; color: var(--text-gray); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; padding: 8px 16px; font-family: inherit; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; transition: color 0.2s; }
         .nav-btn.active { color: var(--text-white); }
         .nav-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; }
 
         /* СТРАНИЦА БРЕНДА */
-        .sub-header { display: flex; align-items: center; gap: 12px; padding: 16px; margin-bottom: 16px; background: var(--bg-dark); position: sticky; top: 0; z-index: 10; }
-        .back-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-dark); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-white); }
+        .sub-header { display: flex; align-items: center; gap: 12px; padding: 16px; margin-bottom: 16px; background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-card); position: sticky; top: 0; z-index: 10; box-shadow: var(--shadow-card); }
+        .back-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-white); box-shadow: var(--shadow-card); }
         .sub-title { font-size: 18px; font-weight: 600; }
         .product-list { display: flex; flex-direction: column; gap: 12px; padding: 0 16px 100px; }
-        .product-card { background: var(--bg-card); border: 1px solid var(--border-dark); border-radius: 20px; padding: 14px; display: flex; gap: 14px; align-items: center; cursor: pointer; transition: background 0.2s; position: relative; z-index: 1; }
+        .product-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 14px; display: flex; gap: 14px; align-items: center; cursor: pointer; transition: background 0.2s; position: relative; z-index: 1; box-shadow: var(--shadow-card); }
         .product-card:active { background: var(--bg-card-hover); }
-        .product-thumb { width: 80px; height: 80px; border-radius: 14px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 32px; flex-shrink: 0; overflow: hidden; }
+        .product-thumb { width: 80px; height: 80px; border-radius: 14px; background: var(--border-card); display: flex; align-items: center; justify-content: center; font-size: 32px; flex-shrink: 0; overflow: hidden; border: 1px solid var(--border-card); }
         .product-thumb img { width: 100%; height: 100%; object-fit: contain; }
         .product-thumb img.full-cover { object-fit: cover; transform: scale(1.25); }
         .product-info { flex: 1; min-width: 0; }
@@ -530,9 +538,11 @@
         /* АККОРДЕОН БРЕНДОВ И РАСЦВЕТОК */
         .brand-group { display: flex; flex-direction: column; gap: 8px; }
         .brand-group-card {
-            background: var(--bg-card); border: 1px solid var(--border-dark); border-radius: 20px;
+            background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-card); border-radius: 20px;
             padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
             cursor: pointer; transition: background 0.2s, border-color 0.2s;
+            box-shadow: var(--shadow-card);
         }
         .brand-group-card:active { background: var(--bg-card-hover); }
         .brand-group-card.open { border-color: var(--text-white); }
@@ -545,13 +555,17 @@
 
         .model-colors-list {
             display: none; flex-wrap: wrap; gap: 8px; padding: 10px 14px;
-            background: rgba(255,255,255,0.03); border: 1px solid var(--border-dark);
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-card);
             border-radius: 16px; margin-top: -4px;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            box-shadow: var(--shadow-card);
         }
         .model-colors-list.open { display: flex; }
         .color-chip {
-            background: var(--bg-card); border: 1px solid var(--border-dark);
+            background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-card);
             border-radius: 12px; padding: 6px 12px; font-size: 12px; color: var(--text-white);
+            box-shadow: var(--shadow-card);
         }
 
         /* КОРЗИНА И ПРОФИЛЬ */
@@ -666,7 +680,7 @@
 
     <script>
         // --- ВАША ССЫЛКА НА CSV ---
-        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS9xjVn31NafFzNqA_aXeHhSeuvGcRiR3bf1pnfGD4HtEBAMuB6bS6j9ivHrR7zkzhGGtyk_R1PEc0V/pub?gid=0&single=true&output=csv';
+        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKsclp9BNO6AGdBL3JalqHSfz4nmyZV_osjJX_Vhn4QxdS5SNb2sR1HQltEUKJruEvvvou9K3-Y3Y/pub?gid=0&single=true&output=csv';
 
         // --- ДАННЫЕ ---
         const categories = [
@@ -677,129 +691,16 @@
             { id: 'consumables', name: 'РАСХОДНИКИ', sub: '5 брендов', icon: '🔧', image: 'rashodniki.png' }
         ];
 
-        const vapeBrands = [
-            {
-                brand: 'XROS',
-                models: [
-                    { name: 'XROS 6', desc: 'Под-система', price: 85, image: 'vape.png', colors: ['Чёрный', 'Серебро', 'Синий', 'Красный'] },
-                    { name: 'XROS 6 mini', desc: 'Под-система', price: 65, image: 'xros6mini.png', isCover: true, colors: ['Чёрный', 'Серебро', 'Фиолетовый', 'Зелёный'] },
-                    { name: 'XROS 5 mini', desc: 'Под-система', price: 60, image: 'vape.png', colors: ['Чёрный', 'Серый', 'Розовый'] },
-                    { name: 'XROS 5 mini CE', desc: 'Под-система', price: 65, image: 'vape.png', colors: ['Чёрный', 'Белый', 'Синий'] },
-                    { name: 'XROS CUBE', desc: 'Под-система', price: 50, image: 'vape.png', colors: ['Чёрный', 'Серый', 'Оранжевый'] },
-                    { name: 'XROS PRO 2', desc: 'Под-система', price: 90, image: 'vape.png', colors: ['Чёрный', 'Серебро', 'Синий'] }
-                ]
-            },
-            {
-                brand: 'AEGIS',
-                models: [
-                    { name: 'AEGIS HERO CRYSTAL', desc: 'Под-система', price: 85, image: 'vape.png', colors: ['Чёрный', 'Прозрачный', 'Синий'] },
-                    { name: 'AEGIS HERO 3', desc: 'Под-система', price: 85, image: 'vape.png', colors: ['Чёрный', 'Красный', 'Синий'] },
-                    { name: 'AEGIS HERO 5', desc: 'Под-система', price: 95, image: 'vape.png', colors: ['Чёрный', 'Серебро', 'Зелёный'] },
-                    { name: 'AEGIS BOOST 3', desc: 'Под-система', price: 100, image: 'vape.png', colors: ['Чёрный', 'Серый', 'Синий'] }
-                ]
-            },
-            {
-                brand: 'PASITO 3',
-                models: [
-                    { name: 'PASITO 3', desc: 'Под-система', price: 110, image: 'vape.png', colors: ['Чёрный', 'Серебро', 'Карбон'] }
-                ]
-            }
-        ];
-        const liquidBrands = [
-            {
-                brand: 'BJORN',
-                flavors: [
-                    { name: 'BJORN HEADSHOT', desc: '100MG', price: 17 },
-                    { name: 'BJORN ZLOY LONG', desc: '80MG', price: 17 },
-                    { name: 'BJORN DON ORO', desc: '80MG', price: 17 },
-                    { name: 'BJORN СОН ПРИЗРАКА', desc: '80MG', price: 17 },
-                    { name: 'BJORN ZLOY V1/V2', desc: '50MG', price: 17 },
-                    { name: 'BJORN VMЁD', desc: '50MG', price: 17 },
-                    { name: 'BJORN JOKER', desc: '20MG', price: 17 }
-                ]
-            },
-            {
-                brand: 'ELFIQ',
-                flavors: [
-                    { name: 'ELFIQ 50MG', desc: '50MG', price: 17 }
-                ]
-            },
-            {
-                brand: 'ANNIMA LOVE',
-                flavors: [
-                    { name: 'ANNIMA LOVE 50MG', desc: '50MG', price: 17 }
-                ]
-            },
-            {
-                brand: 'PODONKI PODGON',
-                flavors: [
-                    { name: 'PODONKI PODGON 50MG', desc: '50MG', price: 17 }
-                ]
-            },
-            {
-                brand: 'РИК И МОРТИ',
-                flavors: [
-                    { name: 'РИК И МОРТИ 50MG', desc: '50MG', price: 17 }
-                ]
-            },
-            {
-                brand: 'HOTSPOT',
-                flavors: [
-                    { name: 'HOTSPOT 50MG', desc: '50MG', price: 17 }
-                ]
-            }
-        ];
-
         const catalogData = {
-            vapes: [
-                { id: 'v1', name: 'XROS 6', desc: 'Под-система', price: 85, icon: '📱', image: 'vape.png' },
-                { id: 'v2', name: 'XROS 6 mini', desc: 'Под-система', price: 65, icon: '📱', image: 'xros6mini.png', isCover: true },
-                { id: 'v3', name: 'XROS 5 mini', desc: 'Под-система', price: 60, icon: '📱', image: 'vape.png' },
-                { id: 'v4', name: 'XROS 5 mini CE', desc: 'Под-система', price: 65, icon: '📱', image: 'vape.png' },
-                { id: 'v5', name: 'XROS CUBE', desc: 'Под-система', price: 50, icon: '📱', image: 'vape.png' },
-                { id: 'v6', name: 'XROS PRO 2', desc: 'Под-система', price: 90, icon: '📱', image: 'vape.png' },
-                { id: 'v7', name: 'AEGIS HERO CRYSTAL', desc: 'Под-система', price: 85, icon: '🔋', image: 'vape.png' },
-                { id: 'v8', name: 'AEGIS HERO 3', desc: 'Под-система', price: 85, icon: '🔋', image: 'vape.png' },
-                { id: 'v9', name: 'AEGIS HERO 5', desc: 'Под-система', price: 95, icon: '🔋', image: 'vape.png' },
-                { id: 'v10', name: 'AEGIS BOOST 3', desc: 'Под-система', price: 100, icon: '🔋', image: 'vape.png' },
-                { id: 'v11', name: 'PASITO 3', desc: 'Под-система', price: 110, icon: '⚡', image: 'vape.png' }
-            ],
-            snus: [
-                { id: 's1', name: 'DRYMOST', desc: '75/150/175/200MG', price: 15, icon: '📦', image: 'snus.png' },
-                { id: 's2', name: 'ICEBURN', desc: '75/150MG', price: 15, icon: '📦', image: 'snus.png' },
-                { id: 's3', name: 'GLICH POUCHES', desc: '75MG', price: 15, icon: '📦', image: 'snus.png' }
-            ],
-            liquids: [
-                { id: 'l1', name: 'BJORN HEADSHOT', desc: '100MG', price: 17, icon: '💧', image: 'zhizha.png' },
-                { id: 'l2', name: 'BJORN ZLOY LONG', desc: '80MG', price: 17, icon: '💧', image: 'zhizha.png' },
-                { id: 'l3', name: 'BJORN DON ORO', desc: '80MG', price: 17, icon: '💧', image: 'zhizha.png' },
-                { id: 'l4', name: 'BJORN СОН ПРИЗРАКА', desc: '80MG', price: 17, icon: '💧', image: 'zhizha.png' },
-                { id: 'l5', name: 'BJORN ZLOY V1/V2', desc: '50MG', price: 17, icon: '💧', image: 'zhizha.png' },
-                { id: 'l6', name: 'BJORN VMЁD', desc: '50MG', price: 17, icon: '💧', image: 'zhizha.png' },
-                { id: 'l7', name: 'BJORN JOKER', desc: '20MG', price: 17, icon: '💧', image: 'zhizha.png' },
-                { id: 'l8', name: 'ELFIQ', desc: '50MG', price: 17, icon: '💧', image: 'zhizha.png' },
-                { id: 'l9', name: 'ANNIMA LOVE', desc: '50MG', price: 17, icon: '💧', image: 'zhizha.png' },
-                { id: 'l10', name: 'PODONKI PODGON', desc: '50MG', price: 17, icon: '💧', image: 'zhizha.png' },
-                { id: 'l11', name: 'РИК И МОРТИ', desc: '50MG', price: 17, icon: '💧', image: 'zhizha.png' },
-                { id: 'l12', name: 'HOTSPOT', desc: '50MG', price: 17, icon: '💧', image: 'zhizha.png' }
-            ],
-            disposables: [
-                { id: 'd1', name: 'PUFFUP 5k', desc: 'Одноразка', price: 25, icon: '🚬', image: 'odnorazki.png' },
-                { id: 'd2', name: 'ELFBAR 40k', desc: 'Одноразка', price: 35, icon: '🚬', image: 'odnorazki.png' },
-                { id: 'd3', name: 'VOZOL 40k', desc: 'Одноразка', price: 35, icon: '🚬', image: 'odnorazki.png' },
-                { id: 'd4', name: 'BJORN TRON 55k', desc: 'Одноразка', price: 40, icon: '🚬', image: 'odnorazki.png' }
-            ],
-            consumables: [
-                { id: 'c1', name: 'XROS 0.6 Ом 2ml', desc: 'Картридж', price: 12, icon: '🔧', image: 'rashodniki.png' },
-                { id: 'c2', name: 'XROS 0.6 Ом 3ml', desc: 'Картридж', price: 12, icon: '🔧', image: 'rashodniki.png' },
-                { id: 'c3', name: 'XROS 0.4 Ом 3ml', desc: 'Картридж', price: 13, icon: '🔧', image: 'rashodniki.png' },
-                { id: 'c4', name: 'Aegis hero/boost (0.3)', desc: 'Испаритель', price: 10, icon: '🔧', image: 'rashodniki.png' },
-                { id: 'c5', name: 'Pasito 2/knight 55-65Ватт', desc: 'Испаритель', price: 12, icon: '🔧', image: 'rashodniki.png' },
-                { id: 'c6', name: 'Pasito 2/knight 70-90Ватт', desc: 'Испаритель', price: 12, icon: '🔧', image: 'rashodniki.png' },
-                { id: 'c7', name: 'Картридж Pasito 3 (без испар)', desc: 'Картридж', price: 8, icon: '🔧', image: 'rashodniki.png' }
-            ]
+            vapes: [],
+            snus: [],
+            liquids: [],
+            disposables: [],
+            consumables: []
         };
 
+        let vapeBrands = [];
+        let liquidBrands = [];
         let cart = [];
         let currentCategoryId = null;
 
@@ -899,9 +800,13 @@
 
                 const headers = rows[0].map(h => h.toLowerCase().trim());
                 const idxCat = headers.indexOf('category');
+                const idxBrand = headers.indexOf('brand');
                 const idxName = headers.indexOf('name');
+                const idxDesc = headers.indexOf('desc');
                 const idxPrice = headers.indexOf('price');
                 const idxStock = headers.indexOf('stock');
+                const idxColors = headers.indexOf('colors');
+                const idxImage = headers.indexOf('image');
 
                 if (idxName === -1 || idxPrice === -1) {
                     console.warn('В таблице не найдены столбцы name или price');
@@ -916,6 +821,16 @@
                     'disposables': 'disposables'
                 };
 
+                const defaultImages = {
+                    vapes: 'vape.png',
+                    snus: 'snus.png',
+                    liquids: 'zhizha.png',
+                    disposables: 'odnorazki.png',
+                    consumables: 'rashodniki.png'
+                };
+
+                const newVapeData = [];
+                const newLiquidData = [];
                 const newData = {
                     vapes: [],
                     snus: [],
@@ -934,40 +849,87 @@
                     const name = r[idxName].trim();
                     const price = Number(r[idxPrice]) || 0;
                     const stock = idxStock !== -1 ? (Number(r[idxStock]) || 0) : 99;
+                    const brand = idxBrand !== -1 ? r[idxBrand].trim() : '';
+                    const desc = idxDesc !== -1 ? r[idxDesc].trim() : '';
+                    const colorsStr = idxColors !== -1 ? r[idxColors].trim() : '';
+                    const image = idxImage !== -1 ? r[idxImage].trim() : '';
 
                     if (stock <= 0) continue;
 
-                    if (newData[siteCat]) {
-                        const existingItem = catalogData[siteCat]?.find(item => item.name.toLowerCase() === name.toLowerCase());
-                        
-                        let img = existingItem ? existingItem.image : 'vape.png';
-                        let isCover = false;
+                    const colors = colorsStr ? colorsStr.split(',').map(c => c.trim()).filter(Boolean) : [];
+                    const img = image || defaultImages[siteCat] || 'vape.png';
+                    const isCover = name.toLowerCase() === 'xros 6 mini';
 
-                        if (name.toLowerCase() === 'xros 6 mini') {
-                            img = 'xros6mini.png';
-                            isCover = true;
-                        }
+                    const item = {
+                        id: `auto_${i}`,
+                        name: name,
+                        desc: desc,
+                        price: price,
+                        image: img,
+                        isCover: isCover
+                    };
 
-                        newData[siteCat].push({
-                            id: existingItem ? existingItem.id : `auto_${i}`,
-                            name: name,
-                            desc: existingItem ? existingItem.desc : '',
-                            price: price,
-                            icon: existingItem ? existingItem.icon : '📦',
-                            image: img,
-                            isCover: isCover
-                        });
+                    if (siteCat === 'vapes' && brand) {
+                        newVapeData.push({ ...item, brand, colors });
+                    } else if (siteCat === 'liquids' && brand) {
+                        newLiquidData.push({ ...item, brand });
+                    } else if (newData[siteCat]) {
+                        const iconMap = { vapes: '📱', snus: '📦', liquids: '💧', disposables: '🚬', consumables: '🔧' };
+                        newData[siteCat].push({ ...item, icon: iconMap[siteCat] || '📦' });
                     }
                 }
 
+                // Build vapeBrands grouped by brand
+                const vapeBrandMap = new Map();
+                for (const item of newVapeData) {
+                    if (!vapeBrandMap.has(item.brand)) {
+                        vapeBrandMap.set(item.brand, { brand: item.brand, models: [] });
+                    }
+                    vapeBrandMap.get(item.brand).models.push({
+                        name: item.name,
+                        desc: item.desc || 'Под-система',
+                        price: item.price,
+                        image: item.image,
+                        isCover: item.isCover,
+                        colors: item.colors.length > 0 ? item.colors : ['Чёрный']
+                    });
+                }
+                vapeBrands = Array.from(vapeBrandMap.values());
+
+                // Build liquidBrands grouped by brand
+                const liquidBrandMap = new Map();
+                for (const item of newLiquidData) {
+                    if (!liquidBrandMap.has(item.brand)) {
+                        liquidBrandMap.set(item.brand, { brand: item.brand, flavors: [] });
+                    }
+                    liquidBrandMap.get(item.brand).flavors.push({
+                        name: item.name,
+                        desc: item.desc || '',
+                        price: item.price
+                    });
+                }
+                liquidBrands = Array.from(liquidBrandMap.values());
+
+                // Update other categories
                 Object.keys(newData).forEach(key => {
                     if (newData[key].length > 0) {
                         catalogData[key] = newData[key];
                     }
                 });
 
-                console.log('Данные синхронизированы');
+                // Update categories array with actual counts
+                categories[0].sub = `${vapeBrands.length} бренд${vapeBrands.length === 1 ? '' : vapeBrands.length < 5 ? 'а' : 'ов'}`;
+                categories[2].sub = `${liquidBrands.length} бренд${liquidBrands.length === 1 ? '' : liquidBrands.length < 5 ? 'а' : 'ов'}`;
+                categories[1].sub = `${catalogData.snus.length} товар${catalogData.snus.length === 1 ? '' : catalogData.snus.length < 5 ? 'а' : 'ов'}`;
+                categories[3].sub = `${catalogData.disposables.length} товар${catalogData.disposables.length === 1 ? '' : catalogData.disposables.length < 5 ? 'а' : 'ов'}`;
+                categories[4].sub = `${catalogData.consumables.length} товар${catalogData.consumables.length === 1 ? '' : catalogData.consumables.length < 5 ? 'а' : 'ов'}`;
+
+                console.log('Данные синхронизированы:', { vapeBrands: vapeBrands.length, liquidBrands: liquidBrands.length, ...Object.fromEntries(Object.entries(catalogData).map(([k,v]) => [k, v.length])) });
                 
+                // Re-render categories if on catalog page
+                renderCategories();
+                
+                // Update open category page if user is inside it
                 if (currentCategoryId && pages.brand.classList.contains('active')) {
                     openCategory(currentCategoryId);
                 }
@@ -978,14 +940,17 @@
 
         function renderCategories() {
             categoryGrid.innerHTML = categories.map(cat => {
-                const count = cat.id === 'vapes' ? vapeBrands.length : (catalogData[cat.id]?.length || 0);
+                let count = 0;
+                if (cat.id === 'vapes') count = vapeBrands.length;
+                else if (cat.id === 'liquids') count = liquidBrands.length;
+                else count = catalogData[cat.id]?.length || 0;
                 return `
                 <div class="category-card" data-category="${cat.id}">
                     <div class="category-card-image">
                         ${cat.image ? `<img src="${cat.image}" alt="${cat.name}">` : `<span>${cat.icon}</span>`}
                     </div>
                     <div class="category-card-title">${cat.name}</div>
-                    <div class="category-card-sub">${cat.id === 'vapes' ? `${count} бренда` : `${count} шт.`}</div>
+                    <div class="category-card-sub">${(cat.id === 'vapes' || cat.id === 'liquids') ? `${count} бренд${count === 1 ? '' : count < 5 ? 'а' : 'ов'}` : `${count} шт.`}</div>
                 </div>
             `}).join('');
 
@@ -1144,7 +1109,7 @@
                     ${cart.map(item => {
                         total += item.price * item.qty;
                         return `
-                        <div class="cart-item" style="background:var(--bg-card); border:1px solid var(--border-dark); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:10px;">
+                        <div class="cart-item" style="background:var(--bg-card); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid var(--border-card); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:10px; box-shadow:var(--shadow-card);">
                             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                                 <div style="flex:1; min-width:0;">
                                     <div style="font-size:15px; font-weight:700; text-transform:uppercase;">${item.name}</div>
@@ -1153,17 +1118,17 @@
                                 </div>
                                 <div style="font-size:16px; font-weight:700; white-space:nowrap;">${item.price * item.qty} BYN</div>
                             </div>
-                            <div style="display:flex; align-items:center; gap:8px; border-top:1px solid var(--border-dark); padding-top:10px;">
-                                <button class="qty-btn" data-id="${item.id}" data-action="decrease" style="width:36px; height:36px; border-radius:50%; background:var(--bg-dark); border:1px solid var(--border-dark); color:var(--text-white); font-size:18px; display:flex; align-items:center; justify-content:center;">−</button>
+                            <div style="display:flex; align-items:center; gap:8px; border-top:1px solid var(--border-card); padding-top:10px;">
+                                <button class="qty-btn" data-id="${item.id}" data-action="decrease" style="width:36px; height:36px; border-radius:50%; background:var(--bg-dark); border:1px solid var(--border-card); color:var(--text-white); font-size:18px; display:flex; align-items:center; justify-content:center;">−</button>
                                 <span class="qty-value" style="min-width:24px; text-align:center; font-size:15px; font-weight:600;">${item.qty}</span>
-                                <button class="qty-btn" data-id="${item.id}" data-action="increase" style="width:36px; height:36px; border-radius:50%; background:var(--bg-dark); border:1px solid var(--border-dark); color:var(--text-white); font-size:18px; display:flex; align-items:center; justify-content:center;">+</button>
-                                <button class="remove-btn" data-id="${item.id}" style="margin-left:auto; padding:6px 12px; background:transparent; border:1px solid var(--border-dark); border-radius:12px; color:var(--text-gray); font-size:11px; text-transform:uppercase; letter-spacing:0.5px;">Удалить</button>
+                                <button class="qty-btn" data-id="${item.id}" data-action="increase" style="width:36px; height:36px; border-radius:50%; background:var(--bg-dark); border:1px solid var(--border-card); color:var(--text-white); font-size:18px; display:flex; align-items:center; justify-content:center;">+</button>
+                                <button class="remove-btn" data-id="${item.id}" style="margin-left:auto; padding:6px 12px; background:transparent; border:1px solid var(--border-card); border-radius:12px; color:var(--text-gray); font-size:11px; text-transform:uppercase; letter-spacing:0.5px;">Удалить</button>
                             </div>
                         </div>
                         `;
                     }).join('')}
                 </div>
-                <div style="position:fixed; bottom:calc(68px + env(safe-area-inset-bottom)); left:0; right:0; background:rgba(0,0,0,0.95); backdrop-filter:blur(20px); border-top:1px solid var(--border-dark); padding:16px; display:flex; flex-direction:column; gap:12px; z-index:100;">
+                <div style="position:fixed; bottom:calc(68px + env(safe-area-inset-bottom)); left:0; right:0; background:var(--bg-card); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-top:1px solid var(--border-card); padding:16px; display:flex; flex-direction:column; gap:12px; z-index:100; box-shadow:var(--shadow-card);">
                     <div style="display:flex; justify-content:space-between; font-size:16px; font-weight:700;">
                         <span>Итого</span>
                         <span id="cartTotal">${total} BYN</span>
@@ -1227,34 +1192,42 @@
             `;
             modal.innerHTML = `
                 <div style="
-                    background: var(--bg-card); border: 1px solid var(--border-dark);
+                    background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+                    border: 1px solid var(--border-card);
                     border-radius: 20px; padding: 24px; width: 100%; max-width: 360px;
                     animation: slideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+                    box-shadow: var(--shadow-card);
                 ">
                     <h3 style="font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; text-align: center;">ВРЕМЯ ПОЛУЧЕНИЯ</h3>
                     <p style="font-size: 13px; color: var(--text-gray); text-align: center; margin-bottom: 20px;">Когда вам удобно забрать заказ?</p>
                     <div class="delivery-options" style="display: flex; flex-direction: column; gap: 10px;">
                         <button class="delivery-option" data-day="today" style="
-                            padding: 16px; border-radius: 14px; border: 1px solid var(--border-dark);
-                            background: var(--bg-dark); color: var(--text-white); font-size: 15px; font-weight: 600;
+                            padding: 16px; border-radius: 14px; border: 1px solid var(--border-card);
+                            background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+                            color: var(--text-white); font-size: 15px; font-weight: 600;
                             text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;
                             display: flex; align-items: center; justify-content: center; gap: 10px;
                             transition: background 0.2s, border-color 0.2s;
+                            box-shadow: var(--shadow-card);
                         ">📍 Сегодня</button>
                         <button class="delivery-option" data-day="tomorrow" style="
-                            padding: 16px; border-radius: 14px; border: 1px solid var(--border-dark);
-                            background: var(--bg-dark); color: var(--text-white); font-size: 15px; font-weight: 600;
+                            padding: 16px; border-radius: 14px; border: 1px solid var(--border-card);
+                            background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+                            color: var(--text-white); font-size: 15px; font-weight: 600;
                             text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;
                             display: flex; align-items: center; justify-content: center; gap: 10px;
                             transition: background 0.2s, border-color 0.2s;
+                            box-shadow: var(--shadow-card);
                         ">📅 Завтра</button>
                     </div>
                     <div class="time-picker" style="display: none; margin-top: 16px;">
                         <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Выберите время</label>
                         <select id="deliveryTime" style="
                             width: 100%; padding: 14px 16px; border-radius: 12px;
-                            background: var(--bg-dark); border: 1px solid var(--border-dark);
+                            background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+                            border: 1px solid var(--border-card);
                             color: var(--text-white); font-size: 14px; font-family: inherit;
+                            box-shadow: var(--shadow-card);
                         "></select>
                     </div>
                 </div>
@@ -1324,8 +1297,8 @@
         }
 
         // --- ОБРАБОТЧИКИ ---
-        document.getElementById('goToCatalogBtn').addEventListener('click', async () => {
-            await syncWithSheet();
+        document.getElementById('goToCatalogBtn').addEventListener('click', () => {
+            // Данные уже загружены при старте, просто переходим в каталог
             renderCategories();
             showPage('catalog');
         });
@@ -1501,6 +1474,10 @@
             if (tg.setBackgroundColor) tg.setBackgroundColor('#000000');
         }
 
+        // Загружаем данные из таблицы сразу при старте
+        syncWithSheet();
+        
+        // Автообновление каждые 30 секунд
         setInterval(syncWithSheet, 30000);
     </script>
 </body>
