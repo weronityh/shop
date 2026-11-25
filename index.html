@@ -1695,96 +1695,192 @@ document.getElementById('admSubPurchaseBtn').addEventListener('click', () => upd
             }
         });
 
-        function showDeliveryModal() {
-            const modal = document.createElement('div');
-            modal.className = 'delivery-modal';
-            modal.style.cssText = `position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.2s ease;`;
-            modal.innerHTML = `
-                <div style="background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 24px; width: 100%; max-width: 360px; animation: slideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1); box-shadow: var(--shadow-card);">
-                    <h3 style="font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; text-align: center;">ВРЕМЯ ПОЛУЧЕНИЯ</h3>
-                    <p style="font-size: 13px; color: var(--text-gray); text-align: center; margin-bottom: 20px;">Когда вам удобно забрать заказ?</p>
-                    <div class="delivery-options" style="display: flex; flex-direction: column; gap: 10px;">
-                        <button class="delivery-option" data-day="today" style="padding: 16px; border-radius: 14px; border: 1px solid var(--border-card); background: var(--bg-card); color: var(--text-white); font-size: 15px; font-weight: 600; text-transform: uppercase; cursor: pointer;">📍 Сегодня</button>
-                        <button class="delivery-option" data-day="tomorrow" style="padding: 16px; border-radius: 14px; border: 1px solid var(--border-card); background: var(--bg-card); color: var(--text-white); font-size: 15px; font-weight: 600; text-transform: uppercase; cursor: pointer;">📅 Завтра</button>
+       function showDeliveryModal() {
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+
+    const modal = document.createElement('div');
+    modal.className = 'delivery-modal';
+    modal.style.cssText = `position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 16px; animation: fadeIn 0.2s ease;`;
+    modal.innerHTML = `
+        <div style="background: var(--bg-card); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border-card); border-radius: 22px; padding: 20px; width: 100%; max-width: 380px; animation: slideUp 0.25s cubic-bezier(0.22, 1, 0.36, 1); box-shadow: var(--shadow-card); display:flex; flex-direction:column; gap:16px;">
+            <div>
+                <div style="font-size:16px; font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+                    <span>🕒 Когда заберёте</span><span style="color:#ff453a;">*</span>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div>
+                        <label style="font-size:12px; color:var(--text-gray); display:block; margin-bottom:6px;">Дата</label>
+                        <input type="date" id="orderDateInput" value="${todayStr}" min="${todayStr}" style="width:100%; padding:12px 10px; border-radius:14px; background:rgba(255,255,255,0.06); border:1px solid var(--border-card); color:#fff; font-size:14px; font-family:inherit; outline:none; color-scheme:dark;">
                     </div>
-                    <div class="time-picker" style="display: none; margin-top: 16px;">
-                        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 8px; display: block; text-transform: uppercase;">Выберите время</label>
-                        <select id="deliveryTime" style="width: 100%; padding: 14px 16px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-card); color: var(--text-white); font-size: 14px; font-family: inherit;"></select>
+                    <div>
+                        <label style="font-size:12px; color:var(--text-gray); display:block; margin-bottom:6px;">Время</label>
+                        <input type="time" id="orderTimeInput" style="width:100%; padding:12px 10px; border-radius:14px; background:rgba(255,255,255,0.06); border:1px solid var(--border-card); color:#fff; font-size:14px; font-family:inherit; outline:none; color-scheme:dark;">
                     </div>
                 </div>
-            `;
-            document.body.appendChild(modal);
+                <div id="timeErrorMsg" style="display:none; color:#ff453a; font-size:12px; margin-top:8px;">Это время уже прошло — выберите позже</div>
+            </div>
 
-            let selectedDay = 'Сегодня';
-            const timeSelect = modal.querySelector('#deliveryTime');
-            const timeOptions = ['09:00 - 11:00', '11:00 - 13:00', '13:00 - 15:00', '15:00 - 17:00', '17:00 - 19:00', '19:00 - 21:00', '21:00 - 23:00', 'как можно быстрее'];
-            const defaultOpt = document.createElement('option');
-            defaultOpt.value = ''; defaultOpt.textContent = 'Выберите время...'; defaultOpt.disabled = true; defaultOpt.selected = true;
-            timeSelect.appendChild(defaultOpt);
-            timeOptions.forEach(t => {
-                const opt = document.createElement('option');
-                opt.value = t; opt.textContent = t;
-                timeSelect.appendChild(opt);
-            });
+            <div style="border-top:1px solid var(--border-card); padding-top:14px;">
+                <div style="font-size:15px; font-weight:700; margin-bottom:10px;">Способ оплаты</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <button type="button" class="pay-method-btn selected" data-pay="Наличные" style="padding:14px 10px; border-radius:14px; border:1px solid #fff; background:#fff; color:#000; font-size:13px; font-weight:700; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px;">
+                        <span>💵</span><span>Наличные</span>
+                    </button>
+                    <button type="button" class="pay-method-btn" data-pay="Безнал" style="padding:14px 10px; border-radius:14px; border:1px solid var(--border-card); background:rgba(255,255,255,0.06); color:#fff; font-size:13px; font-weight:700; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px;">
+                        <span>💳</span><span>Безнал</span>
+                    </button>
+                </div>
 
-            modal.querySelectorAll('.delivery-option').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    selectedDay = btn.dataset.day === 'today' ? 'Сегодня' : 'Завтра';
-                    modal.querySelector('.delivery-options').style.display = 'none';
-                    modal.querySelector('.time-picker').style.display = 'block';
-                    modal.querySelector('h3').textContent = selectedDay === 'Сегодня' ? 'ВРЕМЯ НА СЕГОДНЯ' : 'ВРЕМЯ НА ЗАВТРА';
-                });
-            });
+                <div id="changeBlock" style="margin-top:14px;">
+                    <div style="font-size:13px; color:var(--text-gray); margin-bottom:8px;">С какой суммы нужна сдача?</div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:8px;">
+                        <button type="button" class="change-chip selected" data-val="Без сдачи" style="padding:10px 6px; border-radius:12px; border:1px solid #fff; background:#fff; color:#000; font-size:12px; font-weight:700; cursor:pointer;">Без сдачи</button>
+                        <button type="button" class="change-chip" data-val="50 BYN" style="padding:10px 6px; border-radius:12px; border:1px solid var(--border-card); background:rgba(255,255,255,0.06); color:#fff; font-size:12px; font-weight:700; cursor:pointer;">50 BYN</button>
+                        <button type="button" class="change-chip" data-val="100 BYN" style="padding:10px 6px; border-radius:12px; border:1px solid var(--border-card); background:rgba(255,255,255,0.06); color:#fff; font-size:12px; font-weight:700; cursor:pointer;">100 BYN</button>
+                    </div>
+                    <input type="text" id="customChangeInput" placeholder="Другая сумма..." style="width:100%; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid var(--border-card); color:#fff; font-size:13px; outline:none;">
+                </div>
+            </div>
 
-            timeSelect.addEventListener('change', (e) => {
-                if (!e.target.value) return;
-                sendOrder(selectedDay, e.target.value);
-                modal.remove();
-            });
+            <button type="button" id="confirmOrderModalBtn" disabled style="width:100%; padding:15px; border-radius:16px; border:none; background:var(--text-white); color:var(--bg-dark); font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; cursor:pointer; opacity:0.45;">ПОДТВЕРДИТЬ ЗАКАЗ</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
 
-            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+    const dateInput = modal.querySelector('#orderDateInput');
+    const timeInput = modal.querySelector('#orderTimeInput');
+    const timeError = modal.querySelector('#timeErrorMsg');
+    const confirmBtn = modal.querySelector('#confirmOrderModalBtn');
+    const changeBlock = modal.querySelector('#changeBlock');
+    const customChangeInput = modal.querySelector('#customChangeInput');
+
+    let selectedPayment = 'Наличные';
+    let selectedChange = 'Без сдачи';
+
+    function validateDateTime() {
+        const dVal = dateInput.value;
+        const tVal = timeInput.value;
+        if (!dVal || !tVal) {
+            timeError.style.display = 'none';
+            confirmBtn.disabled = true;
+            confirmBtn.style.opacity = '0.45';
+            return false;
         }
-
-        async function sendOrder(dayLabel, timeLabel) {
-            let orderText = 'Здравствуйте! Хочу оформить заказ:\n';
-            let total = 0;
-            const usedRewardIds = [];
-
-            cart.forEach((item, i) => {
-                const pricing = calcItemPricing(item);
-                total += pricing.finalTotal;
-                const colorStr = item.color ? ` (${item.color})` : '';
-                let bonusNote = '';
-                if (pricing.reward) {
-                    usedRewardIds.push(pricing.reward.id);
-                    bonusNote = pricing.reward.type === 'free_liquid'
-                        ? ' [🎁 Бесплатная жижа по рулетке]'
-                        : ` [🏷 Скидка -${pricing.reward.percent}% на 1 шт.]`;
-                }
-                orderText += `${i + 1}. ${item.name}${colorStr} × ${item.qty} — ${formatMoney(pricing.finalTotal)} BYN${bonusNote}\n`;
-            });
-
-            orderText += `\nИтого: ${formatMoney(total)} BYN\n📍 Способ получения: ${selectedPickup || 'ВОКЗАЛ'}\n📅 День: ${dayLabel}\n⏰ Время: ${timeLabel}`;
-
-            if (usedRewardIds.length > 0) {
-                const usedSet = new Set(usedRewardIds);
-                const remainingRewards = userRewards.filter(r => !usedSet.has(r.id));
-                userRewards = remainingRewards;
-                try {
-                    await db.collection('users').doc(getUserDocId()).set({
-                        rewards: remainingRewards
-                    }, { merge: true });
-                } catch (err) {
-                    console.error('Ошибка списания бонусов:', err);
-                }
-            }
-
-            const url = 'https://t.me/Seregablatnou?text=' + encodeURIComponent(orderText);
-            if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
-            else window.open(url, '_blank');
-
-            cart = []; selectedPickup = null; updateCartCount(); renderCart(); showToast('Заказ сформирован');
+        const chosen = new Date(`${dVal}T${tVal}:00`);
+        const current = new Date();
+        if (chosen < current) {
+            timeError.style.display = 'block';
+            dateInput.style.borderColor = '#ff453a';
+            timeInput.style.borderColor = '#ff453a';
+            confirmBtn.disabled = true;
+            confirmBtn.style.opacity = '0.45';
+            return false;
         }
+        timeError.style.display = 'none';
+        dateInput.style.borderColor = 'var(--border-card)';
+        timeInput.style.borderColor = 'var(--border-card)';
+        confirmBtn.disabled = false;
+        confirmBtn.style.opacity = '1';
+        return true;
+    }
+
+    dateInput.addEventListener('change', validateDateTime);
+    timeInput.addEventListener('change', validateDateTime);
+    timeInput.addEventListener('input', validateDateTime);
+
+    modal.querySelectorAll('.pay-method-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            selectedPayment = btn.dataset.pay;
+            modal.querySelectorAll('.pay-method-btn').forEach(b => {
+                const active = b === btn;
+                b.style.background = active ? '#fff' : 'rgba(255,255,255,0.06)';
+                b.style.color = active ? '#000' : '#fff';
+                b.style.borderColor = active ? '#fff' : 'var(--border-card)';
+            });
+            changeBlock.style.display = selectedPayment === 'Наличные' ? 'block' : 'none';
+        });
+    });
+
+    modal.querySelectorAll('.change-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+            selectedChange = btn.dataset.val;
+            customChangeInput.value = '';
+            modal.querySelectorAll('.change-chip').forEach(b => {
+                const active = b === btn;
+                b.style.background = active ? '#fff' : 'rgba(255,255,255,0.06)';
+                b.style.color = active ? '#000' : '#fff';
+                b.style.borderColor = active ? '#fff' : 'var(--border-card)';
+            });
+        });
+    });
+
+    customChangeInput.addEventListener('input', () => {
+        if (customChangeInput.value.trim()) {
+            selectedChange = customChangeInput.value.trim();
+            modal.querySelectorAll('.change-chip').forEach(b => {
+                b.style.background = 'rgba(255,255,255,0.06)';
+                b.style.color = '#fff';
+                b.style.borderColor = 'var(--border-card)';
+            });
+        }
+    });
+
+    confirmBtn.addEventListener('click', () => {
+        if (!validateDateTime()) return;
+        const [y, m, d] = dateInput.value.split('-');
+        const formattedDate = `${d}.${m}.${y}`;
+        const payInfo = selectedPayment === 'Наличные'
+            ? `Наличные (${selectedChange})`
+            : 'Безнал';
+        sendOrder(formattedDate, timeInput.value, payInfo);
+        modal.remove();
+    });
+
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+}
+
+async function sendOrder(dayLabel, timeLabel, payInfo = 'Наличные') {
+    let orderText = 'Здравствуйте! Хочу оформить заказ:\n';
+    let total = 0;
+    const usedRewardIds = [];
+
+    cart.forEach((item, i) => {
+        const pricing = calcItemPricing(item);
+        total += pricing.finalTotal;
+        const colorStr = item.color ? ` (${item.color})` : '';
+        let bonusNote = '';
+        if (pricing.reward) {
+            usedRewardIds.push(pricing.reward.id);
+            bonusNote = pricing.reward.type === 'free_liquid'
+                ? ' [🎁 Бесплатная жижа по рулетке]'
+                : ` [🏷 Скидка -${pricing.reward.percent}% на 1 шт.]`;
+        }
+        orderText += `${i + 1}. ${item.name}${colorStr} × ${item.qty} — ${formatMoney(pricing.finalTotal)} BYN${bonusNote}\n`;
+    });
+
+    orderText += `\nИтого: ${formatMoney(total)} BYN\n📍 Способ получения: ${selectedPickup || 'ВОКЗАЛ'}\n📅 Дата: ${dayLabel}\n⏰ Время: ${timeLabel}\n💳 Оплата: ${payInfo}`;
+
+    if (usedRewardIds.length > 0) {
+        const usedSet = new Set(usedRewardIds);
+        const remainingRewards = userRewards.filter(r => !usedSet.has(r.id));
+        userRewards = remainingRewards;
+        try {
+            await db.collection('users').doc(getUserDocId()).set({
+                rewards: remainingRewards
+            }, { merge: true });
+        } catch (err) {
+            console.error('Ошибка списания бонусов:', err);
+        }
+    }
+
+    const url = 'https://t.me/Seregablatnou?text=' + encodeURIComponent(orderText);
+    if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
+    else window.open(url, '_blank');
+
+    cart = []; selectedPickup = null; updateCartCount(); renderCart(); showToast('Заказ сформирован');
+}
 
         document.getElementById('goToCatalogBtn').addEventListener('click', () => { renderCategories(); showPage('catalog'); });
         document.getElementById('backToCatalog').addEventListener('click', () => showPage('catalog'));
