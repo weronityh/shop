@@ -1065,7 +1065,7 @@
             const username = tgUser?.username ? `@${tgUser.username}` : (tgUser?.first_name || 'Гость');
             const avatarLetter = (tgUser?.first_name || tgUser?.username || 'W')[0].toUpperCase();
             let purchases = Number(localStorage.getItem('weggew_purchases') || 0);
-            const canSpin = purchases >= 5;
+            const canSpin = isAdminUser() || purchases >= 5;
 
             container.innerHTML = `
                 <div class="profile-card"><div class="profile-user"><div class="profile-avatar">${avatarLetter}</div><div><div class="profile-username">${username}</div><div class="profile-sub">Ваш профиль Telegram</div></div></div></div>
