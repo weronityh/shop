@@ -22,7 +22,7 @@
         }
         html, body { height: 100%; height: 100dvh; overflow: hidden; overscroll-behavior: none; }
         body { font-family: var(--font-main); background: var(--bg-dark); color: var(--text-white); display: flex; flex-direction: column; font-size: 15px; line-height: 1.4; }
-.smoke-canvas {
+        .smoke-canvas {
             position: fixed;
             inset: 0;
             width: 100%;
@@ -112,7 +112,6 @@
             opacity: 1;
             transform: scale(1.06) translateY(0);
         }
-        /* Живой дым поверх картинки — струится и связывает её с фоном */
         .hero-smoke {
             position: absolute;
             inset: -10%;
@@ -135,56 +134,6 @@
         }
         @media (prefers-reduced-motion: reduce) {
             .hero-smoke { animation: none; opacity: .55; }
-            .paw-left, .paw-right { animation: none; opacity: .16; filter: blur(10px); }
-        }
-        /* Лапы-дымки: мягко всплывают и растворяются в общем дыме */
-        .paw-left, .paw-right {
-            position: absolute;
-            bottom: 4%;
-            width: 86px;
-            height: 76px;
-            pointer-events: none;
-            opacity: 0;
-            filter: blur(6px);
-            z-index: 2;
-            animation: pawFadeIn 2.2s ease-out 1s forwards, pawSmoke 7s ease-in-out 3.2s infinite;
-            background:
-                radial-gradient(ellipse 34% 26% at 50% 72%, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0.06) 55%, transparent 78%),
-                radial-gradient(ellipse 15% 13% at 22% 38%, rgba(255,255,255,0.16) 0%, transparent 72%),
-                radial-gradient(ellipse 15% 13% at 42% 26%, rgba(255,255,255,0.15) 0%, transparent 72%),
-                radial-gradient(ellipse 15% 13% at 62% 27%, rgba(255,255,255,0.15) 0%, transparent 72%),
-                radial-gradient(ellipse 15% 13% at 80% 39%, rgba(255,255,255,0.14) 0%, transparent 72%);
-        }
-        .paw-left {
-            left: 12%;
-            transform: rotate(-14deg);
-        }
-        .paw-right {
-            right: 12%;
-            transform: rotate(14deg);
-            animation: pawFadeInRight 2.2s ease-out 1.15s forwards, pawSmokeRight 7.5s ease-in-out 3.5s infinite;
-        }
-        @keyframes pawFadeIn {
-            0% { opacity: 0; transform: translateY(18px) rotate(-14deg) scale(0.8); filter: blur(0); }
-            60% { opacity: 0.5; transform: translateY(-6px) rotate(-14deg) scale(1.04); filter: blur(4px); }
-            100% { opacity: 0.34; transform: translateY(0) rotate(-14deg) scale(1); filter: blur(7px); }
-        }
-        @keyframes pawSmoke {
-            0% { opacity: 0.34; transform: translateY(0) rotate(-14deg) scale(1); filter: blur(7px); }
-            35% { opacity: 0.2; transform: translateY(-22px) rotate(-8deg) scale(1.22); filter: blur(13px); }
-            70% { opacity: 0.07; transform: translateY(-52px) rotate(-2deg) scale(1.55); filter: blur(24px); }
-            100% { opacity: 0; transform: translateY(-86px) rotate(4deg) scale(1.85); filter: blur(34px); }
-        }
-        @keyframes pawFadeInRight {
-            0% { opacity: 0; transform: translateY(18px) rotate(14deg) scale(0.8); filter: blur(0); }
-            60% { opacity: 0.5; transform: translateY(-6px) rotate(14deg) scale(1.04); filter: blur(4px); }
-            100% { opacity: 0.34; transform: translateY(0) rotate(14deg) scale(1); filter: blur(7px); }
-        }
-        @keyframes pawSmokeRight {
-            0% { opacity: 0.34; transform: translateY(0) rotate(14deg) scale(1); filter: blur(7px); }
-            35% { opacity: 0.2; transform: translateY(-22px) rotate(8deg) scale(1.22); filter: blur(13px); }
-            70% { opacity: 0.07; transform: translateY(-52px) rotate(2deg) scale(1.55); filter: blur(24px); }
-            100% { opacity: 0; transform: translateY(-86px) rotate(-4deg) scale(1.85); filter: blur(34px); }
         }
 
         /* ЭКРАН 1: ПРИВЕТСТВИЕ */
@@ -210,188 +159,11 @@
             overflow: hidden;
             z-index: 1;
         }
-        .phone-mask {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            overflow: hidden;
-        }
-        .phone {
-            position: relative;
-            flex-shrink: 0;
-            width: 25.5em;
-            aspect-ratio: 9 / 19.4;
-            margin-top: 0.35em;
-            font-size: clamp(6px, min(2.5vw, 1.62vh), 12.5px);
-            border: 0.12em solid #333333;
-            border-radius: 3.6em;
-            background: linear-gradient(150deg, #3a3a3a 0%, #121212 8%, #000 30%, #000 100%);
-            box-shadow:
-                0 2em 4em rgba(0,0,0,0.9),
-                0 0 0 0.12em #050505,
-                inset 0 0 0 0.16em #0a0a0a,
-                inset 0 0 1.4em rgba(255,255,255,0.08);
-            transform: rotate(8deg) translateZ(0);
-            transform-origin: 50% 35%;
-            color: #ffffff;
-        }
-        .phone::before,
-        .phone::after {
-            content: "";
-            position: absolute;
-            right: -0.2em;
-            width: 0.18em;
-            border-radius: 0.2em;
-            background: linear-gradient(180deg, #2d2d2d, #111111);
-        }
-        .phone::before { top: 17%; height: 4.6em; }
-        .phone::after { top: 31%; height: 8.6em; }
-        .phone-left-btn {
-            position: absolute;
-            left: -0.17em;
-            top: 23%;
-            width: 0.13em;
-            height: 3.2em;
-            border-radius: 0.2em;
-            background: #222222;
-        }
-        .phone-left-btn.two { top: 31%; height: 5.2em; }
-        .phone-screen {
-            position: absolute;
-            inset: 0.3em;
-            display: flex;
-            flex-direction: column;
-            padding: 0.75em 1em 0;
-            border-radius: 3.35em;
-            background: #080808;
-            overflow: hidden;
-            box-shadow: inset 0 0 1.5em rgba(0,0,0,0.9);
-        }
-        .phone-screen::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            background:
-                radial-gradient(circle at 20% 15%, rgba(255,255,255,0.032), transparent 30%),
-                radial-gradient(circle at 80% 45%, rgba(255,255,255,0.026), transparent 35%);
-        }
-        .tg-island {
-            position: absolute;
-            top: 0.55em;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 4.6em;
-            height: 1.15em;
-            border-radius: 1em;
-            background: #000000;
-            box-shadow: 0 0 0 0.06em rgba(255,255,255,0.05);
-            z-index: 3;
-        }
-        .tg-status {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.25em 0.65em 0;
-            font-size: 0.82em;
-            font-weight: 700;
-            position: relative;
-            z-index: 1;
-        }
-        .tg-status-icons { display: flex; align-items: center; gap: 0.3em; }
-        .tg-status-icons svg { width: 1.25em; height: 1.25em; }
-        .tg-topbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.9em 0.4em 0.2em;
-            color: #bdbdbd;
-            position: relative;
-            z-index: 1;
-        }
-        .tg-back { font-size: 1.9em; line-height: 0.9; font-weight: 300; color: #c9c9c9; }
-        .tg-more { font-size: 1.1em; font-weight: 700; letter-spacing: 0.08em; color: #c9c9c9; }
-        .tg-avatar {
-            width: 7.15em;
-            height: 7.15em;
-            margin: 0.5em auto 0.1em;
-            border-radius: 50%;
-            background: radial-gradient(circle at 50% 28%, #7a7a7a 0%, #3a3a3a 42%, #141414 100%);
-            border: 0.12em solid rgba(255,255,255,0.08);
-            box-shadow: 0 0.5em 1.4em rgba(0,0,0,0.6), inset 0 0.2em 0.8em rgba(255,255,255,0.12);
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
-            z-index: 1;
-        }
-        .tg-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .tg-name {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.25em;
-            margin-top: 0.55em;
-            font-size: 2.02em;
-            font-weight: 800;
-            line-height: 1.1;
-            letter-spacing: 0.01em;
-            position: relative;
-            z-index: 1;
-        }
-        .tg-verified {
-            width: 1em;
-            height: 1em;
-            border-radius: 50%;
-            background: #2f9cf5;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            box-shadow: 0 0.08em 0.3em rgba(47,156,245,0.5);
-        }
-        .tg-verified svg { width: 0.64em; height: 0.64em; display: block; }
-        .tg-lastseen { margin-top: 0.55em; text-align: center; font-size: 0.82em; color: #8f8f8f; position: relative; z-index: 1; }
-        .tg-actions { display: flex; gap: 0.55em; margin-top: 1.1em; position: relative; z-index: 1; }
-        .tg-action {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.4em;
-            padding: 0.75em 0.15em 0.55em;
-            border-radius: 0.85em;
-            background: linear-gradient(180deg, #242424, #1a1a1a);
-            box-shadow: inset 0 0.06em 0 rgba(255,255,255,0.05);
-        }
-        .tg-action svg { width: 1.5em; height: 1.5em; stroke: #e8e8e8; fill: none; stroke-width: 1.7; }
-        .tg-action span { font-size: 0.68em; color: #d2d2d2; }
-        .tg-note { margin-top: 1.1em; text-align: center; font-size: 0.76em; color: #8f8f8f; position: relative; z-index: 1; }
-        .tg-note b { color: #bdbdbd; font-weight: 600; }
-        .tg-card {
-            margin-top: 0.85em;
-            background: #222222;
-            border-radius: 0.85em;
-            overflow: hidden;
-            position: relative;
-            z-index: 1;
-        }
-        .tg-row { padding: 0.65em 0.85em 0.7em; border-bottom: 1px solid rgba(255,255,255,0.055); }
-        .tg-row:last-child { border-bottom: 0; }
-        .tg-label { margin-bottom: 0.18em; font-size: 0.68em; color: #7f7f7f; }
-        .tg-value { font-size: 1.05em; font-weight: 500; color: #ededed; }
-        .tg-bio { font-size: 0.82em; line-height: 1.3; color: #a8a8a8; font-weight: 400; }
         @media (max-height: 700px) {
             #welcomePage { padding-top: calc(env(safe-area-inset-top, 0px) + 4px); }
             .welcome-title { font-size: clamp(24px, 7.2vw, 32px); }
             .welcome-divider { margin: 8px auto; }
             .welcome-subtitle { margin-bottom: 12px; font-size: 11px; line-height: 1.6; }
-            .features-grid { margin-bottom: 12px; }
-            .feature-item { gap: 6px; }
-            .feature-text { font-size: 8px; }
             .main-btn { padding-top: 13px; padding-bottom: 13px; }
         }
         .welcome-bottom {
@@ -525,23 +297,6 @@
             background: var(--accent);
             color: var(--bg-dark);
         }
-        /* ЭКРАН 2: ВЫБОР ТОЧКИ */
-        #locationPage { padding: 40px 24px; justify-content: center; align-items: center; }
-        .location-header { text-align: center; margin-bottom: 30px; width: 100%; }
-        .location-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.8; }
-        .location-title { font-size: 28px; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
-        .location-desc { font-size: 13px; color: var(--text-gray); line-height: 1.5; max-width: 300px; margin: 0 auto; }
-        .location-list { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
-        .location-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: background 0.2s, border-color 0.2s; text-align: left; position: relative; z-index: 1; box-shadow: var(--shadow-card); }
-        .location-card:active { background: var(--bg-card-hover); }
-        .location-card.selected { border-color: var(--text-white); }
-        .location-card-icon { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-        .location-card-content { flex: 1; }
-        .location-card-title { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
-        .location-card-sub { font-size: 12px; color: var(--text-gray); }
-        .location-card-arrow { color: var(--text-gray); font-size: 18px; }
-        .legal-info { text-align: center; font-size: 11px; color: #555; line-height: 1.6; margin-bottom: 30px; max-width: 320px; position: relative; z-index: 1; }
-        .legal-info p { margin-bottom: 6px; }
 
         /* ЭКРАН 3: КАТАЛОГ */
         #catalogPage { padding: 20px 16px 100px; }
@@ -551,11 +306,6 @@
         .search-bar input { background: transparent; border: none; outline: none; color: var(--text-white); font-size: 14px; width: 100%; font-family: inherit; }
         .search-bar input::placeholder { color: var(--text-gray); }
         .search-bar svg { width: 20px; height: 20px; stroke: var(--text-gray); flex-shrink: 0; }
-        .filters-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; margin-bottom: 20px; }
-        .filters-row::-webkit-scrollbar { display: none; }
-        .filter-chip { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 8px 16px; font-size: 12px; color: var(--text-white); white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 6px; flex-shrink: 0; box-shadow: var(--shadow-card); }
-        .filter-chip.active { background: var(--text-white); color: var(--bg-dark); border-color: var(--text-white); }
-        .filter-chip .badge-dot { width: 8px; height: 8px; background: var(--text-white); border-radius: 50%; }
         .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
         .category-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; cursor: pointer; transition: background 0.2s; text-align: center; position: relative; z-index: 1; box-shadow: var(--shadow-card); }
         .category-card:active { background: var(--bg-card-hover); }
@@ -563,8 +313,6 @@
         .category-card-image img { width: 100%; height: 100%; object-fit: contain; }
         .category-card-title { font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
         .category-card-sub { font-size: 12px; color: var(--text-gray); }
-        .scroll-hint { position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 8px 16px; border-radius: 20px; font-size: 12px; color: var(--text-white); display: flex; align-items: center; gap: 6px; pointer-events: none; animation: fadeInOut 3s infinite; }
-        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
 
         /* НИЖНЯЯ НАВИГАЦИЯ */
         .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; background: var(--bg-card); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border-card); display: flex; justify-content: space-around; align-items: center; height: calc(68px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); z-index: 100; box-shadow: var(--shadow-card); }
@@ -590,10 +338,8 @@
         .promo-badge { display: inline-block; background: #ff9800; color: #000; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px; text-transform: uppercase; }
         .add-to-cart-btn { margin-left: auto; padding: 8px 14px; background: var(--text-white); color: var(--bg-dark); border: none; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; flex-shrink: 0; transition: background 0.2s, transform 0.1s; }
         .add-to-cart-btn:active { background: #e0e0e0; transform: scale(0.98); }
-        .product-card.has-btn { flex-wrap: wrap; }
-        .product-card.has-btn .product-info { flex: 1 1 calc(100% - 100px); }
 
-        /* АККОРДЕОН БРЕНДОВ И РАСЦВЕТОК */
+        /* АККОРДЕОН БРЕНДОВ */
         .brand-group { display: flex; flex-direction: column; gap: 8px; }
         .brand-group-card {
             background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -607,26 +353,10 @@
         .brand-group-title { font-size: 18px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
         .brand-group-arrow { font-size: 18px; color: var(--text-gray); transition: transform 0.2s; }
         .brand-group-card.open .brand-group-arrow { transform: rotate(90deg); color: var(--text-white); }
-
         .brand-models-list { display: none; flex-direction: column; gap: 8px; padding-left: 12px; }
         .brand-models-list.open { display: flex; }
 
-        .model-colors-list {
-            display: none; flex-wrap: wrap; gap: 8px; padding: 10px 14px;
-            background: rgba(255,255,255,0.03); border: 1px solid var(--border-card);
-            border-radius: 16px; margin-top: -4px;
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            box-shadow: var(--shadow-card);
-        }
-        .model-colors-list.open { display: flex; }
-        .color-chip {
-            background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border-card);
-            border-radius: 12px; padding: 6px 12px; font-size: 12px; color: var(--text-white);
-            box-shadow: var(--shadow-card);
-        }
-
-        /* БРЕНДЫ СПИСОК (с миниатюрами) */
+        /* БРЕНДЫ СПИСОК */
         .brand-card {
             background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--border-card); border-radius: 20px;
@@ -646,11 +376,9 @@
         .brand-card-count { font-size: 12px; color: var(--text-gray); margin-top: 2px; }
         .brand-card-arrow { color: var(--text-gray); font-size: 20px; }
 
-        /* СТРАНИЦА МОДЕЛЕЙ БРЕНДА */
+        /* СТРАНИЦА ТОВАРА */
         .product-detail-header { display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-card); position: sticky; top: 0; z-index: 10; box-shadow: var(--shadow-card); }
         .product-detail-title { font-size: 18px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        /* СТРАНИЦА ТОВАРА */
         .product-detail-content { padding: 20px 16px 190px; display: flex; flex-direction: column; align-items: center; }
         .product-detail-image-wrap { width: 100%; max-width: 320px; aspect-ratio: 1; margin-bottom: 20px; border-radius: 24px; overflow: hidden; background: var(--bg-dark); position: relative; }
         .product-detail-image { width: 100%; height: 100%; object-fit: contain; transition: opacity 0.2s ease; }
@@ -661,7 +389,7 @@
 
         .color-selector { width: 100%; max-width: 360px; margin-bottom: 20px; }
         .color-selector-label { font-size: 12px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
-        .color-selector-label span { color: var(--text-white); font-weight: 600; }
+        .color-selector-label span, .color-selector-label b { color: var(--text-white); font-weight: 600; }
         .color-thumbs { display: flex; gap: 10px; overflow-x: auto; padding: 4px 4px 8px; scrollbar-width: none; }
         .color-thumbs::-webkit-scrollbar { display: none; }
         .color-thumb {
@@ -693,8 +421,8 @@
         /* TOAST */
         .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text-white); color: var(--bg-dark); padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 1000; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-/* ПРОФИЛЬ */
+
+        /* ПРОФИЛЬ */
         .profile-cards { display: flex; flex-direction: column; gap: 12px; }
         .profile-card {
             background: var(--bg-card);
@@ -734,7 +462,6 @@
     </style>
 </head>
 <body>
-    <!-- ФОН С ДЫМОМ -->
     <canvas id="smokeCanvas" class="smoke-canvas" aria-hidden="true"></canvas>
     <div class="smoke-shade" aria-hidden="true"></div>
 
@@ -775,7 +502,6 @@
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
                         <input type="text" placeholder="Поиск товаров..." id="searchInput">
                     </div>
-                   
                 </div>
                 <div class="category-grid" id="categoryGrid"></div>
             </div>
@@ -851,10 +577,8 @@
     <div class="toast" id="toast">Добавлено</div>
 
     <script>
-        // --- ВАША ССЫЛКА НА CSV ---
         const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS9xjVn31NafFzNqA_aXeHhSeuvGcRiR3bf1pnfGD4HtEBAMuB6bS6j9ivHrR7zkzhGGtyk_R1PEc0V/pub?gid=0&single=true&output=csv';
 
-        // --- ДАННЫЕ ---
         const categories = [
             { id: 'vapes', name: 'ВЕЙПЫ', sub: '3 бренда', icon: '📱', image: 'vape.png' },
             { id: 'snus', name: 'СНЮС', sub: '4 бренда', icon: '📦', image: 'snus.png' },
@@ -878,10 +602,6 @@
         let currentBrandIdx = null;
         let currentModelIdx = null;
 
-        // --- ФОТО ЦВЕТОВ ДЛЯ ВЕЙПОВ ---
-        // Ключ — точное название модели, значение — объект «цвет: файл».
-        // PASITO 3 заполнен полностью; остальные модели можно добавить сюда позже,
-        // когда появятся свои фото цветов. Первый цвет в списке — главное фото модели.
         const VAPE_COLOR_IMAGES = {
             'PASITO 3': {
                 'Фиолетовый': 'PASSITO3FIOL.jpg',
@@ -894,20 +614,11 @@
             }
         };
 
-        function applyVapeColorImages() {
+        function getFallbackColorImage(modelName, colorName) {
             const norm = (value) => String(value || '').toUpperCase().replace(/\s+/g, ' ').trim();
-            const entries = Object.entries(VAPE_COLOR_IMAGES);
-            for (const brand of vapeBrands) {
-                for (const model of brand.models) {
-                    const found = entries.find(([name]) => norm(name) === norm(model.name));
-                    if (!found) continue;
-                    const images = found[1];
-                    const colors = Object.keys(images);
-                    model.colors = colors;
-                    model.colorImages = { ...images };
-                    model.image = images[colors[0]];
-                }
-            }
+            const found = Object.entries(VAPE_COLOR_IMAGES).find(([name]) => norm(name) === norm(modelName));
+            if (!found) return null;
+            return found[1][colorName] || null;
         }
 
         const pages = {
@@ -939,15 +650,12 @@
                     catImg.classList.remove('loaded');
                     requestAnimationFrame(() => catImg.classList.add('loaded'));
                 }
-                // Restart entrance animations
                 restartWelcomeAnimations();
             }
 
-            // Subtle smoke on location page
             document.body.classList.toggle('subtle-smoke', name === 'location');
             document.body.classList.toggle('catalog-bg', name === 'catalog');
 
-            // Show bottom nav for main pages only
             if (name === 'catalog' || name === 'cart' || name === 'profile' || name === 'brand') {
                 bottomNav.style.display = 'flex';
             } else {
@@ -969,7 +677,7 @@
             [divider, hint, ...subtitleLines, ...titleChars].forEach(el => {
                 if (el) {
                     el.style.animation = 'none';
-                    el.offsetHeight; // force reflow
+                    el.offsetHeight;
                     el.style.animation = '';
                 }
             });
@@ -982,7 +690,6 @@
             window._toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
         }
 
-        // --- ПАРСИНГ CSV ---
         function parseCSV(text) {
             const rows = [];
             let row = [], cell = '', inQuotes = false;
@@ -999,13 +706,12 @@
             return rows;
         }
 
-        // --- СИНХРОНИЗАЦИЯ С ТАБЛИЦЕЙ ---
         async function syncWithSheet() {
             try {
                 const res = await fetch(`${SHEET_CSV_URL}&t=${Date.now()}`);
                 const csvText = await res.text();
                 const rows = parseCSV(csvText);
-                
+
                 if (rows.length < 2) return;
 
                 const headers = rows[0].map(h => h.toLowerCase().trim());
@@ -1015,7 +721,9 @@
                 const idxDesc = headers.indexOf('desc');
                 const idxPrice = headers.indexOf('price');
                 const idxStock = headers.indexOf('stock');
+                const idxColor = headers.indexOf('color');
                 const idxColors = headers.indexOf('colors');
+                const idxColorStock = headers.indexOf('color_stock');
                 const idxImage = headers.indexOf('image');
 
                 if (idxName === -1 || idxPrice === -1) {
@@ -1053,61 +761,105 @@
                     const r = rows[i];
                     if (!r[idxName] || r[idxName].trim() === '') continue;
 
-                    const rawCat = idxCat !== -1 ? r[idxCat].trim() : '';
-                    const siteCat = catMapping[rawCat] || rawCat; 
-                    
+                    const rawCat = idxCat !== -1 && r[idxCat] ? r[idxCat].trim() : '';
+                    const siteCat = catMapping[rawCat] || rawCat;
+
                     const name = r[idxName].trim();
                     const price = Number(r[idxPrice]) || 0;
-                    const stock = idxStock !== -1 ? (Number(r[idxStock]) || 0) : 99;
-                    const brand = idxBrand !== -1 ? r[idxBrand].trim() : '';
-                    const desc = idxDesc !== -1 ? r[idxDesc].trim() : '';
-                    const colorsStr = idxColors !== -1 ? r[idxColors].trim() : '';
-                    const image = idxImage !== -1 ? r[idxImage].trim() : '';
+                    const stockRaw = idxStock !== -1 && r[idxStock] !== undefined ? r[idxStock].trim() : '';
+                    const stock = stockRaw !== '' ? (Number(stockRaw) || 0) : 99;
+                    const brand = idxBrand !== -1 && r[idxBrand] ? r[idxBrand].trim() : '';
+                    const desc = idxDesc !== -1 && r[idxDesc] ? r[idxDesc].trim() : '';
+                    const singleColor = idxColor !== -1 && r[idxColor] ? r[idxColor].trim() : '';
+                    const colorsStr = idxColors !== -1 && r[idxColors] ? r[idxColors].trim() : '';
+                    const colorStockRaw = idxColorStock !== -1 && r[idxColorStock] !== undefined ? r[idxColorStock].trim() : '';
+                    const colorStock = colorStockRaw !== '' ? (Number(colorStockRaw) || 0) : stock;
+                    const rawImage = idxImage !== -1 && r[idxImage] ? r[idxImage].trim() : '';
 
                     if (stock <= 0) continue;
 
-                    const colors = colorsStr ? colorsStr.split(',').map(c => c.trim()).filter(Boolean) : [];
-                    const img = image || defaultImages[siteCat] || 'vape.png';
-                    const isCover = name.toLowerCase() === 'xros 6 mini';
-
-                    const item = {
-                        id: `auto_${i}`,
-                        name: name,
-                        desc: desc,
-                        price: price,
-                        image: img,
-                        isCover: isCover
-                    };
-
                     if (siteCat === 'vapes' && brand) {
-                        newVapeData.push({ ...item, brand, colors });
+                        if (singleColor && colorStock <= 0) continue;
+
+                        const resolvedImage = rawImage
+                            || (singleColor ? getFallbackColorImage(name, singleColor) : null)
+                            || defaultImages.vapes;
+
+                        const colors = singleColor
+                            ? [singleColor]
+                            : (colorsStr ? colorsStr.split(',').map(c => c.trim()).filter(Boolean) : ['Чёрный']);
+
+                        newVapeData.push({
+                            id: `auto_${i}`,
+                            brand,
+                            name,
+                            desc,
+                            price,
+                            stock,
+                            colorStock,
+                            image: resolvedImage,
+                            rawImage,
+                            isCover: name.toLowerCase() === 'xros 6 mini',
+                            colors
+                        });
                     } else if (siteCat === 'liquids' && brand) {
-                        newLiquidData.push({ ...item, brand });
+                        newLiquidData.push({ id: `auto_${i}`, brand, name, desc, price, stock });
                     } else if (newData[siteCat]) {
                         const iconMap = { vapes: '📱', snus: '📦', liquids: '💧', disposables: '🚬', consumables: '🔧' };
-                        newData[siteCat].push({ ...item, icon: iconMap[siteCat] || '📦' });
+                        newData[siteCat].push({
+                            id: `auto_${i}`,
+                            name,
+                            desc,
+                            price,
+                            stock,
+                            image: rawImage || defaultImages[siteCat] || 'vape.png',
+                            isCover: name.toLowerCase() === 'xros 6 mini',
+                            icon: iconMap[siteCat] || '📦'
+                        });
                     }
                 }
 
-                // Build vapeBrands grouped by brand
                 const vapeBrandMap = new Map();
                 for (const item of newVapeData) {
                     if (!vapeBrandMap.has(item.brand)) {
-                        vapeBrandMap.set(item.brand, { brand: item.brand, models: [] });
+                        vapeBrandMap.set(item.brand, { brand: item.brand, modelsMap: new Map() });
                     }
-                    vapeBrandMap.get(item.brand).models.push({
-                        name: item.name,
-                        desc: item.desc || 'Под-система',
-                        price: item.price,
-                        image: item.image,
-                        isCover: item.isCover,
-                        colors: item.colors.length > 0 ? item.colors : ['Чёрный']
-                    });
-                }
-                vapeBrands = Array.from(vapeBrandMap.values());
-                applyVapeColorImages();
+                    const brandEntry = vapeBrandMap.get(item.brand);
+                    const modelKey = item.name.toLowerCase();
 
-                // Build liquidBrands grouped by brand
+                    if (!brandEntry.modelsMap.has(modelKey)) {
+                        brandEntry.modelsMap.set(modelKey, {
+                            name: item.name,
+                            desc: item.desc || 'Под-система',
+                            price: item.price,
+                            stock: item.stock,
+                            image: item.image,
+                            isCover: item.isCover,
+                            colors: [],
+                            colorImages: {},
+                            colorStocks: {}
+                        });
+                    }
+
+                    const model = brandEntry.modelsMap.get(modelKey);
+                    for (const c of item.colors) {
+                        if (!model.colors.includes(c)) {
+                            model.colors.push(c);
+                        }
+                        model.colorImages[c] = item.rawImage
+                            || getFallbackColorImage(item.name, c)
+                            || item.image;
+                        model.colorStocks[c] = item.colorStock;
+                    }
+                    if (model.image === defaultImages.vapes && item.image !== defaultImages.vapes) {
+                        model.image = item.image;
+                    }
+                }
+
+                vapeBrands = Array.from(vapeBrandMap.values())
+                    .map(b => ({ brand: b.brand, models: Array.from(b.modelsMap.values()) }))
+                    .filter(b => b.models.length > 0);
+
                 const liquidBrandMap = new Map();
                 for (const item of newLiquidData) {
                     if (!liquidBrandMap.has(item.brand)) {
@@ -1116,31 +868,26 @@
                     liquidBrandMap.get(item.brand).flavors.push({
                         name: item.name,
                         desc: item.desc || '',
-                        price: item.price
+                        price: item.price,
+                        stock: item.stock
                     });
                 }
                 liquidBrands = Array.from(liquidBrandMap.values());
 
-                // Update other categories
                 Object.keys(newData).forEach(key => {
-                    if (newData[key].length > 0) {
+                    if (key !== 'vapes' && key !== 'liquids') {
                         catalogData[key] = newData[key];
                     }
                 });
 
-                // Update categories array with actual counts
                 categories[0].sub = `${vapeBrands.length} бренд${vapeBrands.length === 1 ? '' : vapeBrands.length < 5 ? 'а' : 'ов'}`;
                 categories[2].sub = `${liquidBrands.length} бренд${liquidBrands.length === 1 ? '' : liquidBrands.length < 5 ? 'а' : 'ов'}`;
                 categories[1].sub = `${catalogData.snus.length} товар${catalogData.snus.length === 1 ? '' : catalogData.snus.length < 5 ? 'а' : 'ов'}`;
                 categories[3].sub = `${catalogData.disposables.length} товар${catalogData.disposables.length === 1 ? '' : catalogData.disposables.length < 5 ? 'а' : 'ов'}`;
                 categories[4].sub = `${catalogData.consumables.length} товар${catalogData.consumables.length === 1 ? '' : catalogData.consumables.length < 5 ? 'а' : 'ов'}`;
 
-                console.log('Данные синхронизированы:', { vapeBrands: vapeBrands.length, liquidBrands: liquidBrands.length, ...Object.fromEntries(Object.entries(catalogData).map(([k,v]) => [k, v.length])) });
-                
-                // Re-render categories if on catalog page
                 renderCategories();
-                
-                // Update open category page if user is inside it
+
                 if (currentCategoryId && pages.brand.classList.contains('active')) {
                     openCategory(currentCategoryId);
                 }
@@ -1176,6 +923,11 @@
             brandPageTitle.textContent = category.name;
 
             if (categoryId === 'vapes') {
+                if (vapeBrands.length === 0) {
+                    brandList.innerHTML = `<div class="empty-state">В этой категории пока нет товаров в наличии</div>`;
+                    showPage('brand');
+                    return;
+                }
                 brandList.innerHTML = vapeBrands.map((b, bIdx) => {
                     const firstModel = b.models[0];
                     return `
@@ -1203,6 +955,11 @@
                 return;
             }
             if (categoryId === 'liquids') {
+                if (liquidBrands.length === 0) {
+                    brandList.innerHTML = `<div class="empty-state">В этой категории пока нет товаров в наличии</div>`;
+                    showPage('brand');
+                    return;
+                }
                 brandList.innerHTML = liquidBrands.map((b, bIdx) => `
                     <div class="brand-group">
                         <div class="brand-group-card" data-brand-idx="${bIdx}">
@@ -1211,7 +968,7 @@
                         </div>
                         <div class="brand-models-list" id="liquidFlavors_${bIdx}">
                             ${b.flavors.map(f => `
-                                <div class="product-card" data-liquid="${JSON.stringify(f).replace(/"/g, '"')}">
+                                <div class="product-card">
                                     <div class="product-info">
                                         <div class="product-title">${f.name}</div>
                                         <div class="product-desc">${f.desc || ''}</div>
@@ -1235,7 +992,7 @@
                 showPage('brand');
                 return;
             }
-            
+
             const entries = catalogData[categoryId] || [];
 
             if (entries.length === 0) {
@@ -1259,7 +1016,6 @@
             showPage('brand');
         }
 
-        // Открыть модели бренда (для вейпов)
         function openBrandModels(brandIdx) {
             currentBrandIdx = brandIdx;
             const brand = vapeBrands[brandIdx];
@@ -1268,7 +1024,7 @@
                 openProductDetail(brandIdx, 0);
                 return;
             }
-            
+
             document.getElementById('brandModelsTitle').textContent = brand.brand;
             const modelsList = document.getElementById('brandModelsList');
             modelsList.innerHTML = brand.models.map((m, mIdx) => `
@@ -1294,7 +1050,6 @@
             showPage('brandModels');
         }
 
-        // Открыть детальную страницу товара (для вейпов)
         function openProductDetail(brandIdx, modelIdx) {
             currentBrandIdx = brandIdx;
             currentModelIdx = modelIdx;
@@ -1306,7 +1061,6 @@
             const footer = document.getElementById('productDetailFooter');
             document.getElementById('productDetailTitle').textContent = model.name.toUpperCase();
 
-            // Default to first color
             let selectedColorIdx = 0;
             const colors = model.colors && model.colors.length > 0 ? model.colors : ['Чёрный'];
 
@@ -1314,6 +1068,9 @@
                 const selectedColor = colors[selectedColorIdx];
                 const colorImages = model.colorImages || {};
                 const imageSrc = colorImages[selectedColor] || model.image;
+                const maxStock = (model.colorStocks && model.colorStocks[selectedColor] !== undefined)
+                    ? model.colorStocks[selectedColor]
+                    : (model.stock || 99);
 
                 content.innerHTML = `
                     <div class="product-detail-image-wrap">
@@ -1325,7 +1082,10 @@
                     <div class="product-detail-desc">${model.desc || 'Под-система'}</div>
 
                     <div class="color-selector">
-                        <div class="color-selector-label">ЦВЕТ: <span id="selectedColorName">${selectedColor}</span></div>
+                        <div class="color-selector-label">
+                            <span>ЦВЕТ: <b id="selectedColorName">${selectedColor}</b></span>
+                            <span>В наличии: ${maxStock} шт.</span>
+                        </div>
                         <div class="color-thumbs" id="colorThumbs">
                             ${colors.map((c, ci) => {
                                 const cImg = colorImages[c] || model.image;
@@ -1352,24 +1112,25 @@
                     </div>
                 `;
 
-                // Выбор цвета: сразу добавляем выбранный вариант в корзину
                 document.querySelectorAll('#colorThumbs .color-thumb').forEach(thumb => {
                     thumb.addEventListener('click', () => {
                         selectedColorIdx = parseInt(thumb.dataset.colorIdx, 10);
                         const colorName = colors[selectedColorIdx];
+                        const colorMaxStock = (model.colorStocks && model.colorStocks[colorName] !== undefined)
+                            ? model.colorStocks[colorName]
+                            : (model.stock || 99);
                         renderContent();
                         addToCart({
                             name: model.name,
                             price: model.price,
                             desc: model.desc || 'Под-система',
                             color: colorName,
-                            image: (model.colorImages || {})[colorName] || model.image
+                            image: (model.colorImages || {})[colorName] || model.image,
+                            maxStock: colorMaxStock
                         }, 1);
-                        showToast(`${model.name} · ${colorName} — добавлено в корзину`);
                     });
                 });
 
-                // Quantity controls
                 let qty = 1;
                 const qtyValue = document.getElementById('qtyValue');
                 document.getElementById('qtyDecrease').addEventListener('click', () => {
@@ -1379,21 +1140,23 @@
                     }
                 });
                 document.getElementById('qtyIncrease').addEventListener('click', () => {
-                    qty++;
-                    qtyValue.textContent = qty;
+                    if (qty < maxStock) {
+                        qty++;
+                        qtyValue.textContent = qty;
+                    } else {
+                        showToast(`В наличии только ${maxStock} шт.`);
+                    }
                 });
 
-                // Add to cart
                 document.getElementById('addToCartMain').addEventListener('click', () => {
-                    const selectedColor = colors[selectedColorIdx];
                     addToCart({
                         name: model.name,
                         price: model.price,
                         desc: model.desc || 'Под-система',
                         color: selectedColor,
-                        image: model.colorImages?.[selectedColor] || model.image
+                        image: model.colorImages?.[selectedColor] || model.image,
+                        maxStock
                     }, qty);
-                    showToast(`${model.name} (${selectedColor}) × ${qty} добавлено в корзину`);
                 });
             }
 
@@ -1401,10 +1164,17 @@
             showPage('productDetail');
         }
 
-        // --- КОРЗИНА ---
         function addToCart(product, qty = 1) {
             const count = Math.max(1, parseInt(qty, 10) || 1);
+            const maxStock = product.maxStock ?? product.stock ?? Infinity;
             const existing = cart.find(item => item.name === product.name && item.color === product.color);
+            const currentQty = existing ? existing.qty : 0;
+
+            if (currentQty + count > maxStock) {
+                showToast(`Максимум в наличии: ${maxStock} шт.`);
+                return;
+            }
+
             if (existing) {
                 existing.qty += count;
             } else {
@@ -1414,7 +1184,8 @@
                     desc: product.desc || '',
                     price: product.price,
                     qty: count,
-                    color: product.color || null
+                    color: product.color || null,
+                    maxStock
                 });
             }
             updateCartCount();
@@ -1473,15 +1244,19 @@
                 </div>
             `;
 
-            // Event listeners for cart items
             cartPage.querySelectorAll('.qty-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const id = btn.dataset.id;
                     const action = btn.dataset.action;
                     const item = cart.find(i => i.id === id);
                     if (item) {
-                        if (action === 'increase') item.qty += 1;
-                        else if (action === 'decrease') {
+                        if (action === 'increase') {
+                            if (item.maxStock && item.qty >= item.maxStock) {
+                                showToast(`Максимум в наличии: ${item.maxStock} шт.`);
+                                return;
+                            }
+                            item.qty += 1;
+                        } else if (action === 'decrease') {
                             item.qty -= 1;
                             if (item.qty <= 0) {
                                 const idx = cart.indexOf(item);
@@ -1516,7 +1291,8 @@
             }
             showDeliveryModal();
         }
-function renderProfile() {
+
+        function renderProfile() {
             const container = document.getElementById('profileCard');
             if (!container) return;
 
@@ -1657,16 +1433,16 @@ function renderProfile() {
             let selectedDay = 'Сегодня';
             const timeSelect = modal.querySelector('#deliveryTime');
             const timeOptions = [
-    '09:00 - 11:00',
-    '11:00 - 13:00',
-    '13:00 - 15:00',
-    '15:00 - 17:00',
-    '17:00 - 19:00',
-    '19:00 - 21:00',
-    '21:00 - 23:00',
-    'как можно быстрее'
-];
-            
+                '09:00 - 11:00',
+                '11:00 - 13:00',
+                '13:00 - 15:00',
+                '15:00 - 17:00',
+                '17:00 - 19:00',
+                '19:00 - 21:00',
+                '21:00 - 23:00',
+                'как можно быстрее'
+            ];
+
             const defaultOpt = document.createElement('option');
             defaultOpt.value = '';
             defaultOpt.textContent = 'Выберите время...';
@@ -1725,15 +1501,12 @@ function renderProfile() {
             showToast('Заказ сформирован');
         }
 
-        // --- ОБРАБОТЧИКИ ---
         document.getElementById('goToCatalogBtn').addEventListener('click', () => {
-            // Данные уже загружены при старте, просто переходим в каталог
             renderCategories();
             showPage('catalog');
         });
 
         document.getElementById('backToCatalog').addEventListener('click', () => showPage('catalog'));
-
         document.getElementById('backToBrands').addEventListener('click', () => showPage('brand'));
         document.getElementById('backToModels').addEventListener('click', () => {
             const brand = vapeBrands[currentBrandIdx];
@@ -1751,9 +1524,7 @@ function renderProfile() {
             });
         });
 
-        // Delegated add-to-cart for dynamically rendered buttons
         document.getElementById('brandList').addEventListener('click', (e) => {
-            // Add-to-cart buttons
             const btn = e.target.closest('.add-to-cart-btn');
             if (btn && btn.dataset.product) {
                 try {
@@ -1762,25 +1533,9 @@ function renderProfile() {
                 } catch (err) {
                     console.error('Add to cart parse error:', err);
                 }
-                return;
-            }
-            // Color chips for vapes
-            const chip = e.target.closest('.color-chip');
-            if (chip) {
-                e.stopPropagation();
-                const color = chip.textContent.trim();
-                const productCard = chip.closest('.model-colors-list')?.previousElementSibling;
-                const titleEl = productCard?.querySelector('.product-title');
-                const priceEl = productCard?.querySelector('.product-price');
-                const name = titleEl ? titleEl.textContent.replace('🤑 скидка на жидкость', '').trim() : '';
-                const price = priceEl ? parseInt(priceEl.textContent) : 0;
-                if (name && price) {
-                    addToCart({ name, price, color, desc: `Вейп: ${name}, цвет: ${color}` });
-                }
             }
         });
 
-        // --- АНИМИРОВАННЫЙ ДЫМ (canvas) ---
         (function initSmoke() {
             const canvas = document.getElementById('smokeCanvas');
             if (!canvas || !canvas.getContext) return;
@@ -1788,7 +1543,6 @@ function renderProfile() {
             let width = 0, height = 0, dpr = 1;
             let puffs = [];
 
-            // Мягкая «клякса» дыма — offscreen canvas
             const puff = document.createElement('canvas');
             puff.width = puff.height = 256;
             const pctx = puff.getContext('2d');
@@ -1901,7 +1655,6 @@ function renderProfile() {
             rafId = requestAnimationFrame(draw);
         })();
 
-        // --- ИНИЦИАЛИЗАЦИЯ ---
         if (window.Telegram && window.Telegram.WebApp) {
             const tg = window.Telegram.WebApp;
             tg.ready();
@@ -1910,18 +1663,15 @@ function renderProfile() {
             if (tg.setBackgroundColor) tg.setBackgroundColor('#000000');
         }
 
-        // Загружаем данные из таблицы сразу при старте
         syncWithSheet();
 
-        // Плавное появление кота на главном экране
         const initialCat = document.getElementById('catImage');
         if (initialCat) {
             if (initialCat.complete) initialCat.classList.add('loaded');
             else initialCat.addEventListener('load', () => initialCat.classList.add('loaded'), { once: true });
             initialCat.addEventListener('error', () => initialCat.classList.add('loaded'), { once: true });
         }
-        
-        // Автообновление каждые 30 секунд
+
         setInterval(syncWithSheet, 30000);
     </script>
 </body>
