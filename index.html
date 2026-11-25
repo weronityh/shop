@@ -200,6 +200,18 @@
         .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text-white); color: var(--bg-dark); padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 1000; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+        /* КНОПКИ СПОСОБА ПОЛУЧЕНИЯ В КОРЗИНЕ */
+        .pickup-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .pickup-btn {
+            padding: 12px 10px; border-radius: 12px; border: 1px solid var(--border-card);
+            background: rgba(255,255,255,0.05); color: var(--text-white);
+            font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+            cursor: pointer; text-align: center; transition: all 0.2s ease;
+        }
+        .pickup-btn.selected { background: var(--text-white); color: var(--bg-dark); border-color: var(--text-white); }
+        .pickup-btn.disabled { opacity: 0.4; cursor: not-allowed; }
+        .checkout-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
         /* ПРОФИЛЬ */
         .profile-cards { display: flex; flex-direction: column; gap: 12px; }
         .profile-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 18px; box-shadow: var(--shadow-card); }
@@ -441,6 +453,7 @@
         let vapeBrands = [];
         let liquidBrands = [];
         let cart = [];
+        let selectedPickup = null;
         let currentCategoryId = null;
         let currentBrandIdx = null;
         let currentModelIdx = null;
@@ -603,7 +616,6 @@
             showToast(`@${clean} назначен админом`);
         });
 
-        // --- ПОДПИСКА НА ТОВАРЫ FIRESTORE (СТАКАЕМ ВСЕ КАТЕГОРИИ ПО ИМЕНИ) ---
         function startFirestoreSync() {
             db.collection('products').onSnapshot((snapshot) => {
                 const defaultImages = { vapes: 'vape.png', snus: 'snus.png', liquids: 'zhizha.png', disposables: 'odnorazki.png', consumables: 'rashodniki.png' };
@@ -753,7 +765,7 @@
                     </div>`;
                 }).join('');
                 brandList.querySelectorAll('.brand-card').forEach(card => {
-                    card.addEventListener('click', () => openBrandModels(card.dataset.brandIdx, 'vapes'));
+                    card.addEventListener('click', () => openBrandModels(card.dataset.brandIdx));
                 });
                 showPage('brand'); return;
             }
@@ -957,11 +969,15 @@
 
         function renderCart() {
             const cartPage = document.getElementById('cartPage');
-            if (cart.length === 0) { cartPage.innerHTML = `<h1 class="section-title">КОРЗИНА</h1><div class="empty-state">Корзина пока пуста</div>`; return; }
+            if (cart.length === 0) {
+                selectedPickup = null;
+                cartPage.innerHTML = `<h1 class="section-title">КОРЗИНА</h1><div class="empty-state">Корзина пока пуста</div>`;
+                return;
+            }
             let total = 0;
             cartPage.innerHTML = `
                 <h1 class="section-title">КОРЗИНА</h1>
-                <div class="cart-list" style="display:flex; flex-direction:column; gap:12px; padding:0 16px 100px;">
+                <div class="cart-list" style="display:flex; flex-direction:column; gap:12px; padding:0 16px 190px;">
                     ${cart.map(item => {
                         total += item.price * item.qty;
                         return `
@@ -983,11 +999,25 @@
                         </div>`;
                     }).join('')}
                 </div>
-                <div style="position:fixed; bottom:calc(68px + env(safe-area-inset-bottom)); left:0; right:0; background:var(--bg-card); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-top:1px solid var(--border-card); padding:16px; display:flex; flex-direction:column; gap:12px; z-index:100; box-shadow:var(--shadow-card);">
-                    <div style="display:flex; justify-content:space-between; font-size:16px; font-weight:700;"><span>Итого</span><span id="cartTotal">${total} BYN</span></div>
-                    <button class="checkout-btn" id="checkoutBtn" style="width:100%; padding:16px 24px; border:none; border-radius:16px; background:var(--text-white); color:var(--bg-dark); font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:1px; cursor:pointer;">ОФОРМИТЬ ЗАКАЗ</button>
+                <div style="position:fixed; bottom:calc(68px + env(safe-area-inset-bottom)); left:0; right:0; background:var(--bg-card); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-top:1px solid var(--border-card); padding:14px 16px; display:flex; flex-direction:column; gap:10px; z-index:100; box-shadow:var(--shadow-card);">
+                    <div style="font-size:11px; color:var(--text-gray); text-transform:uppercase; letter-spacing:0.5px;">Способ получения *</div>
+                    <div class="pickup-methods">
+                        <button class="pickup-btn ${selectedPickup === 'ВОКЗАЛ' ? 'selected' : ''}" id="pickupVokzal">📍 ВОКЗАЛ</button>
+                        <button class="pickup-btn disabled" id="pickupDelivery">🚚 ДОСТАВКА СКОРО</button>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:16px; font-weight:700; margin-top:2px;"><span>Итого</span><span id="cartTotal">${total} BYN</span></div>
+                    <button class="checkout-btn" id="checkoutBtn" ${selectedPickup === 'ВОКЗАЛ' ? '' : 'disabled'} style="width:100%; padding:15px 24px; border:none; border-radius:16px; background:var(--text-white); color:var(--bg-dark); font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:1px; cursor:pointer;">ОФОРМИТЬ ЗАКАЗ</button>
                 </div>
             `;
+
+            document.getElementById('pickupVokzal').addEventListener('click', () => {
+                selectedPickup = 'ВОКЗАЛ';
+                renderCart();
+            });
+
+            document.getElementById('pickupDelivery').addEventListener('click', () => {
+                showToast('Доставка скоро появится');
+            });
 
             cartPage.querySelectorAll('.qty-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -1016,7 +1046,16 @@
 
         function checkout() {
             if (cart.length === 0) { showToast('Корзина пуста'); return; }
+            if (selectedPickup !== 'ВОКЗАЛ') { showToast('Выберите способ получения: ВОКЗАЛ'); return; }
             showDeliveryModal();
+        }
+
+        function spinRoulettePrize() {
+            const r = Math.random() * 100;
+            if (r < 50) return 'Скидка 5% на всё';
+            if (r < 80) return 'Скидка 10% на всё';
+            if (r < 95) return 'Скидка 15% на всё';
+            return 'Бесплатная жидкость';
         }
 
         function renderProfile() {
@@ -1026,7 +1065,7 @@
             const username = tgUser?.username ? `@${tgUser.username}` : (tgUser?.first_name || 'Гость');
             const avatarLetter = (tgUser?.first_name || tgUser?.username || 'W')[0].toUpperCase();
             let purchases = Number(localStorage.getItem('weggew_purchases') || 0);
-            const canSpin = purchases >= 10;
+            const canSpin = purchases >= 5;
 
             container.innerHTML = `
                 <div class="profile-card"><div class="profile-user"><div class="profile-avatar">${avatarLetter}</div><div><div class="profile-username">${username}</div><div class="profile-sub">Ваш профиль Telegram</div></div></div></div>
@@ -1045,13 +1084,15 @@
                 <div class="profile-card"><div class="profile-card-title">Время работы</div><div style="font-size: 16px; font-weight: 700;">11:00 - 23:00</div></div>
                 <div class="profile-card"><div class="profile-card-title">Только честные отзывы</div><a href="https://t.me/Seregablatnou" target="_blank" class="profile-btn" id="reviewsBtn">Перейти к отзывам →</a></div>
                 <div class="profile-card">
-                    <div class="profile-card-title">Рулетка при покупке от 10 шт</div>
-                    <div style="font-size: 13px; color: #dcdcdc;">Накоплено: <b id="rouletteCount">${Math.min(purchases, 10)}</b> / 10 шт.</div>
-                    <div class="roulette-bar"><div class="roulette-fill" style="width: ${Math.min(purchases, 10) * 10}%"></div></div>
-                    <div style="font-size: 12px; color: var(--text-gray); margin-bottom: 10px;">После покупки 10-го товара можно прокрутить рулетку 1 раз. Призы: 5%, 10%, 15% или бесплатная жидкость.</div>
-                    <button class="profile-btn primary" id="spinRouletteBtn" ${canSpin ? '' : 'disabled'}>${canSpin ? 'Крутить рулетку 🎰' : `Осталось ${10 - Math.min(purchases, 10)} шт.`}</button>
+                    <div class="profile-card-title">Рулетка после 5 покупок</div>
+                    <div style="font-size: 13px; color: #dcdcdc;">Оформлено покупок: <b id="rouletteCount">${Math.min(purchases, 5)}</b> / 5</div>
+                    <div class="roulette-bar"><div class="roulette-fill" style="width: ${Math.min(purchases, 5) * 20}%"></div></div>
+                    <div style="font-size: 12px; color: var(--text-gray); margin-bottom: 10px;">
+                        После 5 покупок открывается колесо: 5% (50%), 10% (30%), 15% (15%) или бесплатная жидкость (5%).
+                    </div>
+                    <button class="profile-btn primary" id="spinRouletteBtn" ${canSpin ? '' : 'disabled'}>${canSpin ? 'Крутить рулетку 🎰' : `Осталось ${5 - Math.min(purchases, 5)} пок.`}</button>
                     <div class="roulette-result" id="rouletteResult"></div>
-                    <div class="roulette-note">* скидка действует на все товары, на одну единицу</div>
+                    <div class="roulette-note">* скидка действует на все товары</div>
                 </div>
                 <div class="profile-card"><div class="profile-card-title">Обратная связь</div><button class="profile-btn" id="feedbackBtn">Написать в Telegram (@Seregablatnou)</button></div>
             `;
@@ -1063,8 +1104,7 @@
             });
 
             document.getElementById('spinRouletteBtn').addEventListener('click', () => {
-                const prizes = ['Скидка 5%', 'Скидка 10%', 'Скидка 15%', 'Бесплатная жидкость'];
-                const win = prizes[Math.floor(Math.random() * prizes.length)];
+                const win = spinRoulettePrize();
                 localStorage.setItem('weggew_purchases', '0');
                 document.getElementById('rouletteResult').textContent = `🎉 Ваш приз: ${win}!`;
                 document.getElementById('spinRouletteBtn').disabled = true;
@@ -1232,11 +1272,15 @@
                 const colorStr = item.color ? ` (${item.color})` : '';
                 orderText += `${i + 1}. ${item.name}${colorStr} × ${item.qty} — ${lineTotal} BYN\n`;
             });
-            orderText += `\nИтого: ${total} BYN\n📅 Получение: ${dayLabel}\n⏰ Время: ${timeLabel}`;
+            orderText += `\nИтого: ${total} BYN\n📍 Способ получения: ${selectedPickup || 'ВОКЗАЛ'}\n📅 День: ${dayLabel}\n⏰ Время: ${timeLabel}`;
             const url = 'https://t.me/Seregablatnou?text=' + encodeURIComponent(orderText);
             if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
             else window.open(url, '_blank');
-            cart = []; updateCartCount(); renderCart(); showToast('Заказ сформирован');
+
+            const prevPurchases = Number(localStorage.getItem('weggew_purchases') || 0);
+            localStorage.setItem('weggew_purchases', String(prevPurchases + 1));
+
+            cart = []; selectedPickup = null; updateCartCount(); renderCart(); showToast('Заказ сформирован');
         }
 
         document.getElementById('goToCatalogBtn').addEventListener('click', () => { renderCategories(); showPage('catalog'); });
@@ -1324,31 +1368,4 @@
             function scheduleResize() { resize(); createPuffs(); if (!rafId) rafId = requestAnimationFrame(draw); }
             resize(); createPuffs();
             window.addEventListener('resize', scheduleResize);
-            if (window.visualViewport) window.visualViewport.addEventListener('resize', scheduleResize);
-            if (window.Telegram?.WebApp) {
-                try { window.Telegram.WebApp.onEvent('viewportChanged', scheduleResize); } catch (e) {}
-            }
-            rafId = requestAnimationFrame(draw);
-        })();
-
-        if (window.Telegram?.WebApp) {
-            const tg = window.Telegram.WebApp;
-            tg.ready();
-            tg.expand();
-            if (tg.setHeaderColor) tg.setHeaderColor('#000000');
-            if (tg.setBackgroundColor) tg.setBackgroundColor('#000000');
-        }
-
-        updateAdminVisibility();
-        startAdminsSync();
-        startFirestoreSync();
-
-        const initialCat = document.getElementById('catImage');
-        if (initialCat) {
-            if (initialCat.complete) initialCat.classList.add('loaded');
-            else initialCat.addEventListener('load', () => initialCat.classList.add('loaded'), { once: true });
-            initialCat.addEventListener('error', () => initialCat.classList.add('loaded'), { once: true });
-        }
-    </script>
-</body>
-</html>
+            if (window.visualViewport) window.visualViewport.add
