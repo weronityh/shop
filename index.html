@@ -27,7 +27,8 @@
         body.catalog-bg::before {
             content: ""; position: fixed; inset: 0; background: url('zadniufon.jpg') center center / cover no-repeat; z-index: 0; pointer-events: none;
         }
-        .app { flex: 1; min-height: 0; width: 100%; max-width: 640px; margin: 0 auto; background: transparent; display: flex; flex-direction: column; overflow: hidden; position: relative; }        main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; position: relative; }
+        .app { flex: 1; min-height: 0; width: 100%; max-width: 640px; margin: 0 auto; background: transparent; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; position: relative; }
         .page { display: none; min-height: 100%; flex-direction: column; }
         .page.active { display: flex; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -45,7 +46,6 @@
         }
         .cat-mask::after { content: ""; position: absolute; left: -6%; right: -6%; bottom: -1px; height: 22%; pointer-events: none; z-index: 1; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.18) 46%, rgba(0,0,0,0.62) 82%, #000 100%); }
         .cat-image.loaded { opacity: 1; transform: scale(1.06) translateY(0); }
-        
 
         /* ЭКРАН 1: ПРИВЕТСТВИЕ */
         #welcomePage { justify-content: space-between; align-items: center; padding: 0 0 calc(env(safe-area-inset-bottom, 0px) + 8px); text-align: center; position: relative; overflow: hidden; height: 100%; max-height: 100%; min-height: 100%; }
@@ -58,7 +58,8 @@
             .main-btn { padding-top: 13px; padding-bottom: 13px; }
         }
         .welcome-title { font-size: clamp(30px, 8.6vw, 42px); font-weight: 400; letter-spacing: clamp(10px, 3.6vw, 18px); text-transform: uppercase; color: #ffffff; line-height: 1; padding-left: clamp(10px, 3.6vw, 18px); text-shadow: 0 4px 12px rgba(0,0,0,1), 0 0 2px #000; position: relative; z-index: 3; display: flex; flex-wrap: wrap; justify-content: center; gap: 0; }
-        @keyframes charReveal { to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }        .welcome-divider { width: 46px; height: 1px; background: rgba(255,255,255,0.38); margin: clamp(12px, 2vh, 18px) auto; position: relative; z-index: 3; transform: scaleX(0); transform-origin: center; animation: dividerReveal 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: 0.95s; will-change: transform; }
+        @keyframes charReveal { to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
+        .welcome-divider { width: 46px; height: 1px; background: rgba(255,255,255,0.38); margin: clamp(12px, 2vh, 18px) auto; position: relative; z-index: 3; transform: scaleX(0); transform-origin: center; animation: dividerReveal 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: 0.95s; will-change: transform; }
         @keyframes dividerReveal { to { transform: scaleX(1); } }
         .welcome-subtitle { font-size: clamp(11px, 3.2vw, 13px); font-weight: 300; letter-spacing: clamp(3px, 1.25vw, 5px); line-height: 1.85; color: #ffffff; text-transform: uppercase; margin-bottom: clamp(20px, 3.4vh, 32px); position: relative; z-index: 3; }
         .subtitle-line { display: block; opacity: 0; transform: translateY(10px); filter: blur(4px); animation: subtitleReveal 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards; will-change: opacity, transform, filter; }
@@ -105,8 +106,10 @@
         .product-info { flex: 1; min-width: 0; }
         .product-title { font-size: 15px; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
         .product-desc { font-size: 12px; color: var(--text-gray); margin-bottom: 6px; line-height: 1.3; }
-        .product-price { font-size: 16px; font-weight: 700; color: var(--text-white); }
+        .product-price { font-size: 16px; font-weight: 700; color: var(--text-white); display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
         .promo-badge { display: inline-block; background: #ff9800; color: #000; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px; text-transform: uppercase; }
+        .free-badge { display: inline-block; background: linear-gradient(135deg, #28cd41, #1e9e32); color: #ffffff; font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 999px; letter-spacing: 0.6px; text-transform: uppercase; box-shadow: 0 2px 10px rgba(40, 205, 65, 0.35); }
+        .old-price { text-decoration: line-through; color: var(--text-gray); font-size: 13px; font-weight: 500; }
         .add-to-cart-btn { margin-left: auto; padding: 8px 14px; background: var(--text-white); color: var(--bg-dark); border: none; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; flex-shrink: 0; transition: background 0.2s, transform 0.1s; }
         .add-to-cart-btn:active { background: #e0e0e0; transform: scale(0.98); }
 
@@ -139,8 +142,9 @@
         .product-detail-image { width: 100%; height: 100%; object-fit: contain; transition: opacity 0.2s ease; }
         .product-detail-category { font-size: 12px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
         .product-detail-name { font-size: 22px; font-weight: 900; text-transform: uppercase; text-align: center; margin-bottom: 6px; }
-        .product-detail-price { font-size: 20px; font-weight: 700; color: var(--text-white); margin-bottom: 4px; }
+        .product-detail-price { font-size: 20px; font-weight: 700; color: var(--text-white); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
         .product-detail-desc { font-size: 14px; color: var(--text-gray); text-align: center; margin-bottom: 24px; line-height: 1.4; }
+        .free-hint-box { background: rgba(40, 205, 65, 0.14); border: 1px solid rgba(40, 205, 65, 0.45); color: #7ef28f; padding: 8px 14px; border-radius: 12px; font-size: 12px; font-weight: 600; text-align: center; margin-bottom: 14px; }
 
         .color-selector { width: 100%; max-width: 360px; margin-bottom: 20px; }
         .color-selector-label { font-size: 12px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
@@ -168,15 +172,21 @@
         #cartPage, #profilePage, #adminPage { padding: 20px 16px 100px; }
         .empty-state { text-align: center; padding: 60px 20px; color: var(--text-gray); }
         .section-title { font-size: 22px; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; }
-        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text-white); color: var(--bg-dark); padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 1000; }
+        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text-white); color: var(--bg-dark); padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 1000; text-align: center; max-width: 90vw; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        /* КНОПКИ СПОСОБА ПОЛУЧЕНИЯ В КОРЗИНЕ */
+        /* КНОПКИ СПОСОБА ПОЛУЧЕНИЯ И БОНУСОВ В КОРЗИНЕ */
         .pickup-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .pickup-btn { padding: 12px 10px; border-radius: 12px; border: 1px solid var(--border-card); background: rgba(255,255,255,0.05); color: var(--text-white); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; text-align: center; transition: all 0.2s ease; }
         .pickup-btn.selected { background: var(--text-white); color: var(--bg-dark); border-color: var(--text-white); }
         .pickup-btn.disabled { opacity: 0.4; cursor: not-allowed; }
         .checkout-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .cart-bonus-row { display: flex; flex-wrap: wrap; gap: 8px; border-top: 1px dashed rgba(255,255,255,0.12); padding-top: 10px; align-items: center; }
+        .cart-bonus-btn { padding: 7px 12px; border-radius: 10px; border: 1px solid rgba(255,152,0,0.5); background: rgba(255,152,0,0.14); color: #ffb74d; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; cursor: pointer; transition: all 0.15s ease; }
+        .cart-bonus-btn:active { transform: scale(0.97); }
+        .cart-bonus-btn.free { border-color: rgba(40,205,65,0.55); background: rgba(40,205,65,0.16); color: #69f07a; }
+        .cart-bonus-btn.applied { border-color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.12); color: #ffffff; }
+        .cart-bonus-banner { background: rgba(255,152,0,0.12); border: 1px solid rgba(255,152,0,0.35); border-radius: 14px; padding: 10px 14px; margin: 0 16px 12px; font-size: 12px; color: #ffd180; line-height: 1.4; }
 
         /* ПРОФИЛЬ */
         .profile-cards { display: flex; flex-direction: column; gap: 12px; }
@@ -195,6 +205,9 @@
         .roulette-fill { height: 100%; background: var(--text-white); width: 0%; transition: width 0.3s ease; }
         .roulette-note { font-size: 11px; color: var(--text-gray); margin-top: 8px; line-height: 1.4; }
         .roulette-result { margin-top: 10px; font-size: 14px; font-weight: 700; color: #ff9800; }
+        .reward-item-card { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); margin-bottom: 8px; }
+        .reward-item-card:last-child { margin-bottom: 0; }
+        .reward-use-btn { padding: 7px 12px; border-radius: 10px; border: none; background: var(--text-white); color: var(--bg-dark); font-size: 11px; font-weight: 800; text-transform: uppercase; cursor: pointer; flex-shrink: 0; }
 
         /* ГОРИЗОНТАЛЬНАЯ РУЛЕТКА */
         .roulette-modal {
@@ -284,7 +297,7 @@
                     </div>
                     <div class="welcome-hint">ЗДЕСЬ ЧТО-ТО БОЛЬШЕ ЧЕМ ПАР</div>
                     <button class="main-btn" id="goToCatalogBtn">ПЕРЕЙТИ В КАТАЛОГ →</button>
-<div style="font-size: 10px; color: #777; margin-top: 10px; line-height: 1.3; letter-spacing: 0.5px;">
+                    <div style="font-size: 10px; color: #777; margin-top: 10px; line-height: 1.3; letter-spacing: 0.5px;">
                         Нажимая «ПЕРЕЙТИ В КАТАЛОГ», вы подтверждаете своё совершеннолетие
                     </div>
                 </div>
@@ -362,12 +375,17 @@
                 </div>
 
                 <div class="profile-card" style="margin-bottom: 16px;">
-                    <div class="profile-card-title">⭐ Засчитать покупку клиенту</div>
-                    <div style="display:flex; gap:8px;">
-                        <input class="admin-input" id="admClientUsername" placeholder="@username покупателя">
-                        <button class="profile-btn primary" id="admAddPurchaseBtn" style="width:auto; padding:0 16px; flex-shrink:0;">+1 покупка</button>
-                    </div>
-                </div>
+                    <div class="profile-card" style="margin-bottom: 16px;">
+    <div class="profile-card-title">⭐ Засчитать покупку клиенту</div>
+    <div style="display:flex; gap:8px;">
+        <input class="admin-input" id="admClientUsername" placeholder="@username покупателя">
+        <button class="profile-btn" id="admSubPurchaseBtn" style="width:auto; padding:0 14px; flex-shrink:0; border-color:rgba(255,59,48,0.45); color:#ff6961;">−1</button>
+        <button class="profile-btn primary" id="admAddPurchaseBtn" style="width:auto; padding:0 16px; flex-shrink:0;">+1</button>
+    </div>
+    <div style="font-size:11px; color:var(--text-gray); margin-top:8px;">
+        5 покупок = 1 прокрут рулетки. Покупки сверх 5 сохраняются.
+    </div>
+</div>
 
                 <div class="profile-card" style="margin-bottom: 16px;">
                     <div class="profile-card-title">+ Добавить товар</div>
@@ -434,6 +452,7 @@
     <script>
         const SUPER_ADMIN = 'seregablatnou';
         const IMGBB_API_KEY = 'aa100eea73f466598cc1886be9d7466f';
+        const PURCHASES_PER_SPIN = 5;
 
         const firebaseConfig = {
             apiKey: "AIzaSyCjs05afH0dhwWRYs9cq15rG9mi8fdZHfM",
@@ -458,6 +477,8 @@
         const catalogData = { vapes: [], snus: [], liquids: [], disposables: [], consumables: [] };
         let extraAdmins = [];
         let userPurchases = 0;
+        let userRewards = [];
+        let isRouletteSpinning = false;
         let allRawProducts = [];
         let vapeBrands = [];
         let liquidBrands = [];
@@ -465,7 +486,6 @@
         let selectedPickup = null;
         let currentCategoryId = null;
         let currentBrandIdx = null;
-        let currentModelIdx = null;
         let detailBackPage = 'brand';
 
         const VAPE_COLOR_IMAGES = {
@@ -509,6 +529,18 @@
         function getTgUsername() {
             return (window.Telegram?.WebApp?.initDataUnsafe?.user?.username || '').toLowerCase().trim();
         }
+        function getUserDocId() {
+            const uname = getTgUsername();
+            if (uname) return uname;
+            const tgId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+            if (tgId) return `id_${tgId}`;
+            let guestId = localStorage.getItem('weggew_guest_id');
+            if (!guestId) {
+                guestId = 'guest_' + Math.random().toString(36).slice(2, 10);
+                localStorage.setItem('weggew_guest_id', guestId);
+            }
+            return guestId;
+        }
         function isSuperAdmin() {
             return getTgUsername() === SUPER_ADMIN;
         }
@@ -516,6 +548,24 @@
             const u = getTgUsername();
             return u === SUPER_ADMIN || extraAdmins.includes(u);
         }
+        function hasFreeLiquidReward() {
+            return userRewards.some(r => r.type === 'free_liquid');
+        }
+        function getDiscountRewards() {
+            return userRewards.filter(r => r.type === 'discount');
+        }
+        function getUnusedRewards() {
+            const usedIds = new Set(cart.map(i => i.appliedRewardId).filter(Boolean));
+            return userRewards.filter(r => !usedIds.has(r.id));
+        }
+        function findRewardById(id) {
+            return userRewards.find(r => r.id === id) || null;
+        }
+        function formatMoney(val) {
+            const num = Math.max(0, Number(val) || 0);
+            return Number.isInteger(num) ? `${num}` : `${Number(num.toFixed(2))}`;
+        }
+
         function updateAdminVisibility() {
             const adminBtn = document.getElementById('adminNavBtn');
             const superBlock = document.getElementById('superAdminBlock');
@@ -575,15 +625,30 @@
             toast.textContent = text;
             toast.classList.add('show');
             clearTimeout(window._toastTimer);
-            window._toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+            window._toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+        }
+
+        function syncCartRewardsValidity() {
+            const validIds = new Set(userRewards.map(r => r.id));
+            cart.forEach(item => {
+                if (item.appliedRewardId && !validIds.has(item.appliedRewardId)) {
+                    item.appliedRewardId = null;
+                }
+            });
         }
 
         function startUserPurchasesSync() {
-            const uname = getTgUsername();
-            if (!uname) return;
-            db.collection('users').doc(uname).onSnapshot((doc) => {
-                userPurchases = doc.exists ? (Number(doc.data().purchases) || 0) : 0;
+            const docId = getUserDocId();
+            if (!docId) return;
+            db.collection('users').doc(docId).onSnapshot((doc) => {
+                const data = doc.exists ? doc.data() : {};
+                userPurchases = Number(data.purchases) || 0;
+                userRewards = Array.isArray(data.rewards) ? data.rewards : [];
+                syncCartRewardsValidity();
+
                 if (pages.profile.classList.contains('active')) renderProfile();
+                if (pages.cart.classList.contains('active')) renderCart();
+                if (currentCategoryId === 'liquids' && pages.brand.classList.contains('active')) openCategory('liquids');
             });
         }
 
@@ -634,22 +699,48 @@
             showToast(`@${clean} назначен админом`);
         });
 
-        document.getElementById('admAddPurchaseBtn').addEventListener('click', async () => {
-            if (!isAdminUser()) return;
-            const input = document.getElementById('admClientUsername');
-            const clean = input.value.replace(/^@+/, '').trim().toLowerCase();
-            if (!clean) { showToast('Введите @username клиента'); return; }
-            try {
-                await db.collection('users').doc(clean).set({
-                    purchases: firebase.firestore.FieldValue.increment(1)
-                }, { merge: true });
-                input.value = '';
-                showToast(`+1 покупка засчитана для @${clean}`);
-            } catch (err) {
-                console.error(err);
-                showToast('Ошибка записи в базу');
-            }
-        });
+        async function updateClientPurchases(delta) {
+    if (!isAdminUser()) return;
+    const input = document.getElementById('admClientUsername');
+    const addBtn = document.getElementById('admAddPurchaseBtn');
+    const subBtn = document.getElementById('admSubPurchaseBtn');
+    const clean = input.value.replace(/^@+/, '').trim().toLowerCase();
+
+    if (!clean) { showToast('Введите @username клиента'); return; }
+
+    const actionText = delta > 0 ? `+1 покупку` : `−1 покупку`;
+    if (!confirm(`Вы уверены, что хотите начислить ${actionText} для @${clean}?`)) return;
+
+    addBtn.disabled = true;
+    subBtn.disabled = true;
+
+    try {
+        const userRef = db.collection('users').doc(clean);
+        const snap = await userRef.get();
+        const current = snap.exists ? (Number(snap.data().purchases) || 0) : 0;
+        const next = Math.max(0, current + delta);
+
+        const payload = { purchases: next };
+        if (delta > 0) {
+            payload.totalPurchases = firebase.firestore.FieldValue.increment(1);
+        }
+
+        await userRef.set(payload, { merge: true });
+        input.value = '';
+        showToast(`${delta > 0 ? '+1' : '−1'} покупка для @${clean} (баланс: ${next} пок.)`);
+    } catch (err) {
+        console.error(err);
+        showToast('Ошибка записи в базу');
+    } finally {
+        setTimeout(() => {
+            addBtn.disabled = false;
+            subBtn.disabled = false;
+        }, 1200);
+    }
+}
+
+document.getElementById('admAddPurchaseBtn').addEventListener('click', () => updateClientPurchases(1));
+document.getElementById('admSubPurchaseBtn').addEventListener('click', () => updateClientPurchases(-1));
 
         function startFirestoreSync() {
             db.collection('products').onSnapshot((snapshot) => {
@@ -694,7 +785,7 @@
                         const mKey = name.toLowerCase();
                         if (!modelsMap.has(mKey)) {
                             modelsMap.set(mKey, {
-                                id: doc.id, name, desc: desc || 'Под-система', price, stock, image: resolvedImage,
+                                id: doc.id, category: 'vapes', name, desc: desc || 'Под-система', price, stock, image: resolvedImage,
                                 isCover: name.toLowerCase() === 'xros 6 mini',
                                 colors: [], colorImages: {}, colorStocks: {}
                             });
@@ -711,7 +802,7 @@
                         const mKey = name.toLowerCase();
                         if (!modelsMap.has(mKey)) {
                             modelsMap.set(mKey, {
-                                id: doc.id, name, desc, price, stock, image: resolvedImage,
+                                id: doc.id, category: 'liquids', name, desc, price, stock, image: resolvedImage,
                                 isCover: false, colors: [], colorImages: {}, colorStocks: {}
                             });
                         }
@@ -725,7 +816,7 @@
                         const mKey = `${brand.toLowerCase()}||${name.toLowerCase()}`;
                         if (!map.has(mKey)) {
                             map.set(mKey, {
-                                id: doc.id, brand, name, desc, price, stock, image: resolvedImage,
+                                id: doc.id, category: siteCat, brand, name, desc, price, stock, image: resolvedImage,
                                 isCover: name.toLowerCase() === 'xros 6 mini',
                                 icon: iconMap[siteCat] || '📦',
                                 colors: [], colorImages: {}, colorStocks: {}
@@ -804,31 +895,41 @@
                 });
                 showPage('brand'); return;
             }
+
             if (categoryId === 'liquids') {
                 if (liquidBrands.length === 0) {
                     brandList.innerHTML = `<div class="empty-state">В этой категории пока нет товаров в наличии</div>`;
                     showPage('brand'); return;
                 }
-                brandList.innerHTML = liquidBrands.map((b, bIdx) => `
-                    <div class="brand-group">
-                        <div class="brand-group-card" data-brand-idx="${bIdx}">
-                            <div class="brand-group-title">${b.brand}</div>
-                            <div class="brand-group-arrow">›</div>
-                        </div>
-                        <div class="brand-models-list" id="liquidFlavors_${bIdx}">
-                            ${b.models.map((m, mIdx) => `
-                                <div class="product-card" data-liq-brand="${bIdx}" data-liq-model="${mIdx}">
-                                    <div class="product-info">
-                                        <div class="product-title">${m.name}</div>
-                                        <div class="product-desc">${m.desc || ''} ${m.colors.length > 1 || m.colors[0] !== 'Стандарт' ? `· ${m.colors.length} вкус.` : ''}</div>
-                                        <div class="product-price">${m.price} BYN</div>
+                const freeLiquid = hasFreeLiquidReward();
+                brandList.innerHTML = `
+                    ${freeLiquid ? `<div class="free-hint-box">🎁 У вас есть приз «Бесплатная жидкость» — выберите любую и примените в корзине!</div>` : ''}
+                    ${liquidBrands.map((b, bIdx) => `
+                        <div class="brand-group">
+                            <div class="brand-group-card" data-brand-idx="${bIdx}">
+                                <div class="brand-group-title">${b.brand}</div>
+                                <div class="brand-group-arrow">›</div>
+                            </div>
+                            <div class="brand-models-list" id="liquidFlavors_${bIdx}">
+                                ${b.models.map((m, mIdx) => `
+                                    <div class="product-card" data-liq-brand="${bIdx}" data-liq-model="${mIdx}">
+                                        <div class="product-info">
+                                            <div class="product-title">${m.name}</div>
+                                            <div class="product-desc">${m.desc || ''} ${m.colors.length > 1 || m.colors[0] !== 'Стандарт' ? `· ${m.colors.length} вкус.` : ''}</div>
+                                            <div class="product-price">
+                                                ${freeLiquid
+                                                    ? `<span class="old-price">${m.price} BYN</span><span class="free-badge">БЕСПЛАТНО</span>`
+                                                    : `${m.price} BYN`
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="brand-card-arrow">›</div>
                                     </div>
-                                    <div class="brand-card-arrow">›</div>
-                                </div>
-                            `).join('')}
+                                `).join('')}
+                            </div>
                         </div>
-                    </div>
-                `).join('');
+                    `).join('')}
+                `;
                 brandList.querySelectorAll('.brand-group-card').forEach(card => {
                     card.addEventListener('click', () => {
                         const idx = card.dataset.brandIdx;
@@ -914,6 +1015,8 @@
 
             let selectedColorIdx = 0;
             const colors = model.colors && model.colors.length > 0 ? model.colors : ['Стандарт'];
+            const isLiquid = model.category === 'liquids' || categoryLabel === 'ЖИДКОСТИ';
+            const freeLiquid = isLiquid && hasFreeLiquidReward();
 
             function renderContent() {
                 const selectedColor = colors[selectedColorIdx];
@@ -925,7 +1028,13 @@
                     <div class="product-detail-image-wrap"><img class="product-detail-image" id="productMainImage" src="${imageSrc}" alt="${model.name}"></div>
                     <div class="product-detail-category">${categoryLabel}</div>
                     <div class="product-detail-name">${model.name}</div>
-                    <div class="product-detail-price">${model.price} BYN</div>
+                    <div class="product-detail-price">
+                        ${freeLiquid
+                            ? `<span class="old-price">${model.price} BYN</span><span class="free-badge">БЕСПЛАТНО</span>`
+                            : `${model.price} BYN`
+                        }
+                    </div>
+                    ${freeLiquid ? `<div class="free-hint-box">🎁 После добавления в корзину нажмите кнопку «Сделать бесплатно»</div>` : ''}
                     <div class="product-detail-desc">${model.desc || ''}</div>
                     <div class="color-selector">
                         <div class="color-selector-label">
@@ -971,6 +1080,7 @@
                 });
                 document.getElementById('addToCartMain').addEventListener('click', () => {
                     addToCart({
+                        category: model.category || currentCategoryId || (isLiquid ? 'liquids' : 'other'),
                         name: model.name,
                         price: model.price,
                         desc: model.desc || '',
@@ -988,11 +1098,24 @@
         function addToCart(product, qty = 1) {
             const count = Math.max(1, parseInt(qty, 10) || 1);
             const maxStock = product.maxStock ?? product.stock ?? Infinity;
-            const existing = cart.find(item => item.name === product.name && item.color === product.color);
+            const existing = cart.find(item => item.name === product.name && item.color === product.color && item.category === (product.category || 'other'));
             const currentQty = existing ? existing.qty : 0;
             if (currentQty + count > maxStock) { showToast(`Максимум в наличии: ${maxStock} шт.`); return; }
-            if (existing) existing.qty += count;
-            else cart.push({ id: product.id || 'item_' + Date.now(), name: product.name, desc: product.desc || '', price: product.price, qty: count, color: product.color || null, maxStock });
+            if (existing) {
+                existing.qty += count;
+            } else {
+                cart.push({
+                    id: 'ci_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+                    category: product.category || currentCategoryId || 'other',
+                    name: product.name,
+                    desc: product.desc || '',
+                    price: product.price,
+                    qty: count,
+                    color: product.color || null,
+                    maxStock,
+                    appliedRewardId: null
+                });
+            }
             updateCartCount();
             showToast('Добавлено в корзину');
         }
@@ -1002,29 +1125,112 @@
             if (cartCountEl) { cartCountEl.textContent = total; cartCountEl.style.display = total > 0 ? 'flex' : 'none'; }
         }
 
+        function calcItemPricing(item) {
+            const baseTotal = +(item.price * item.qty).toFixed(2);
+            const reward = item.appliedRewardId ? findRewardById(item.appliedRewardId) : null;
+            if (!reward) {
+                return { baseTotal, discountAmount: 0, finalTotal: baseTotal, reward: null };
+            }
+            if (reward.type === 'free_liquid' && item.category === 'liquids') {
+                const discountAmount = +item.price.toFixed(2);
+                return {
+                    baseTotal,
+                    discountAmount,
+                    finalTotal: Math.max(0, +(baseTotal - discountAmount).toFixed(2)),
+                    reward
+                };
+            }
+            if (reward.type === 'discount') {
+                const discountAmount = +(item.price * ((Number(reward.percent) || 0) / 100)).toFixed(2);
+                return {
+                    baseTotal,
+                    discountAmount,
+                    finalTotal: Math.max(0, +(baseTotal - discountAmount).toFixed(2)),
+                    reward
+                };
+            }
+            return { baseTotal, discountAmount: 0, finalTotal: baseTotal, reward: null };
+        }
+
         function renderCart() {
             const cartPage = document.getElementById('cartPage');
+            syncCartRewardsValidity();
+
             if (cart.length === 0) {
                 selectedPickup = null;
                 cartPage.innerHTML = `<h1 class="section-title">КОРЗИНА</h1><div class="empty-state">Корзина пока пуста</div>`;
                 return;
             }
-            let total = 0;
+
+            let subtotal = 0;
+            let totalDiscount = 0;
+            const unusedRewards = getUnusedRewards();
+            const unusedDiscounts = unusedRewards.filter(r => r.type === 'discount');
+            const unusedFreeLiquids = unusedRewards.filter(r => r.type === 'free_liquid');
+
+            // Чтобы не дублировать одинаковые кнопки скидок (например, если две по 5%), показываем по одной кнопке на уникальный номинал
+            const uniqueDiscountButtons = [];
+            const seenPercents = new Set();
+            unusedDiscounts.forEach(r => {
+                if (!seenPercents.has(r.percent)) {
+                    seenPercents.add(r.percent);
+                    uniqueDiscountButtons.push(r);
+                }
+            });
+
             cartPage.innerHTML = `
                 <h1 class="section-title">КОРЗИНА</h1>
-                <div class="cart-list" style="display:flex; flex-direction:column; gap:12px; padding:0 16px 190px;">
+                ${userRewards.length > 0 ? `
+                    <div class="cart-bonus-banner">
+                        🎁 У вас есть активные призы рулетки (<b>${userRewards.length} шт.</b>). Нажмите кнопку напротив нужного товара, чтобы применить бонус!
+                    </div>
+                ` : ''}
+                <div class="cart-list" style="display:flex; flex-direction:column; gap:12px; padding:0 16px 230px;">
                     ${cart.map(item => {
-                        total += item.price * item.qty;
+                        const pricing = calcItemPricing(item);
+                        subtotal += pricing.baseTotal;
+                        totalDiscount += pricing.discountAmount;
+                        const isLiquid = item.category === 'liquids';
+
+                        let bonusButtonsHtml = '';
+                        if (pricing.reward) {
+                            const labelText = pricing.reward.type === 'free_liquid'
+                                ? '🎁 Бесплатно применено'
+                                : `🏷 Скидка -${pricing.reward.percent}% (−${formatMoney(pricing.discountAmount)} BYN)`;
+                            bonusButtonsHtml = `
+                                <div class="cart-bonus-row">
+                                    <button class="cart-bonus-btn applied" data-cart-id="${item.id}" data-action="remove-reward">${labelText} · Снять ✕</button>
+                                </div>
+                            `;
+                        } else if ((isLiquid && unusedFreeLiquids.length > 0) || uniqueDiscountButtons.length > 0) {
+                            bonusButtonsHtml = `
+                                <div class="cart-bonus-row">
+                                    ${isLiquid && unusedFreeLiquids.length > 0 ? `
+                                        <button class="cart-bonus-btn free" data-cart-id="${item.id}" data-reward-id="${unusedFreeLiquids[0].id}" data-action="apply-reward">🎁 Сделать бесплатно (0 BYN)</button>
+                                    ` : ''}
+                                    ${uniqueDiscountButtons.map(r => `
+                                        <button class="cart-bonus-btn" data-cart-id="${item.id}" data-reward-id="${r.id}" data-action="apply-reward">🏷 Применить скидку -${r.percent}%</button>
+                                    `).join('')}
+                                </div>
+                            `;
+                        }
+
                         return `
                         <div class="cart-item" style="background:var(--bg-card); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid var(--border-card); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:10px; box-shadow:var(--shadow-card);">
-                            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
                                 <div style="flex:1; min-width:0;">
                                     <div style="font-size:15px; font-weight:700; text-transform:uppercase;">${item.name}</div>
                                     ${item.color ? `<div style="font-size:12px; color:var(--text-gray); margin-top:2px;">Вариант: ${item.color}</div>` : ''}
                                     ${item.desc ? `<div style="font-size:12px; color:var(--text-gray); margin-top:2px;">${item.desc}</div>` : ''}
                                 </div>
-                                <div style="font-size:16px; font-weight:700; white-space:nowrap;">${item.price * item.qty} BYN</div>
+                                <div style="text-align:right; white-space:nowrap;">
+                                    ${pricing.discountAmount > 0 ? `<div class="old-price">${formatMoney(pricing.baseTotal)} BYN</div>` : ''}
+                                    <div style="font-size:16px; font-weight:700; color:${pricing.finalTotal === 0 ? '#69f07a' : 'var(--text-white)'};">
+                                        ${pricing.finalTotal === 0 ? 'БЕСПЛАТНО (0 BYN)' : `${formatMoney(pricing.finalTotal)} BYN`}
+                                    </div>
+                                </div>
                             </div>
+                            ${bonusButtonsHtml}
                             <div style="display:flex; align-items:center; gap:8px; border-top:1px solid var(--border-card); padding-top:10px;">
                                 <button class="qty-btn" data-id="${item.id}" data-action="decrease" style="width:36px; height:36px; border-radius:50%; background:var(--bg-dark); border:1px solid var(--border-card); color:var(--text-white); font-size:18px; display:flex; align-items:center; justify-content:center;">−</button>
                                 <span class="qty-value" style="min-width:24px; text-align:center; font-size:15px; font-weight:600;">${item.qty}</span>
@@ -1040,7 +1246,16 @@
                         <button class="pickup-btn ${selectedPickup === 'ВОКЗАЛ' ? 'selected' : ''}" id="pickupVokzal">📍 ВОКЗАЛ</button>
                         <button class="pickup-btn disabled" id="pickupDelivery">🚚 ДОСТАВКА СКОРО</button>
                     </div>
-                    <div style="display:flex; justify-content:space-between; font-size:16px; font-weight:700; margin-top:2px;"><span>Итого</span><span id="cartTotal">${total} BYN</span></div>
+                    ${totalDiscount > 0 ? `
+                        <div style="display:flex; justify-content:space-between; font-size:13px; color:#69f07a; font-weight:600;">
+                            <span>Скидка по рулетке</span>
+                            <span>−${formatMoney(totalDiscount)} BYN</span>
+                        </div>
+                    ` : ''}
+                    <div style="display:flex; justify-content:space-between; font-size:16px; font-weight:700; margin-top:2px;">
+                        <span>Итого</span>
+                        <span id="cartTotal">${formatMoney(Math.max(0, subtotal - totalDiscount))} BYN</span>
+                    </div>
                     <button class="checkout-btn" id="checkoutBtn" ${selectedPickup === 'ВОКЗАЛ' ? '' : 'disabled'} style="width:100%; padding:15px 24px; border:none; border-radius:16px; background:var(--text-white); color:var(--bg-dark); font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:1px; cursor:pointer;">ОФОРМИТЬ ЗАКАЗ</button>
                 </div>
             `;
@@ -1052,6 +1267,27 @@
 
             document.getElementById('pickupDelivery').addEventListener('click', () => {
                 showToast('Доставка скоро появится');
+            });
+
+            cartPage.querySelectorAll('.cart-bonus-btn[data-action="apply-reward"]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const item = cart.find(i => i.id === btn.dataset.cartId);
+                    const rewardId = btn.dataset.rewardId;
+                    if (!item || !rewardId) return;
+                    item.appliedRewardId = rewardId;
+                    renderCart();
+                    showToast('Бонус применён к товару!');
+                });
+            });
+
+            cartPage.querySelectorAll('.cart-bonus-btn[data-action="remove-reward"]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const item = cart.find(i => i.id === btn.dataset.cartId);
+                    if (!item) return;
+                    item.appliedRewardId = null;
+                    renderCart();
+                    showToast('Бонус снят');
+                });
             });
 
             cartPage.querySelectorAll('.qty-btn').forEach(btn => {
@@ -1087,10 +1323,10 @@
 
         // --- АНИМИРОВАННАЯ РУЛЕТКА 7 СЕКУНД СО ЗВУКОМ ---
         const ROULETTE_PRIZES = [
-            { label: 'Скидка 5% на всё', short: '5% скидка', img: '5proc.png', weight: 50 },
-            { label: 'Скидка 10% на всё', short: '10% скидка', img: '10proc.png', weight: 30 },
-            { label: 'Скидка 15% на всё', short: '15% скидка', img: '15proc.png', weight: 15 },
-            { label: 'Бесплатная жидкость', short: 'Жижа 0 BYN', img: 'zhizhabesplatnaya.jpg', weight: 5 }
+            { type: 'discount', percent: 5, label: 'Скидка 5% на всё', short: '5% скидка', img: '5proc.png', weight: 50 },
+            { type: 'discount', percent: 10, label: 'Скидка 10% на всё', short: '10% скидка', img: '10proc.png', weight: 30 },
+            { type: 'discount', percent: 15, label: 'Скидка 15% на всё', short: '15% скидка', img: '15proc.png', weight: 15 },
+            { type: 'free_liquid', percent: 100, label: 'Бесплатная жидкость', short: 'Жижа 0 BYN', img: 'zhizhabesplatnaya.jpg', weight: 5 }
         ];
 
         function pickWeightedPrize() {
@@ -1136,6 +1372,13 @@
         }
 
         function openRouletteModal() {
+            if (isRouletteSpinning) return;
+            if (!isAdminUser() && userPurchases < PURCHASES_PER_SPIN) {
+                showToast(`Нужно ${PURCHASES_PER_SPIN} подтверждённых покупок`);
+                return;
+            }
+            isRouletteSpinning = true;
+
             const winPrize = pickWeightedPrize();
             const totalItems = 50;
             const winIndex = 42;
@@ -1169,7 +1412,7 @@
 
             const track = modal.querySelector('#rouletteTrack');
             const viewport = modal.querySelector('#rouletteViewport');
-            const itemStep = 112; // 104px + 8px gap
+            const itemStep = 112;
             const centerOffset = (viewport.clientWidth / 2) - 52 - 8;
             const targetX = -(winIndex * itemStep - centerOffset + (Math.random() * 24 - 12));
 
@@ -1179,7 +1422,6 @@
                 audioCtx = new AudioContext();
             } catch (e) {}
 
-            // Звук тиканья барабана на 7 секунд с замедлением
             const startTime = performance.now();
             const duration = 7000;
             let lastStepIndex = -1;
@@ -1206,10 +1448,32 @@
 
             setTimeout(async () => {
                 if (audioCtx) playWinSound(audioCtx);
-                const uname = getTgUsername();
-                if (!isAdminUser() && uname) {
-                    await db.collection('users').doc(uname).set({ purchases: 0 }, { merge: true });
+
+                const newReward = {
+                    id: 'rew_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                    type: winPrize.type,
+                    percent: winPrize.percent,
+                    label: winPrize.label,
+                    createdAt: Date.now()
+                };
+
+                try {
+                    const docId = getUserDocId();
+                    const userRef = db.collection('users').doc(docId);
+                    const updatePayload = {
+                        rewards: firebase.firestore.FieldValue.arrayUnion(newReward)
+                    };
+                    if (!isAdminUser()) {
+                        updatePayload.purchases = Math.max(0, userPurchases - PURCHASES_PER_SPIN);
+                    }
+                    await userRef.set(updatePayload, { merge: true });
+                } catch (err) {
+                    console.error('Ошибка сохранения приза:', err);
+                    userRewards.push(newReward);
+                    if (!isAdminUser()) userPurchases = Math.max(0, userPurchases - PURCHASES_PER_SPIN);
                 }
+
+                isRouletteSpinning = false;
                 modal.querySelector('#modalRouletteResult').textContent = `🎉 Вы выиграли: ${winPrize.label}!`;
                 const closeBtn = modal.querySelector('#closeRouletteModal');
                 closeBtn.style.display = 'block';
@@ -1218,8 +1482,8 @@
                     renderProfile();
                 });
                 const inlineRes = document.getElementById('rouletteResult');
-                if (inlineRes) inlineRes.textContent = `🎉 Ваш приз: ${winPrize.label}!`;
-                showToast(`Вы выиграли: ${winPrize.label}`);
+                if (inlineRes) inlineRes.textContent = `🎉 Ваш приз сохранён: ${winPrize.label}!`;
+                showToast(`Приз добавлен в профиль: ${winPrize.label}`);
             }, 7100);
         }
 
@@ -1229,10 +1493,43 @@
             const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
             const username = tgUser?.username ? `@${tgUser.username}` : (tgUser?.first_name || 'Гость');
             const avatarLetter = (tgUser?.first_name || tgUser?.username || 'W')[0].toUpperCase();
-            const canSpin = isAdminUser() || userPurchases >= 5;
+
+            const spinsAvailable = Math.floor(userPurchases / PURCHASES_PER_SPIN);
+            const progressCount = spinsAvailable > 0 ? PURCHASES_PER_SPIN : (userPurchases % PURCHASES_PER_SPIN);
+            const canSpin = isAdminUser() || userPurchases >= PURCHASES_PER_SPIN;
+
+            const rewardsHtml = userRewards.length > 0 ? `
+                <div class="profile-card">
+                    <div class="profile-card-title">🎁 Мои активные призы (${userRewards.length})</div>
+                    ${userRewards.map(r => `
+                        <div class="reward-item-card">
+                            <div style="min-width:0;">
+                                <div style="font-size:13px; font-weight:700; color:${r.type === 'free_liquid' ? '#69f07a' : '#ffb74d'};">
+                                    ${r.type === 'free_liquid' ? '🎁 Бесплатная жидкость' : `🏷 Скидка ${r.percent}%`}
+                                </div>
+                                <div style="font-size:11px; color:var(--text-gray); margin-top:2px;">
+                                    ${r.type === 'free_liquid' ? 'Откройте раздел «Жидкости» и добавьте любую в корзину' : 'Примените в корзине напротив любого товара'}
+                                </div>
+                            </div>
+                            <button class="reward-use-btn" data-reward-action="${r.type === 'free_liquid' ? 'go-liquids' : 'go-cart'}">
+                                ${r.type === 'free_liquid' ? 'Выбрать' : 'В корзину'}
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : '';
 
             container.innerHTML = `
-                <div class="profile-card"><div class="profile-user"><div class="profile-avatar">${avatarLetter}</div><div><div class="profile-username">${username}</div><div class="profile-sub">Ваш профиль Telegram</div></div></div></div>
+                <div class="profile-card">
+                    <div class="profile-user">
+                        <div class="profile-avatar">${avatarLetter}</div>
+                        <div>
+                            <div class="profile-username">${username}</div>
+                            <div class="profile-sub">Подтверждённых покупок: ${userPurchases}</div>
+                        </div>
+                    </div>
+                </div>
+                ${rewardsHtml}
                 <div class="profile-card">
                     <div class="profile-card-title">Мы созданы друг для друга !</div>
                     <ul class="profile-list">
@@ -1249,19 +1546,34 @@
                 <div class="profile-card"><div class="profile-card-title">Только честные отзывы</div><a href="https://t.me/Seregablatnou" target="_blank" class="profile-btn" id="reviewsBtn">Перейти к отзывам →</a></div>
                 <div class="profile-card">
                     <div class="profile-card-title">Рулетка после 5 покупок</div>
-                    <div style="font-size: 13px; color: #dcdcdc;">Подтверждено покупок: <b id="rouletteCount">${Math.min(userPurchases, 5)}</b> / 5</div>
-                    <div class="roulette-bar"><div class="roulette-fill" style="width: ${Math.min(userPurchases, 5) * 20}%"></div></div>
-                    <div style="font-size: 12px; color: var(--text-gray); margin-bottom: 10px; line-height: 1.5;">
-                        скидки : -5% - 10% - 15%<br>
-                        p.s. так же шанс бесплатной жидкости !!<br><br>
-                        скидка действует на одну позицию любого товара.
+                    <div style="font-size: 13px; color: #dcdcdc;">
+                        Прогресс: <b id="rouletteCount">${progressCount}</b> / ${PURCHASES_PER_SPIN}
+                        ${spinsAvailable > 0 ? `<span style="color:#69f07a; font-weight:700;"> · Доступно вращений: ${spinsAvailable}</span>` : ''}
                     </div>
-                    <button class="profile-btn primary" id="spinRouletteBtn" ${canSpin ? '' : 'disabled'}>${canSpin ? 'Крутить рулетку 🎰' : `Осталось ${5 - Math.min(userPurchases, 5)} пок.`}</button>
+                    <div class="roulette-bar"><div class="roulette-fill" style="width: ${progressCount * 20}%"></div></div>
+                    <div style="font-size: 12px; color: var(--text-gray); margin-bottom: 10px; line-height: 1.5;">
+                        Скидки: -5% / -10% / -15% на любой товар в корзине (на 1 шт.)<br>
+                        P.S. Также шанс бесплатной жидкости!
+                    </div>
+                    <button class="profile-btn primary" id="spinRouletteBtn" ${canSpin ? '' : 'disabled'}>
+                        ${canSpin ? 'Крутить рулетку 🎰' : `Осталось ${PURCHASES_PER_SPIN - progressCount} пок.`}
+                    </button>
                     <div class="roulette-result" id="rouletteResult"></div>
-                    <div class="roulette-note">* скидка действует на все товары</div>
+                    <div class="roulette-note">* Каждые 5 покупок дают 1 вращение. Покупки сверх 5 не сгорают, а все выпавшие призы сохраняются в вашем профиле.</div>
                 </div>
                 <div class="profile-card"><div class="profile-card-title">Обратная связь</div><button class="profile-btn" id="feedbackBtn">Написать в Telegram (@Seregablatnou)</button></div>
             `;
+
+            container.querySelectorAll('.reward-use-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (btn.dataset.rewardAction === 'go-liquids') {
+                        openCategory('liquids');
+                    } else {
+                        showPage('cart');
+                        renderCart();
+                    }
+                });
+            });
 
             document.getElementById('feedbackBtn').addEventListener('click', () => {
                 const url = 'https://t.me/Seregablatnou';
@@ -1422,16 +1734,40 @@
             modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
         }
 
-        function sendOrder(dayLabel, timeLabel) {
+        async function sendOrder(dayLabel, timeLabel) {
             let orderText = 'Здравствуйте! Хочу оформить заказ:\n';
             let total = 0;
+            const usedRewardIds = [];
+
             cart.forEach((item, i) => {
-                const lineTotal = item.price * item.qty;
-                total += lineTotal;
+                const pricing = calcItemPricing(item);
+                total += pricing.finalTotal;
                 const colorStr = item.color ? ` (${item.color})` : '';
-                orderText += `${i + 1}. ${item.name}${colorStr} × ${item.qty} — ${lineTotal} BYN\n`;
+                let bonusNote = '';
+                if (pricing.reward) {
+                    usedRewardIds.push(pricing.reward.id);
+                    bonusNote = pricing.reward.type === 'free_liquid'
+                        ? ' [🎁 Бесплатная жижа по рулетке]'
+                        : ` [🏷 Скидка -${pricing.reward.percent}% на 1 шт.]`;
+                }
+                orderText += `${i + 1}. ${item.name}${colorStr} × ${item.qty} — ${formatMoney(pricing.finalTotal)} BYN${bonusNote}\n`;
             });
-            orderText += `\nИтого: ${total} BYN\n📍 Способ получения: ${selectedPickup || 'ВОКЗАЛ'}\n📅 День: ${dayLabel}\n⏰ Время: ${timeLabel}`;
+
+            orderText += `\nИтого: ${formatMoney(total)} BYN\n📍 Способ получения: ${selectedPickup || 'ВОКЗАЛ'}\n📅 День: ${dayLabel}\n⏰ Время: ${timeLabel}`;
+
+            if (usedRewardIds.length > 0) {
+                const usedSet = new Set(usedRewardIds);
+                const remainingRewards = userRewards.filter(r => !usedSet.has(r.id));
+                userRewards = remainingRewards;
+                try {
+                    await db.collection('users').doc(getUserDocId()).set({
+                        rewards: remainingRewards
+                    }, { merge: true });
+                } catch (err) {
+                    console.error('Ошибка списания бонусов:', err);
+                }
+            }
+
             const url = 'https://t.me/Seregablatnou?text=' + encodeURIComponent(orderText);
             if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
             else window.open(url, '_blank');
