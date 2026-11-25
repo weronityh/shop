@@ -83,6 +83,7 @@
             .main-btn { padding-top: 13px; padding-bottom: 13px; }
         }
         .welcome-bottom { width: 100%; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; position: relative; z-index: 4; margin-top: auto; background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.92) 30%, #000000 100%); padding-top: 8px; }
+        .welcome-title { font-size: clamp(30px, 8.6vw, 42px); font-weight: 200; letter-spacing: clamp(10px, 3.6vw, 18px); text-transform: uppercase; color: #ededed; line-height: 1; padding-left: clamp(10px, 3.6vw, 18px); text-shadow: 0 2px 24px rgba(0,0,0,0.65); position: relative; z-index: 3; display: flex; flex-wrap: wrap; justify-content: center; gap: 0; }
         .title-char { display: inline-block; opacity: 0; transform: translateY(14px) scale(0.96); filter: blur(6px); animation: charReveal 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: calc(var(--i) * 0.14s); will-change: opacity, transform, filter; }
         @keyframes charReveal { to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
         .welcome-divider { width: 46px; height: 1px; background: rgba(255,255,255,0.38); margin: clamp(12px, 2vh, 18px) auto; position: relative; z-index: 3; transform: scaleX(0); transform-origin: center; animation: dividerReveal 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: 0.95s; will-change: transform; }
