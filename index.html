@@ -27,7 +27,7 @@ html
         body { font-family: var(--font-main); background: var(--bg-dark); color: var(--text-white); display: flex; flex-direction: column; font-size: 15px; line-height: 1.4; }
         .smoke-canvas {
             position: fixed; inset: 0; width: 100%; height: 100%; height: 100dvh; height: 100lvh; min-height: 100vh;
-            pointer-events: none; z-index: 1; mix-blend-mode: screen; transition: opacity 0.4s ease;
+            pointer-events: none; z-index: 2; mix-blend-mode: screen; transition: opacity 0.4s ease;
         }
         body.subtle-smoke .smoke-canvas { opacity: 0.35; }
         .smoke-shade {
@@ -39,8 +39,7 @@ html
         body.catalog-bg::before {
             content: ""; position: fixed; inset: 0; background: url('zadniufon.jpg') center center / cover no-repeat; z-index: 0; pointer-events: none;
         }
-        .app { flex: 1; min-height: 0; width: 100%; max-width: 640px; margin: 0 auto; background: transparent; display: flex; flex-direction: column; overflow: hidden; position: relative; z-index: 2; }
-        main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; position: relative; }
+        .app { flex: 1; min-height: 0; width: 100%; max-width: 640px; margin: 0 auto; background: transparent; display: flex; flex-direction: column; overflow: hidden; position: relative; }        main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; position: relative; }
         .page { display: none; min-height: 100%; flex-direction: column; }
         .page.active { display: flex; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
