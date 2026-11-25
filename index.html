@@ -295,7 +295,7 @@
                     </div>
                     <div class="welcome-divider"></div>
                     <div class="welcome-subtitle">
-                        <span class="subtitle-line">ВЕЙПЫ | ЖИДКОСТИ</span><br>
+                        <span class="subtitle-line">ПОД-СИСТЕМЫ | ЖИДКОСТИ</span><br>
                         <span class="subtitle-line">ГОМЕЛЬ</span>
                     </div>
                     <div class="welcome-hint">ЗДЕСЬ ЧТО-ТО БОЛЬШЕ ЧЕМ ПАР</div>
@@ -393,7 +393,7 @@
                     <div class="profile-card-title">+ Добавить товар</div>
                     <div class="admin-form">
                         <select class="admin-select" id="admCategory">
-                            <option value="vapes">Вейпы</option>
+                            <option value="vapes">ВПОД-СИСТЕМЫ</option>
                             <option value="liquids">Жидкости</option>
                             <option value="snus">Снюс</option>
                             <option value="disposables">Одноразки</option>
@@ -469,7 +469,7 @@
         const db = firebase.firestore();
 
         const categories = [
-            { id: 'vapes', name: 'ВЕЙПЫ', sub: '0 брендов', icon: '📱', image: 'vape.png' },
+            { id: 'vapes', name: 'ПОД-СИСТЕМЫ', sub: '0 брендов', icon: '📱', image: 'vape.png' },
             { id: 'snus', name: 'СНЮС', sub: '0 шт.', icon: '📦', image: 'snus.png' },
             { id: 'liquids', name: 'ЖИДКОСТИ', sub: '0 брендов', icon: '💧', image: 'zhizha.png' },
             { id: 'disposables', name: 'ОДНОРАЗКИ', sub: '0 шт.', icon: '🚬', image: 'odnorazki.png' },
@@ -1533,17 +1533,7 @@ document.getElementById('admSubPurchaseBtn').addEventListener('click', () => upd
                 </div>
                 ${rewardsHtml}
                 <div class="profile-card">
-                    <div class="profile-card-title">Мы созданы друг для друга !</div>
-                    <ul class="profile-list">
-                        <li>• только качественный и оригинальный товар</li>
-                        <li>• брак ? (заменим !)</li>
-                        <li>• скидки ? (конечно !)</li>
-                        <li>• акции ? (да !)</li>
-                        <li>• быстрые встречи</li>
-                        <li>• приятная упаковка</li>
-                    </ul>
-                    <div class="profile-love">с любовью для каждого ❤️</div>
-                </div>
+                    
                 <div class="profile-card"><div class="profile-card-title">Время работы</div><div style="font-size: 16px; font-weight: 700;">11:00 - 23:00</div></div>
                 <div class="profile-card"><div class="profile-card-title">Только честные отзывы</div><a href="https://t.me/Seregablatnou" target="_blank" class="profile-btn" id="reviewsBtn">Перейти к отзывам →</a></div>
                 <div class="profile-card">
