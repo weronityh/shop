@@ -471,7 +471,7 @@
         const categories = [
             { id: 'vapes', name: 'ПОД-СИСТЕМЫ', sub: '0 брендов', icon: '📱', image: 'vape.png' },
             { id: 'snus', name: 'СНЮС', sub: '0 шт.', icon: '📦', image: 'snus.png' },
-            { id: 'liquids', name: 'ЖИДКОСТИ', sub: '0 брендов', icon: '💧', image: 'zhizha.png' },
+            { id: 'liquids', name: 'ЖИДКОСТИ', sub: '0 брендов', icon: '💧', image: 'novayazhizha.png' },
             { id: 'disposables', name: 'ОДНОРАЗКИ', sub: '0 шт.', icon: '🚬', image: 'odnorazki.png' },
             { id: 'consumables', name: 'РАСХОДНИКИ', sub: '0 шт.', icon: '🔧', image: 'rashodniki.png' }
         ];
@@ -746,7 +746,7 @@ document.getElementById('admSubPurchaseBtn').addEventListener('click', () => upd
 
         function startFirestoreSync() {
             db.collection('products').onSnapshot((snapshot) => {
-                const defaultImages = { vapes: 'vape.png', snus: 'snus.png', liquids: 'zhizha.png', disposables: 'odnorazki.png', consumables: 'rashodniki.png' };
+                const defaultImages = { vapes: 'vape.png', snus: 'snus.png', liquids: 'novayazhizha.png', disposables: 'odnorazki.png', consumables: 'rashodniki.png' };
                 const iconMap = { vapes: '📱', snus: '📦', liquids: '💧', disposables: '🚬', consumables: '🔧' };
 
                 allRawProducts = [];
