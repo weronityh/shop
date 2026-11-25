@@ -774,4 +774,71 @@
                                     <div class="product-info">
                                         <div class="product-title">${m.name}</div>
                                         <div class="product-desc">${m.desc || ''} ${m.colors.length > 1 || m.colors[0] !== 'Стандарт' ? `· ${m.colors.length} вкус.` : ''}</div>
-                                        <div class="product-price">${m.price} BYN
+                                        <div class="product-price">${m.price} BYN</div>
+                                    </div>
+                                    <div class="brand-card-arrow">›</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+                brandList.querySelectorAll('.brand-group-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const idx = card.dataset.brandIdx;
+                        card.classList.toggle('open');
+                        document.getElementById(`liquidFlavors_${idx}`).classList.toggle('open');
+                    });
+                });
+                brandList.querySelectorAll('.product-card[data-liq-brand]').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const bIdx = parseInt(card.dataset.liqBrand, 10);
+                        const mIdx = parseInt(card.dataset.liqModel, 10);
+                        detailBackPage = 'brand';
+                        openProductDetailObj(liquidBrands[bIdx].models[mIdx], 'ЖИДКОСТИ', 'ВКУС');
+                    });
+                });
+                showPage('brand'); return;
+            }
+
+            const entries = catalogData[categoryId] || [];
+            if (entries.length === 0) {
+                brandList.innerHTML = `<div class="empty-state">В этой категории пока нет товаров в наличии</div>`;
+            } else {
+                brandList.innerHTML = entries.map((entry, idx) => `
+                    <div class="product-card" data-flat-idx="${idx}">
+                        <div class="product-thumb">${entry.image ? `<img src="${entry.image}" class="${entry.isCover ? 'full-cover' : ''}" alt="${entry.name}">` : `<span>${entry.icon}</span>`}</div>
+                        <div class="product-info">
+                            <div class="product-title">${entry.name}</div>
+                            <div class="product-desc">${entry.desc || ''} ${entry.colors.length > 1 || entry.colors[0] !== 'Стандарт' ? `· ${entry.colors.length} вкус.` : ''}</div>
+                            <div class="product-price">${entry.price} BYN</div>
+                        </div>
+                        <div class="brand-card-arrow">›</div>
+                    </div>
+                `).join('');
+
+                brandList.querySelectorAll('.product-card[data-flat-idx]').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const idx = parseInt(card.dataset.flatIdx, 10);
+                        detailBackPage = 'brand';
+                        openProductDetailObj(entries[idx], category.name, 'ВКУС');
+                    });
+                });
+            }
+            showPage('brand');
+        }
+
+        function openBrandModels(brandIdx) {
+            currentBrandIdx = brandIdx;
+            const brand = vapeBrands[brandIdx];
+            if (!brand) return;
+            if (brand.models.length === 1) {
+                detailBackPage = 'brand';
+                openProductDetailObj(brand.models[0], 'POD-СИСТЕМЫ', 'ЦВЕТ');
+                return;
+            }
+
+            document.getElementById('brandModelsTitle').textContent = brand.brand;
+            const modelsList = document.getElementById('brandModelsList');
+            modelsList.innerHTML = brand.models.map((m, mIdx) => `
+                <div class="product-card" data-model-idx="${mIdx}">
+                    <div c
