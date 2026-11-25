@@ -841,4 +841,514 @@
             const modelsList = document.getElementById('brandModelsList');
             modelsList.innerHTML = brand.models.map((m, mIdx) => `
                 <div class="product-card" data-model-idx="${mIdx}">
-                    <div c
+                    <div class="product-thumb"><img src="${m.image}" class="${m.isCover ? 'full-cover' : ''}" alt="${m.name}"></div>
+                    <div class="product-info">
+                        <div class="product-title">${m.name} <span class="promo-badge">🤑 скидка на жидкость</span></div>
+                        <div class="product-desc">${m.desc}</div>
+                        <div class="product-price">${m.price} BYN</div>
+                    </div>
+                </div>
+            `).join('');
+
+            modelsList.querySelectorAll('.product-card[data-model-idx]').forEach(card => {
+                card.addEventListener('click', () => {
+                    detailBackPage = 'brandModels';
+                    openProductDetailObj(brand.models[parseInt(card.dataset.modelIdx, 10)], 'POD-СИСТЕМЫ', 'ЦВЕТ');
+                });
+            });
+            showPage('brandModels');
+        }
+
+        function openProductDetailObj(model, categoryLabel, variantLabel) {
+            if (!model) return;
+            const content = document.getElementById('productDetailContent');
+            const footer = document.getElementById('productDetailFooter');
+            document.getElementById('productDetailTitle').textContent = model.name.toUpperCase();
+
+            let selectedColorIdx = 0;
+            const colors = model.colors && model.colors.length > 0 ? model.colors : ['Стандарт'];
+
+            function renderContent() {
+                const selectedColor = colors[selectedColorIdx];
+                const colorImages = model.colorImages || {};
+                const imageSrc = colorImages[selectedColor] || model.image;
+                const maxStock = (model.colorStocks && model.colorStocks[selectedColor] !== undefined) ? model.colorStocks[selectedColor] : (model.stock || 99);
+
+                content.innerHTML = `
+                    <div class="product-detail-image-wrap"><img class="product-detail-image" id="productMainImage" src="${imageSrc}" alt="${model.name}"></div>
+                    <div class="product-detail-category">${categoryLabel}</div>
+                    <div class="product-detail-name">${model.name}</div>
+                    <div class="product-detail-price">${model.price} BYN</div>
+                    <div class="product-detail-desc">${model.desc || ''}</div>
+                    <div class="color-selector">
+                        <div class="color-selector-label">
+                            <span>${variantLabel}: <b id="selectedColorName">${selectedColor}</b></span>
+                            <span>В наличии: ${maxStock} шт.</span>
+                        </div>
+                        <div class="color-thumbs" id="colorThumbs">
+                            ${colors.map((c, ci) => {
+                                const cImg = colorImages[c] || model.image;
+                                return `<div class="color-thumb ${ci === selectedColorIdx ? 'selected' : ''}" data-color-idx="${ci}"><img src="${cImg}" alt="${c}"><div class="color-thumb-name">${c}</div></div>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+
+                footer.innerHTML = `
+                    <div class="purchase-panel">
+                        <div class="quantity-selector">
+                            <span class="quantity-selector-label">КОЛИЧЕСТВО</span>
+                            <div class="quantity-control">
+                                <button class="qty-btn" id="qtyDecrease">−</button>
+                                <span class="qty-value" id="qtyValue">1</span>
+                                <button class="qty-btn" id="qtyIncrease">+</button>
+                            </div>
+                        </div>
+                        <button class="add-to-cart-main" id="addToCartMain">В КОРЗИНУ</button>
+                    </div>
+                `;
+
+                document.querySelectorAll('#colorThumbs .color-thumb').forEach(thumb => {
+                    thumb.addEventListener('click', () => {
+                        selectedColorIdx = parseInt(thumb.dataset.colorIdx, 10);
+                        renderContent();
+                    });
+                });
+
+                let qty = 1;
+                const qtyValue = document.getElementById('qtyValue');
+                document.getElementById('qtyDecrease').addEventListener('click', () => { if (qty > 1) { qty--; qtyValue.textContent = qty; } });
+                document.getElementById('qtyIncrease').addEventListener('click', () => {
+                    if (qty < maxStock) { qty++; qtyValue.textContent = qty; }
+                    else showToast(`В наличии только ${maxStock} шт.`);
+                });
+                document.getElementById('addToCartMain').addEventListener('click', () => {
+                    addToCart({
+                        name: model.name,
+                        price: model.price,
+                        desc: model.desc || '',
+                        color: selectedColor === 'Стандарт' ? null : selectedColor,
+                        image: model.colorImages?.[selectedColor] || model.image,
+                        maxStock
+                    }, qty);
+                });
+            }
+
+            renderContent();
+            showPage('productDetail');
+        }
+
+        function addToCart(product, qty = 1) {
+            const count = Math.max(1, parseInt(qty, 10) || 1);
+            const maxStock = product.maxStock ?? product.stock ?? Infinity;
+            const existing = cart.find(item => item.name === product.name && item.color === product.color);
+            const currentQty = existing ? existing.qty : 0;
+            if (currentQty + count > maxStock) { showToast(`Максимум в наличии: ${maxStock} шт.`); return; }
+            if (existing) existing.qty += count;
+            else cart.push({ id: product.id || 'item_' + Date.now(), name: product.name, desc: product.desc || '', price: product.price, qty: count, color: product.color || null, maxStock });
+            updateCartCount();
+            showToast('Добавлено в корзину');
+        }
+
+        function updateCartCount() {
+            const total = cart.reduce((sum, item) => sum + item.qty, 0);
+            if (cartCountEl) { cartCountEl.textContent = total; cartCountEl.style.display = total > 0 ? 'flex' : 'none'; }
+        }
+
+        function renderCart() {
+            const cartPage = document.getElementById('cartPage');
+            if (cart.length === 0) { cartPage.innerHTML = `<h1 class="section-title">КОРЗИНА</h1><div class="empty-state">Корзина пока пуста</div>`; return; }
+            let total = 0;
+            cartPage.innerHTML = `
+                <h1 class="section-title">КОРЗИНА</h1>
+                <div class="cart-list" style="display:flex; flex-direction:column; gap:12px; padding:0 16px 100px;">
+                    ${cart.map(item => {
+                        total += item.price * item.qty;
+                        return `
+                        <div class="cart-item" style="background:var(--bg-card); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid var(--border-card); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:10px; box-shadow:var(--shadow-card);">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                <div style="flex:1; min-width:0;">
+                                    <div style="font-size:15px; font-weight:700; text-transform:uppercase;">${item.name}</div>
+                                    ${item.color ? `<div style="font-size:12px; color:var(--text-gray); margin-top:2px;">Вариант: ${item.color}</div>` : ''}
+                                    ${item.desc ? `<div style="font-size:12px; color:var(--text-gray); margin-top:2px;">${item.desc}</div>` : ''}
+                                </div>
+                                <div style="font-size:16px; font-weight:700; white-space:nowrap;">${item.price * item.qty} BYN</div>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:8px; border-top:1px solid var(--border-card); padding-top:10px;">
+                                <button class="qty-btn" data-id="${item.id}" data-action="decrease" style="width:36px; height:36px; border-radius:50%; background:var(--bg-dark); border:1px solid var(--border-card); color:var(--text-white); font-size:18px; display:flex; align-items:center; justify-content:center;">−</button>
+                                <span class="qty-value" style="min-width:24px; text-align:center; font-size:15px; font-weight:600;">${item.qty}</span>
+                                <button class="qty-btn" data-id="${item.id}" data-action="increase" style="width:36px; height:36px; border-radius:50%; background:var(--bg-dark); border:1px solid var(--border-card); color:var(--text-white); font-size:18px; display:flex; align-items:center; justify-content:center;">+</button>
+                                <button class="remove-btn" data-id="${item.id}" style="margin-left:auto; padding:6px 12px; background:transparent; border:1px solid var(--border-card); border-radius:12px; color:var(--text-gray); font-size:11px; text-transform:uppercase; letter-spacing:0.5px;">Удалить</button>
+                            </div>
+                        </div>`;
+                    }).join('')}
+                </div>
+                <div style="position:fixed; bottom:calc(68px + env(safe-area-inset-bottom)); left:0; right:0; background:var(--bg-card); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-top:1px solid var(--border-card); padding:16px; display:flex; flex-direction:column; gap:12px; z-index:100; box-shadow:var(--shadow-card);">
+                    <div style="display:flex; justify-content:space-between; font-size:16px; font-weight:700;"><span>Итого</span><span id="cartTotal">${total} BYN</span></div>
+                    <button class="checkout-btn" id="checkoutBtn" style="width:100%; padding:16px 24px; border:none; border-radius:16px; background:var(--text-white); color:var(--bg-dark); font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:1px; cursor:pointer;">ОФОРМИТЬ ЗАКАЗ</button>
+                </div>
+            `;
+
+            cartPage.querySelectorAll('.qty-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const item = cart.find(i => i.id === btn.dataset.id);
+                    if (!item) return;
+                    if (btn.dataset.action === 'increase') {
+                        if (item.maxStock && item.qty >= item.maxStock) { showToast(`Максимум в наличии: ${item.maxStock} шт.`); return; }
+                        item.qty += 1;
+                    } else {
+                        item.qty -= 1;
+                        if (item.qty <= 0) cart.splice(cart.indexOf(item), 1);
+                    }
+                    renderCart(); updateCartCount();
+                });
+            });
+
+            cartPage.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = cart.findIndex(i => i.id === btn.dataset.id);
+                    if (idx !== -1) { cart.splice(idx, 1); renderCart(); updateCartCount(); }
+                });
+            });
+
+            document.getElementById('checkoutBtn').addEventListener('click', checkout);
+        }
+
+        function checkout() {
+            if (cart.length === 0) { showToast('Корзина пуста'); return; }
+            showDeliveryModal();
+        }
+
+        function renderProfile() {
+            const container = document.getElementById('profileCard');
+            if (!container) return;
+            const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+            const username = tgUser?.username ? `@${tgUser.username}` : (tgUser?.first_name || 'Гость');
+            const avatarLetter = (tgUser?.first_name || tgUser?.username || 'W')[0].toUpperCase();
+            let purchases = Number(localStorage.getItem('weggew_purchases') || 0);
+            const canSpin = purchases >= 10;
+
+            container.innerHTML = `
+                <div class="profile-card"><div class="profile-user"><div class="profile-avatar">${avatarLetter}</div><div><div class="profile-username">${username}</div><div class="profile-sub">Ваш профиль Telegram</div></div></div></div>
+                <div class="profile-card">
+                    <div class="profile-card-title">Мы созданы друг для друга !</div>
+                    <ul class="profile-list">
+                        <li>• только качественный и оригинальный товар</li>
+                        <li>• брак ? (заменим !)</li>
+                        <li>• скидки ? (конечно !)</li>
+                        <li>• акции ? (да !)</li>
+                        <li>• быстрые встречи</li>
+                        <li>• приятная упаковка</li>
+                    </ul>
+                    <div class="profile-love">с любовью для каждого ❤️</div>
+                </div>
+                <div class="profile-card"><div class="profile-card-title">Время работы</div><div style="font-size: 16px; font-weight: 700;">11:00 - 23:00</div></div>
+                <div class="profile-card"><div class="profile-card-title">Только честные отзывы</div><a href="https://t.me/Seregablatnou" target="_blank" class="profile-btn" id="reviewsBtn">Перейти к отзывам →</a></div>
+                <div class="profile-card">
+                    <div class="profile-card-title">Рулетка при покупке от 10 шт</div>
+                    <div style="font-size: 13px; color: #dcdcdc;">Накоплено: <b id="rouletteCount">${Math.min(purchases, 10)}</b> / 10 шт.</div>
+                    <div class="roulette-bar"><div class="roulette-fill" style="width: ${Math.min(purchases, 10) * 10}%"></div></div>
+                    <div style="font-size: 12px; color: var(--text-gray); margin-bottom: 10px;">После покупки 10-го товара можно прокрутить рулетку 1 раз. Призы: 5%, 10%, 15% или бесплатная жидкость.</div>
+                    <button class="profile-btn primary" id="spinRouletteBtn" ${canSpin ? '' : 'disabled'}>${canSpin ? 'Крутить рулетку 🎰' : `Осталось ${10 - Math.min(purchases, 10)} шт.`}</button>
+                    <div class="roulette-result" id="rouletteResult"></div>
+                    <div class="roulette-note">* скидка действует на все товары, на одну единицу</div>
+                </div>
+                <div class="profile-card"><div class="profile-card-title">Обратная связь</div><button class="profile-btn" id="feedbackBtn">Написать в Telegram (@Seregablatnou)</button></div>
+            `;
+
+            document.getElementById('feedbackBtn').addEventListener('click', () => {
+                const url = 'https://t.me/Seregablatnou';
+                if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
+                else window.open(url, '_blank');
+            });
+
+            document.getElementById('spinRouletteBtn').addEventListener('click', () => {
+                const prizes = ['Скидка 5%', 'Скидка 10%', 'Скидка 15%', 'Бесплатная жидкость'];
+                const win = prizes[Math.floor(Math.random() * prizes.length)];
+                localStorage.setItem('weggew_purchases', '0');
+                document.getElementById('rouletteResult').textContent = `🎉 Ваш приз: ${win}!`;
+                document.getElementById('spinRouletteBtn').disabled = true;
+                document.getElementById('spinRouletteBtn').textContent = 'Использовано';
+                showToast(`Вы выиграли: ${win}`);
+            });
+        }
+
+        function renderAdminList() {
+            const listEl = document.getElementById('adminProductList');
+            const countEl = document.getElementById('admTotalCount');
+            if (!listEl) return;
+            countEl.textContent = allRawProducts.length;
+
+            if (allRawProducts.length === 0) {
+                listEl.innerHTML = `<div class="empty-state" style="padding: 30px 10px;">База пока пуста. Добавьте первый товар выше!</div>`;
+                return;
+            }
+
+            listEl.innerHTML = allRawProducts.map(p => {
+                const hasVariantStock = Boolean(p.color);
+                const currentStock = hasVariantStock ? (p.color_stock ?? p.stock ?? 0) : (p.stock ?? 0);
+                return `
+                <div class="admin-item">
+                    <div class="admin-item-thumb">${p.image ? `<img src="${p.image}" alt="">` : `<span>📦</span>`}</div>
+                    <div class="admin-item-info">
+                        <div class="admin-item-title">${p.name || 'Без названия'}</div>
+                        <div class="admin-item-sub">${p.brand || ''} ${p.color ? '· ' + p.color : ''} · ${p.price || 0} BYN</div>
+                    </div>
+                    <div class="admin-stock-ctrl">
+                        <button class="admin-mini-btn" data-id="${p.docId}" data-has-var="${hasVariantStock ? '1' : '0'}" data-val="${currentStock}" data-act="dec">−</button>
+                        <span style="min-width: 22px; text-align:center; font-size:13px; font-weight:700;">${currentStock}</span>
+                        <button class="admin-mini-btn" data-id="${p.docId}" data-has-var="${hasVariantStock ? '1' : '0'}" data-val="${currentStock}" data-act="inc">+</button>
+                        <button class="admin-del-btn" data-id="${p.docId}" data-act="del">🗑</button>
+                    </div>
+                </div>`;
+            }).join('');
+
+            listEl.querySelectorAll('.admin-mini-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.dataset.id;
+                    const hasVar = btn.dataset.hasVar === '1';
+                    const cur = Number(btn.dataset.val) || 0;
+                    const next = btn.dataset.act === 'inc' ? cur + 1 : Math.max(0, cur - 1);
+                    await db.collection('products').doc(id).update(hasVar ? { color_stock: next } : { stock: next });
+                    showToast(`Сток обновлён: ${next}`);
+                });
+            });
+
+            listEl.querySelectorAll('.admin-del-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    await db.collection('products').doc(btn.dataset.id).delete();
+                    showToast('Удалено');
+                });
+            });
+        }
+
+        document.getElementById('admPhotoFile').addEventListener('change', async (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            showToast('Загрузка фото...');
+            const formData = new FormData();
+            formData.append('image', file);
+            try {
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
+                const json = await res.json();
+                if (json.success) {
+                    document.getElementById('admImage').value = json.data.url;
+                    showToast('Фото загружено!');
+                } else showToast('Ошибка загрузки фото');
+            } catch (err) {
+                console.error(err);
+                showToast('Ошибка сети при загрузке');
+            }
+        });
+
+        document.getElementById('admSaveBtn').addEventListener('click', async () => {
+            const category = document.getElementById('admCategory').value;
+            const brand = document.getElementById('admBrand').value.trim();
+            const name = document.getElementById('admName').value.trim();
+            const desc = document.getElementById('admDesc').value.trim();
+            const price = Number(document.getElementById('admPrice').value) || 0;
+            const stock = Number(document.getElementById('admStock').value) || 0;
+            const color = document.getElementById('admColor').value.trim();
+            const colorStockRaw = document.getElementById('admColorStock').value.trim();
+            const color_stock = colorStockRaw !== '' ? (Number(colorStockRaw) || 0) : stock;
+            const image = document.getElementById('admImage').value.trim();
+
+            if (!name || !price) { showToast('Укажите название и цену'); return; }
+
+            try {
+                await db.collection('products').add({
+                    category, brand, name, desc, price, stock, color, color_stock, image,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                document.getElementById('admName').value = '';
+                document.getElementById('admDesc').value = '';
+                document.getElementById('admColor').value = '';
+                document.getElementById('admColorStock').value = '';
+                document.getElementById('admImage').value = '';
+                document.getElementById('admPhotoFile').value = '';
+                showToast('Товар добавлен в базу!');
+            } catch (err) {
+                console.error(err);
+                showToast('Ошибка сохранения в Firebase');
+            }
+        });
+
+        function showDeliveryModal() {
+            const modal = document.createElement('div');
+            modal.className = 'delivery-modal';
+            modal.style.cssText = `position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.2s ease;`;
+            modal.innerHTML = `
+                <div style="background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 24px; width: 100%; max-width: 360px; animation: slideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1); box-shadow: var(--shadow-card);">
+                    <h3 style="font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; text-align: center;">ВРЕМЯ ПОЛУЧЕНИЯ</h3>
+                    <p style="font-size: 13px; color: var(--text-gray); text-align: center; margin-bottom: 20px;">Когда вам удобно забрать заказ?</p>
+                    <div class="delivery-options" style="display: flex; flex-direction: column; gap: 10px;">
+                        <button class="delivery-option" data-day="today" style="padding: 16px; border-radius: 14px; border: 1px solid var(--border-card); background: var(--bg-card); color: var(--text-white); font-size: 15px; font-weight: 600; text-transform: uppercase; cursor: pointer;">📍 Сегодня</button>
+                        <button class="delivery-option" data-day="tomorrow" style="padding: 16px; border-radius: 14px; border: 1px solid var(--border-card); background: var(--bg-card); color: var(--text-white); font-size: 15px; font-weight: 600; text-transform: uppercase; cursor: pointer;">📅 Завтра</button>
+                    </div>
+                    <div class="time-picker" style="display: none; margin-top: 16px;">
+                        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 8px; display: block; text-transform: uppercase;">Выберите время</label>
+                        <select id="deliveryTime" style="width: 100%; padding: 14px 16px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-card); color: var(--text-white); font-size: 14px; font-family: inherit;"></select>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            let selectedDay = 'Сегодня';
+            const timeSelect = modal.querySelector('#deliveryTime');
+            const timeOptions = ['09:00 - 11:00', '11:00 - 13:00', '13:00 - 15:00', '15:00 - 17:00', '17:00 - 19:00', '19:00 - 21:00', '21:00 - 23:00', 'как можно быстрее'];
+            const defaultOpt = document.createElement('option');
+            defaultOpt.value = ''; defaultOpt.textContent = 'Выберите время...'; defaultOpt.disabled = true; defaultOpt.selected = true;
+            timeSelect.appendChild(defaultOpt);
+            timeOptions.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t; opt.textContent = t;
+                timeSelect.appendChild(opt);
+            });
+
+            modal.querySelectorAll('.delivery-option').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    selectedDay = btn.dataset.day === 'today' ? 'Сегодня' : 'Завтра';
+                    modal.querySelector('.delivery-options').style.display = 'none';
+                    modal.querySelector('.time-picker').style.display = 'block';
+                    modal.querySelector('h3').textContent = selectedDay === 'Сегодня' ? 'ВРЕМЯ НА СЕГОДНЯ' : 'ВРЕМЯ НА ЗАВТРА';
+                });
+            });
+
+            timeSelect.addEventListener('change', (e) => {
+                if (!e.target.value) return;
+                sendOrder(selectedDay, e.target.value);
+                modal.remove();
+            });
+
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+        }
+
+        function sendOrder(dayLabel, timeLabel) {
+            let orderText = 'Здравствуйте! Хочу оформить заказ:\n';
+            let total = 0;
+            cart.forEach((item, i) => {
+                const lineTotal = item.price * item.qty;
+                total += lineTotal;
+                const colorStr = item.color ? ` (${item.color})` : '';
+                orderText += `${i + 1}. ${item.name}${colorStr} × ${item.qty} — ${lineTotal} BYN\n`;
+            });
+            orderText += `\nИтого: ${total} BYN\n📅 Получение: ${dayLabel}\n⏰ Время: ${timeLabel}`;
+            const url = 'https://t.me/Seregablatnou?text=' + encodeURIComponent(orderText);
+            if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
+            else window.open(url, '_blank');
+            cart = []; updateCartCount(); renderCart(); showToast('Заказ сформирован');
+        }
+
+        document.getElementById('goToCatalogBtn').addEventListener('click', () => { renderCategories(); showPage('catalog'); });
+        document.getElementById('backToCatalog').addEventListener('click', () => showPage('catalog'));
+        document.getElementById('backToBrands').addEventListener('click', () => showPage('brand'));
+        document.getElementById('backToModels').addEventListener('click', () => showPage(detailBackPage));
+
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                if (tab === 'home') showPage('welcome');
+                if (tab === 'catalog') showPage('catalog');
+                if (tab === 'cart') { showPage('cart'); renderCart(); }
+                if (tab === 'profile') { showPage('profile'); renderProfile(); }
+                if (tab === 'admin' && isAdminUser()) { showPage('admin'); renderAdminList(); renderAdminsList(); }
+            });
+        });
+
+        (function initSmoke() {
+            const canvas = document.getElementById('smokeCanvas');
+            if (!canvas || !canvas.getContext) return;
+            const ctx = canvas.getContext('2d');
+            let width = 0, height = 0, dpr = 1, puffs = [];
+
+            const puff = document.createElement('canvas');
+            puff.width = puff.height = 256;
+            const pctx = puff.getContext('2d');
+            const grad = pctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+            grad.addColorStop(0, 'rgba(230,235,240,0.8)');
+            grad.addColorStop(0.3, 'rgba(200,210,220,0.4)');
+            grad.addColorStop(0.6, 'rgba(170,185,200,0.18)');
+            grad.addColorStop(0.85, 'rgba(150,170,185,0.06)');
+            grad.addColorStop(1, 'rgba(160,170,180,0)');
+            pctx.fillStyle = grad;
+            pctx.fillRect(0, 0, 256, 256);
+
+            function getViewportHeight() {
+                const vv = window.visualViewport;
+                if (vv && vv.height) return vv.height;
+                return Math.max(window.innerHeight, document.documentElement.clientHeight, document.body.clientHeight);
+            }
+
+            function resize() {
+                dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+                width = window.innerWidth;
+                height = getViewportHeight();
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = Math.max(1, Math.round(rect.width * dpr));
+                canvas.height = Math.max(1, Math.round(rect.height * dpr));
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+
+            function createPuffs() {
+                const isMobile = width < 480;
+                const baseCount = isMobile ? 28 : 42;
+                const extraLarge = isMobile ? 6 : 10;
+                puffs = [];
+                for (let i = 0; i < baseCount; i++) {
+                    const r = 65 + Math.random() * 150;
+                    puffs.push({ x: Math.random() * width, y: height + r + Math.random() * height * 0.8, r, vx: (Math.random() - 0.5) * 0.2, vy: -0.5 - Math.random() * 0.6, rot: (Math.random() - 0.5) * 1.8, vr: (Math.random() - 0.5) * 0.001, alpha: 0.18 + Math.random() * 0.14, phase: Math.random() * Math.PI * 2, stretch: 1.3 + Math.random() * 1.0 });
+                }
+                for (let i = 0; i < extraLarge; i++) {
+                    const r = 170 + Math.random() * 130;
+                    puffs.push({ x: Math.random() * width, y: height + r + Math.random() * height * 0.5, r, vx: (Math.random() - 0.5) * 0.1, vy: -0.3 - Math.random() * 0.4, rot: (Math.random() - 0.5) * 1.0, vr: (Math.random() - 0.5) * 0.0005, alpha: 0.12 + Math.random() * 0.10, phase: Math.random() * Math.PI * 2, stretch: 1.1 + Math.random() * 0.7 });
+                }
+            }
+
+            let rafId = 0;
+            function draw(time) {
+                ctx.clearRect(0, 0, width, height);
+                ctx.globalCompositeOperation = 'lighter';
+                for (const p of puffs) {
+                    p.x += p.vx + Math.sin(time / 3200 + p.phase) * 0.22;
+                    p.y += p.vy;
+                    p.rot += p.vr;
+                    if (p.y + p.r * p.stretch < 0) { p.y = height + p.r + Math.random() * height * 0.3; p.x = Math.random() * width; }
+                    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.globalAlpha = p.alpha;
+                    ctx.drawImage(puff, -p.r, -p.r * p.stretch, p.r * 2, p.r * 2 * p.stretch);
+                    ctx.restore();
+                }
+                ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+                rafId = requestAnimationFrame(draw);
+            }
+
+            function scheduleResize() { resize(); createPuffs(); if (!rafId) rafId = requestAnimationFrame(draw); }
+            resize(); createPuffs();
+            window.addEventListener('resize', scheduleResize);
+            if (window.visualViewport) window.visualViewport.addEventListener('resize', scheduleResize);
+            if (window.Telegram?.WebApp) {
+                try { window.Telegram.WebApp.onEvent('viewportChanged', scheduleResize); } catch (e) {}
+            }
+            rafId = requestAnimationFrame(draw);
+        })();
+
+        if (window.Telegram?.WebApp) {
+            const tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
+            if (tg.setHeaderColor) tg.setHeaderColor('#000000');
+            if (tg.setBackgroundColor) tg.setBackgroundColor('#000000');
+        }
+
+        updateAdminVisibility();
+        startAdminsSync();
+        startFirestoreSync();
+
+        const initialCat = document.getElementById('catImage');
+        if (initialCat) {
+            if (initialCat.complete) initialCat.classList.add('loaded');
+            else initialCat.addEventListener('load', () => initialCat.classList.add('loaded'), { once: true });
+            initialCat.addEventListener('error', () => initialCat.classList.add('loaded'), { once: true });
+        }
+    </script>
+</body>
+</html>
