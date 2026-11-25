@@ -1368,4 +1368,31 @@
             function scheduleResize() { resize(); createPuffs(); if (!rafId) rafId = requestAnimationFrame(draw); }
             resize(); createPuffs();
             window.addEventListener('resize', scheduleResize);
-            if (window.visualViewport) window.visualViewport.add
+            if (window.visualViewport) window.visualViewport.addEventListener('resize', scheduleResize);
+            if (window.Telegram?.WebApp) {
+                try { window.Telegram.WebApp.onEvent('viewportChanged', scheduleResize); } catch (e) {}
+            }
+            rafId = requestAnimationFrame(draw);
+        })();
+
+        if (window.Telegram?.WebApp) {
+            const tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
+            if (tg.setHeaderColor) tg.setHeaderColor('#000000');
+            if (tg.setBackgroundColor) tg.setBackgroundColor('#000000');
+        }
+
+        updateAdminVisibility();
+        startAdminsSync();
+        startFirestoreSync();
+
+        const initialCat = document.getElementById('catImage');
+        if (initialCat) {
+            if (initialCat.complete) initialCat.classList.add('loaded');
+            else initialCat.addEventListener('load', () => initialCat.classList.add('loaded'), { once: true });
+            initialCat.addEventListener('error', () => initialCat.classList.add('loaded'), { once: true });
+        }
+    </script>
+</body>
+</html>
