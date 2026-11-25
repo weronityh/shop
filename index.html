@@ -362,6 +362,14 @@
                 </div>
 
                 <div class="profile-card" style="margin-bottom: 16px;">
+                    <div class="profile-card-title">⭐ Засчитать покупку клиенту</div>
+                    <div style="display:flex; gap:8px;">
+                        <input class="admin-input" id="admClientUsername" placeholder="@username покупателя">
+                        <button class="profile-btn primary" id="admAddPurchaseBtn" style="width:auto; padding:0 16px; flex-shrink:0;">+1 покупка</button>
+                    </div>
+                </div>
+
+                <div class="profile-card" style="margin-bottom: 16px;">
                     <div class="profile-card-title">+ Добавить товар</div>
                     <div class="admin-form">
                         <select class="admin-select" id="admCategory">
@@ -449,6 +457,7 @@
 
         const catalogData = { vapes: [], snus: [], liquids: [], disposables: [], consumables: [] };
         let extraAdmins = [];
+        let userPurchases = 0;
         let allRawProducts = [];
         let vapeBrands = [];
         let liquidBrands = [];
@@ -569,6 +578,15 @@
             window._toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
         }
 
+        function startUserPurchasesSync() {
+            const uname = getTgUsername();
+            if (!uname) return;
+            db.collection('users').doc(uname).onSnapshot((doc) => {
+                userPurchases = doc.exists ? (Number(doc.data().purchases) || 0) : 0;
+                if (pages.profile.classList.contains('active')) renderProfile();
+            });
+        }
+
         function startAdminsSync() {
             db.collection('settings').doc('admins').onSnapshot((doc) => {
                 const data = doc.exists ? doc.data() : {};
@@ -614,6 +632,23 @@
             }, { merge: true });
             input.value = '';
             showToast(`@${clean} назначен админом`);
+        });
+
+        document.getElementById('admAddPurchaseBtn').addEventListener('click', async () => {
+            if (!isAdminUser()) return;
+            const input = document.getElementById('admClientUsername');
+            const clean = input.value.replace(/^@+/, '').trim().toLowerCase();
+            if (!clean) { showToast('Введите @username клиента'); return; }
+            try {
+                await db.collection('users').doc(clean).set({
+                    purchases: firebase.firestore.FieldValue.increment(1)
+                }, { merge: true });
+                input.value = '';
+                showToast(`+1 покупка засчитана для @${clean}`);
+            } catch (err) {
+                console.error(err);
+                showToast('Ошибка записи в базу');
+            }
         });
 
         function startFirestoreSync() {
@@ -1064,8 +1099,7 @@
             const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
             const username = tgUser?.username ? `@${tgUser.username}` : (tgUser?.first_name || 'Гость');
             const avatarLetter = (tgUser?.first_name || tgUser?.username || 'W')[0].toUpperCase();
-            let purchases = Number(localStorage.getItem('weggew_purchases') || 0);
-            const canSpin = isAdminUser() || purchases >= 5;
+            const canSpin = isAdminUser() || userPurchases >= 5;
 
             container.innerHTML = `
                 <div class="profile-card"><div class="profile-user"><div class="profile-avatar">${avatarLetter}</div><div><div class="profile-username">${username}</div><div class="profile-sub">Ваш профиль Telegram</div></div></div></div>
@@ -1085,12 +1119,12 @@
                 <div class="profile-card"><div class="profile-card-title">Только честные отзывы</div><a href="https://t.me/Seregablatnou" target="_blank" class="profile-btn" id="reviewsBtn">Перейти к отзывам →</a></div>
                 <div class="profile-card">
                     <div class="profile-card-title">Рулетка после 5 покупок</div>
-                    <div style="font-size: 13px; color: #dcdcdc;">Оформлено покупок: <b id="rouletteCount">${Math.min(purchases, 5)}</b> / 5</div>
-                    <div class="roulette-bar"><div class="roulette-fill" style="width: ${Math.min(purchases, 5) * 20}%"></div></div>
+                    <div style="font-size: 13px; color: #dcdcdc;">Подтверждено покупок: <b id="rouletteCount">${Math.min(userPurchases, 5)}</b> / 5</div>
+                    <div class="roulette-bar"><div class="roulette-fill" style="width: ${Math.min(userPurchases, 5) * 20}%"></div></div>
                     <div style="font-size: 12px; color: var(--text-gray); margin-bottom: 10px;">
                         После 5 покупок открывается колесо: 5% (50%), 10% (30%), 15% (15%) или бесплатная жидкость (5%).
                     </div>
-                    <button class="profile-btn primary" id="spinRouletteBtn" ${canSpin ? '' : 'disabled'}>${canSpin ? 'Крутить рулетку 🎰' : `Осталось ${5 - Math.min(purchases, 5)} пок.`}</button>
+                    <button class="profile-btn primary" id="spinRouletteBtn" ${canSpin ? '' : 'disabled'}>${canSpin ? 'Крутить рулетку 🎰' : `Осталось ${5 - Math.min(userPurchases, 5)} пок.`}</button>
                     <div class="roulette-result" id="rouletteResult"></div>
                     <div class="roulette-note">* скидка действует на все товары</div>
                 </div>
@@ -1103,12 +1137,17 @@
                 else window.open(url, '_blank');
             });
 
-            document.getElementById('spinRouletteBtn').addEventListener('click', () => {
+            document.getElementById('spinRouletteBtn').addEventListener('click', async () => {
                 const win = spinRoulettePrize();
-                localStorage.setItem('weggew_purchases', '0');
+                const uname = getTgUsername();
+                if (!isAdminUser() && uname) {
+                    await db.collection('users').doc(uname).set({ purchases: 0 }, { merge: true });
+                }
                 document.getElementById('rouletteResult').textContent = `🎉 Ваш приз: ${win}!`;
-                document.getElementById('spinRouletteBtn').disabled = true;
-                document.getElementById('spinRouletteBtn').textContent = 'Использовано';
+                if (!isAdminUser()) {
+                    document.getElementById('spinRouletteBtn').disabled = true;
+                    document.getElementById('spinRouletteBtn').textContent = 'Использовано';
+                }
                 showToast(`Вы выиграли: ${win}`);
             });
         }
@@ -1277,9 +1316,6 @@
             if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
             else window.open(url, '_blank');
 
-            const prevPurchases = Number(localStorage.getItem('weggew_purchases') || 0);
-            localStorage.setItem('weggew_purchases', String(prevPurchases + 1));
-
             cart = []; selectedPickup = null; updateCartCount(); renderCart(); showToast('Заказ сформирован');
         }
 
@@ -1385,6 +1421,7 @@
 
         updateAdminVisibility();
         startAdminsSync();
+        startUserPurchasesSync();
         startFirestoreSync();
 
         const initialCat = document.getElementById('catImage');
