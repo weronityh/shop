@@ -1115,19 +1115,7 @@
                 document.querySelectorAll('#colorThumbs .color-thumb').forEach(thumb => {
                     thumb.addEventListener('click', () => {
                         selectedColorIdx = parseInt(thumb.dataset.colorIdx, 10);
-                        const colorName = colors[selectedColorIdx];
-                        const colorMaxStock = (model.colorStocks && model.colorStocks[colorName] !== undefined)
-                            ? model.colorStocks[colorName]
-                            : (model.stock || 99);
                         renderContent();
-                        addToCart({
-                            name: model.name,
-                            price: model.price,
-                            desc: model.desc || 'Под-система',
-                            color: colorName,
-                            image: (model.colorImages || {})[colorName] || model.image,
-                            maxStock: colorMaxStock
-                        }, 1);
                     });
                 });
 
