@@ -1721,7 +1721,7 @@
             }
         });
 
-        function showDeliveryModal() {
+                function showDeliveryModal() {
             const now = new Date();
             const pad = (n) => String(n).padStart(2, '0');
             const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
@@ -1748,28 +1748,6 @@
                         <div id="timeErrorMsg" style="display:none; color:#ff453a; font-size:12px; margin-top:8px;">Это время уже прошло — выберите позже</div>
                     </div>
 
-                    <div style="border-top:1px solid var(--border-card); padding-top:14px;">
-                        <div style="font-size:15px; font-weight:700; margin-bottom:10px;">Способ оплаты</div>
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                            <button type="button" class="pay-method-btn selected" data-pay="Наличные" style="padding:14px 10px; border-radius:14px; border:1px solid #fff; background:#fff; color:#000; font-size:13px; font-weight:700; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px;">
-                                <span>💵</span><span>Наличные</span>
-                            </button>
-                            <button type="button" class="pay-method-btn" data-pay="Безнал" style="padding:14px 10px; border-radius:14px; border:1px solid var(--border-card); background:rgba(255,255,255,0.06); color:#fff; font-size:13px; font-weight:700; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px;">
-                                <span>💳</span><span>Безнал</span>
-                            </button>
-                        </div>
-
-                        <div id="changeBlock" style="margin-top:14px;">
-                            <div style="font-size:13px; color:var(--text-gray); margin-bottom:8px;">С какой суммы нужна сдача?</div>
-                            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:8px;">
-                                <button type="button" class="change-chip selected" data-val="Без сдачи" style="padding:10px 6px; border-radius:12px; border:1px solid #fff; background:#fff; color:#000; font-size:12px; font-weight:700; cursor:pointer;">Без сдачи</button>
-                                <button type="button" class="change-chip" data-val="50 BYN" style="padding:10px 6px; border-radius:12px; border:1px solid var(--border-card); background:rgba(255,255,255,0.06); color:#fff; font-size:12px; font-weight:700; cursor:pointer;">50 BYN</button>
-                                <button type="button" class="change-chip" data-val="100 BYN" style="padding:10px 6px; border-radius:12px; border:1px solid var(--border-card); background:rgba(255,255,255,0.06); color:#fff; font-size:12px; font-weight:700; cursor:pointer;">100 BYN</button>
-                            </div>
-                            <input type="text" id="customChangeInput" placeholder="Другая сумма..." style="width:100%; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid var(--border-card); color:#fff; font-size:13px; outline:none;">
-                        </div>
-                    </div>
-
                     <button type="button" id="confirmOrderModalBtn" disabled style="width:100%; padding:15px; border-radius:16px; border:none; background:var(--text-white); color:var(--bg-dark); font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; cursor:pointer; opacity:0.45;">ПОДТВЕРДИТЬ ЗАКАЗ</button>
                 </div>
             `;
@@ -1779,11 +1757,6 @@
             const timeInput = modal.querySelector('#orderTimeInput');
             const timeError = modal.querySelector('#timeErrorMsg');
             const confirmBtn = modal.querySelector('#confirmOrderModalBtn');
-            const changeBlock = modal.querySelector('#changeBlock');
-            const customChangeInput = modal.querySelector('#customChangeInput');
-
-            let selectedPayment = 'Наличные';
-            let selectedChange = 'Без сдачи';
 
             function validateDateTime() {
                 const dVal = dateInput.value;
@@ -1816,58 +1789,18 @@
             timeInput.addEventListener('change', validateDateTime);
             timeInput.addEventListener('input', validateDateTime);
 
-            modal.querySelectorAll('.pay-method-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    selectedPayment = btn.dataset.pay;
-                    modal.querySelectorAll('.pay-method-btn').forEach(b => {
-                        const active = b === btn;
-                        b.style.background = active ? '#fff' : 'rgba(255,255,255,0.06)';
-                        b.style.color = active ? '#000' : '#fff';
-                        b.style.borderColor = active ? '#fff' : 'var(--border-card)';
-                    });
-                    changeBlock.style.display = selectedPayment === 'Наличные' ? 'block' : 'none';
-                });
-            });
-
-            modal.querySelectorAll('.change-chip').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    selectedChange = btn.dataset.val;
-                    customChangeInput.value = '';
-                    modal.querySelectorAll('.change-chip').forEach(b => {
-                        const active = b === btn;
-                        b.style.background = active ? '#fff' : 'rgba(255,255,255,0.06)';
-                        b.style.color = active ? '#000' : '#fff';
-                        b.style.borderColor = active ? '#fff' : 'var(--border-card)';
-                    });
-                });
-            });
-
-            customChangeInput.addEventListener('input', () => {
-                if (customChangeInput.value.trim()) {
-                    selectedChange = customChangeInput.value.trim();
-                    modal.querySelectorAll('.change-chip').forEach(b => {
-                        b.style.background = 'rgba(255,255,255,0.06)';
-                        b.style.color = '#fff';
-                        b.style.borderColor = 'var(--border-card)';
-                    });
-                }
-            });
-
             confirmBtn.addEventListener('click', () => {
                 if (!validateDateTime()) return;
                 const [y, m, d] = dateInput.value.split('-');
                 const formattedDate = `${d}.${m}.${y}`;
-                const payInfo = selectedPayment === 'Наличные'
-                    ? `Наличные (${selectedChange})`
-                    : 'Безнал';
-                sendOrder(formattedDate, timeInput.value, payInfo);
+                sendOrder(formattedDate, timeInput.value);
                 modal.remove();
             });
 
             modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
         }
 
-        async function sendOrder(dayLabel, timeLabel, payInfo = 'Наличные') {
+                async function sendOrder(dayLabel, timeLabel) {
             let orderText = 'Здравствуйте! Хочу оформить заказ:\n';
             let total = 0;
             const usedRewardIds = [];
@@ -1886,7 +1819,7 @@
                 orderText += `${i + 1}. ${item.name}${colorStr} × ${item.qty} — ${formatMoney(pricing.finalTotal)} BYN${bonusNote}\n`;
             });
 
-            orderText += `\nИтого: ${formatMoney(total)} BYN\n📍 Способ получения: ${selectedPickup || 'ВОКЗАЛ'}\n📅 Дата: ${dayLabel}\n⏰ Время: ${timeLabel}\n💳 Оплата: ${payInfo}`;
+                       orderText += `\nИтого: ${formatMoney(total)} BYN\n📍 Способ получения: ${selectedPickup || 'ВОКЗАЛ'}\n📅 Дата: ${dayLabel}\n⏰ Время: ${timeLabel}`;
 
             if (usedRewardIds.length > 0) {
                 const usedSet = new Set(usedRewardIds);
