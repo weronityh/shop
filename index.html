@@ -689,3 +689,89 @@
                         m.colorImages[variantName] = resolvedImage;
                         m.colorStocks[variantName] = variantStock;
                         if (m.image === defaultImages[siteCat] && resolvedImage !== defaultImages[siteCat]) m.image = resolvedImage;
+                    }
+                });
+
+                vapeBrands = Array.from(groupedVapes.values()).map(b => ({ brand: b.brand, models: Array.from(b.modelsMap.values()) })).filter(b => b.models.length > 0);
+                liquidBrands = Array.from(groupedLiquids.values()).map(b => ({ brand: b.brand, models: Array.from(b.modelsMap.values()) })).filter(b => b.models.length > 0);
+
+                catalogData.snus = Array.from(groupedFlat.snus.values());
+                catalogData.disposables = Array.from(groupedFlat.disposables.values());
+                catalogData.consumables = Array.from(groupedFlat.consumables.values());
+
+                categories[0].sub = `${vapeBrands.length} бренд${vapeBrands.length === 1 ? '' : vapeBrands.length < 5 ? 'а' : 'ов'}`;
+                categories[2].sub = `${liquidBrands.length} бренд${liquidBrands.length === 1 ? '' : liquidBrands.length < 5 ? 'а' : 'ов'}`;
+                categories[1].sub = `${catalogData.snus.length} шт.`;
+                categories[3].sub = `${catalogData.disposables.length} шт.`;
+                categories[4].sub = `${catalogData.consumables.length} шт.`;
+
+                renderCategories();
+                if (currentCategoryId && pages.brand.classList.contains('active')) openCategory(currentCategoryId);
+                if (pages.admin.classList.contains('active')) renderAdminList();
+            }, (err) => console.error('Ошибка Firestore:', err));
+        }
+
+        function renderCategories() {
+            categoryGrid.innerHTML = categories.map(cat => {
+                let count = 0;
+                if (cat.id === 'vapes') count = vapeBrands.length;
+                else if (cat.id === 'liquids') count = liquidBrands.length;
+                else count = catalogData[cat.id]?.length || 0;
+                return `
+                <div class="category-card" data-category="${cat.id}">
+                    <div class="category-card-image">${cat.image ? `<img src="${cat.image}" alt="${cat.name}">` : `<span>${cat.icon}</span>`}</div>
+                    <div class="category-card-title">${cat.name}</div>
+                    <div class="category-card-sub">${(cat.id === 'vapes' || cat.id === 'liquids') ? `${count} бренд${count === 1 ? '' : count < 5 ? 'а' : 'ов'}` : `${count} шт.`}</div>
+                </div>`;
+            }).join('');
+
+            categoryGrid.querySelectorAll('.category-card').forEach(card => {
+                card.addEventListener('click', () => openCategory(card.dataset.category));
+            });
+        }
+
+        function openCategory(categoryId) {
+            currentCategoryId = categoryId;
+            const category = categories.find(c => c.id === categoryId);
+            brandPageTitle.textContent = category.name;
+
+            if (categoryId === 'vapes') {
+                if (vapeBrands.length === 0) {
+                    brandList.innerHTML = `<div class="empty-state">В этой категории пока нет товаров в наличии</div>`;
+                    showPage('brand'); return;
+                }
+                brandList.innerHTML = vapeBrands.map((b, bIdx) => {
+                    const firstModel = b.models[0];
+                    return `
+                    <div class="brand-card" data-brand-idx="${bIdx}">
+                        <div class="brand-card-thumb">${firstModel.image ? `<img src="${firstModel.image}" alt="${firstModel.name}">` : `<span>📱</span>`}</div>
+                        <div class="brand-card-info">
+                            <div class="brand-card-name">${b.brand}</div>
+                            <div class="brand-card-count">${b.models.length} моделей</div>
+                        </div>
+                        <div class="brand-card-arrow">›</div>
+                    </div>`;
+                }).join('');
+                brandList.querySelectorAll('.brand-card').forEach(card => {
+                    card.addEventListener('click', () => openBrandModels(card.dataset.brandIdx, 'vapes'));
+                });
+                showPage('brand'); return;
+            }
+            if (categoryId === 'liquids') {
+                if (liquidBrands.length === 0) {
+                    brandList.innerHTML = `<div class="empty-state">В этой категории пока нет товаров в наличии</div>`;
+                    showPage('brand'); return;
+                }
+                brandList.innerHTML = liquidBrands.map((b, bIdx) => `
+                    <div class="brand-group">
+                        <div class="brand-group-card" data-brand-idx="${bIdx}">
+                            <div class="brand-group-title">${b.brand}</div>
+                            <div class="brand-group-arrow">›</div>
+                        </div>
+                        <div class="brand-models-list" id="liquidFlavors_${bIdx}">
+                            ${b.models.map((m, mIdx) => `
+                                <div class="product-card" data-liq-brand="${bIdx}" data-liq-model="${mIdx}">
+                                    <div class="product-info">
+                                        <div class="product-title">${m.name}</div>
+                                        <div class="product-desc">${m.desc || ''} ${m.colors.length > 1 || m.colors[0] !== 'Стандарт' ? `· ${m.colors.length} вкус.` : ''}</div>
+                                        <div class="product-price">${m.price} BYN
