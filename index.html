@@ -79,10 +79,15 @@
         #catalogPage { padding: 20px 16px 100px; }
         .catalog-header { margin-bottom: 20px; }
         .catalog-title { font-size: 26px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 16px; }
-        .search-bar { display: flex; align-items: center; gap: 10px; background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 12px 16px; margin-bottom: 16px; box-shadow: var(--shadow-card); }
+        .search-bar { display: flex; align-items: center; gap: 10px; background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 12px 16px; margin-bottom: 16px; box-shadow: var(--shadow-card); position: relative; z-index: 1; }
         .search-bar input { background: transparent; border: none; outline: none; color: var(--text-white); font-size: 14px; width: 100%; font-family: inherit; }
         .search-bar input::placeholder { color: var(--text-gray); }
         .search-bar svg { width: 20px; height: 20px; stroke: var(--text-gray); flex-shrink: 0; }
+        .search-clear-btn { display: none; width: 24px; height: 24px; border-radius: 50%; border: none; background: rgba(255,255,255,0.14); color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0; align-items: center; justify-content: center; }
+        .search-clear-btn.visible { display: flex; }
+        .search-results-meta { font-size: 12px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; position: relative; z-index: 1; }
+        .search-results-list { display: flex; flex-direction: column; gap: 12px; }
+        .search-cat-tag { display: inline-block; font-size: 10px; font-weight: 700; color: #bdbdbd; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); padding: 2px 7px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
         .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
         .category-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; cursor: pointer; transition: background 0.2s; text-align: center; position: relative; z-index: 1; box-shadow: var(--shadow-card); }
         .category-card:active { background: var(--bg-card-hover); }
@@ -536,10 +541,12 @@
                     <div class="catalog-title">КАТАЛОГ</div>
                     <div class="search-bar">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
-                        <input type="text" placeholder="Поиск товаров..." id="searchInput">
+                        <input type="text" placeholder="Поиск товаров (например: XROS, Brusko)..." id="searchInput" autocomplete="off">
+                        <button type="button" class="search-clear-btn" id="searchClearBtn" aria-label="Очистить поиск">✕</button>
                     </div>
                 </div>
                 <div class="category-grid" id="categoryGrid"></div>
+                <div id="searchResultsContainer" style="display:none;"></div>
             </div>
 
             <!-- СТРАНИЦА БРЕНДА -->
@@ -720,7 +727,7 @@
             { id: 'vapes', name: 'ПОД-СИСТЕМЫ', sub: '0 брендов', icon: '📱', image: 'vape.png' },
             { id: 'snus', name: 'СНЮС', sub: '0 шт.', icon: '📦', image: 'snus.png' },
             { id: 'liquids', name: 'ЖИДКОСТИ', sub: '0 брендов', icon: '💧', image: 'novayazhizha.png' },
-            { id: 'disposables', name: 'ОДНОРАЗКИ', sub: '0 шт.', icon: '🚬', image: 'odnorazki.png' },
+            { id: 'disposables', name: 'ОДНОРАЗКИ', sub: '0 брендов', icon: '🚬', image: 'odnorazki.png' },
             { id: 'consumables', name: 'РАСХОДНИКИ', sub: '0 брендов', icon: '🔧', image: 'rashodniki.png' },
             { id: 'nicoboosters', name: 'НИКОБУСТЕРЫ', sub: '0 шт.', icon: '🧪', image: 'nikobuster.png' }
         ];
@@ -747,6 +754,7 @@
         let vapeBrands = [];
         let liquidBrands = [];
         let consumableBrands = [];
+        let disposableBrands = [];
         let cart = [];
         let selectedPickup = null;
         let currentCategoryId = null;
@@ -755,6 +763,7 @@
         let detailBackPage = 'brand';
         let adminSelectedDept = 'all';
         let adminSearchQuery = '';
+        let catalogSearchQuery = '';
         let activePageName = 'welcome';
 
         const VAPE_COLOR_IMAGES = {
@@ -798,6 +807,9 @@
         const mainScroll = document.getElementById('mainScroll');
         const bottomNav = document.getElementById('bottomNav');
         const categoryGrid = document.getElementById('categoryGrid');
+        const searchInput = document.getElementById('searchInput');
+        const searchClearBtn = document.getElementById('searchClearBtn');
+        const searchResultsContainer = document.getElementById('searchResultsContainer');
         const brandList = document.getElementById('brandList');
         const brandPageTitle = document.getElementById('brandPageTitle');
         const toast = document.getElementById('toast');
@@ -1381,7 +1393,8 @@
                 const groupedVapes = new Map();
                 const groupedLiquids = new Map();
                 const groupedConsumables = new Map();
-                const groupedFlat = { snus: new Map(), disposables: new Map(), nicoboosters: new Map() };
+                const groupedDisposables = new Map();
+                const groupedFlat = { snus: new Map(), nicoboosters: new Map() };
 
                 snapshot.forEach((doc) => {
                     const d = doc.data();
@@ -1417,9 +1430,9 @@
                         const mKey = name.toLowerCase();
                         if (!modelsMap.has(mKey)) {
                             modelsMap.set(mKey, {
-                                id: doc.id, category: 'vapes', name, desc: desc || 'Под-система', price, stock, image: resolvedImage,
+                                id: doc.id, category: 'vapes', brand: bName, name, desc: desc || 'Под-система', price, stock, image: resolvedImage,
                                 isCover: name.toLowerCase() === 'xros 6 mini',
-                                colors: [], colorImages: {}, colorStocks: {}, colorDocIds: {}
+                                icon: '📱', colors: [], colorImages: {}, colorStocks: {}, colorDocIds: {}
                             });
                         }
                         const m = modelsMap.get(mKey);
@@ -1437,7 +1450,7 @@
                         if (!modelsMap.has(mKey)) {
                             modelsMap.set(mKey, {
                                 id: doc.id, category: 'liquids', brand: bName, name, desc, price, stock, image: resolvedImage,
-                                isCover: false, colors: [], colorImages: {}, colorStocks: {}, colorDocIds: {}
+                                isCover: false, icon: '💧', colors: [], colorImages: {}, colorStocks: {}, colorDocIds: {}
                             });
                         }
                         const m = modelsMap.get(mKey);
@@ -1464,6 +1477,24 @@
                         m.colorStocks[variantName] = variantStock;
                         m.colorDocIds[variantName] = doc.id;
                         if (m.image === defaultImages.consumables && resolvedImage !== defaultImages.consumables) m.image = resolvedImage;
+                    } else if (siteCat === 'disposables') {
+                        const bName = brand || 'Разное';
+                        const bKey = bName.toLowerCase();
+                        if (!groupedDisposables.has(bKey)) groupedDisposables.set(bKey, { brand: bName, modelsMap: new Map() });
+                        const modelsMap = groupedDisposables.get(bKey).modelsMap;
+                        const mKey = name.toLowerCase();
+                        if (!modelsMap.has(mKey)) {
+                            modelsMap.set(mKey, {
+                                id: doc.id, category: 'disposables', brand: bName, name, desc: desc || 'Одноразовая ЭСДН', price, stock, image: resolvedImage,
+                                isCover: false, icon: '🚬', colors: [], colorImages: {}, colorStocks: {}, colorDocIds: {}
+                            });
+                        }
+                        const m = modelsMap.get(mKey);
+                        if (!m.colors.includes(variantName)) m.colors.push(variantName);
+                        m.colorImages[variantName] = resolvedImage;
+                        m.colorStocks[variantName] = variantStock;
+                        m.colorDocIds[variantName] = doc.id;
+                        if (m.image === defaultImages.disposables && resolvedImage !== defaultImages.disposables) m.image = resolvedImage;
                     } else if (groupedFlat[siteCat]) {
                         const map = groupedFlat[siteCat];
                         const mKey = `${brand.toLowerCase()}||${name.toLowerCase()}`;
@@ -1487,23 +1518,28 @@
                 vapeBrands = sortBrandList(groupedVapes);
                 liquidBrands = sortBrandList(groupedLiquids);
                 consumableBrands = sortBrandList(groupedConsumables);
+                disposableBrands = sortBrandList(groupedDisposables);
 
                 catalogData.snus = sortFlatList(groupedFlat.snus);
-                catalogData.disposables = sortFlatList(groupedFlat.disposables);
                 catalogData.nicoboosters = sortFlatList(groupedFlat.nicoboosters);
 
                 const formatBrandSub = (len) => `${len} бренд${len === 1 ? '' : len < 5 ? 'а' : 'ов'}`;
                 categories[0].sub = formatBrandSub(vapeBrands.length);
                 categories[1].sub = `${catalogData.snus.length} шт.`;
                 categories[2].sub = formatBrandSub(liquidBrands.length);
-                categories[3].sub = `${catalogData.disposables.length} шт.`;
+                categories[3].sub = formatBrandSub(disposableBrands.length);
                 categories[4].sub = formatBrandSub(consumableBrands.length);
                 categories[5].sub = `${catalogData.nicoboosters.length} шт.`;
 
                 renderCategories();
+                if (catalogSearchQuery.trim()) renderCatalogSearchResults();
                 if (currentCategoryId && pages.brand.classList.contains('active')) openCategory(currentCategoryId);
                 if (pages.brandModels.classList.contains('active') && currentBrandIdx !== null) {
-                    const arr = currentBrandCategory === 'consumables' ? consumableBrands : vapeBrands;
+                    const arr = currentBrandCategory === 'consumables'
+                        ? consumableBrands
+                        : currentBrandCategory === 'disposables'
+                            ? disposableBrands
+                            : vapeBrands;
                     if (arr[currentBrandIdx]) openBrandModels(currentBrandIdx, currentBrandCategory);
                     else showPage('brand');
                 }
@@ -1511,13 +1547,156 @@
             }, (err) => console.error('Ошибка Firestore:', err));
         }
 
+        // --- ПОИСК ПО КАТАЛОГУ ---
+        function getAllSearchableProducts() {
+            const items = [];
+            vapeBrands.forEach(b => b.models.forEach(m => items.push({
+                model: m, brand: b.brand, categoryLabel: 'POD-СИСТЕМЫ', variantLabel: 'ЦВЕТ', catName: 'Под-системы'
+            })));
+            liquidBrands.forEach(b => b.models.forEach(m => items.push({
+                model: m, brand: b.brand, categoryLabel: 'ЖИДКОСТИ', variantLabel: 'ВКУС', catName: 'Жидкости'
+            })));
+            disposableBrands.forEach(b => b.models.forEach(m => items.push({
+                model: m, brand: b.brand, categoryLabel: 'ОДНОРАЗКИ', variantLabel: 'ВКУС', catName: 'Одноразки'
+            })));
+            consumableBrands.forEach(b => b.models.forEach(m => items.push({
+                model: m, brand: b.brand, categoryLabel: 'РАСХОДНИКИ', variantLabel: 'ВАРИАНТ', catName: 'Расходники'
+            })));
+            (catalogData.snus || []).forEach(m => items.push({
+                model: m, brand: m.brand || '', categoryLabel: 'СНЮС', variantLabel: 'ВКУС', catName: 'Снюс'
+            })));
+            (catalogData.nicoboosters || []).forEach(m => items.push({
+                model: m, brand: m.brand || '', categoryLabel: 'НИКОБУСТЕРЫ', variantLabel: 'ВАРИАНТ', catName: 'Никобустеры'
+            }));
+            return items;
+        }
+
+        function renderCatalogSearchResults() {
+            const q = catalogSearchQuery.trim().toLowerCase();
+            searchClearBtn.classList.toggle('visible', q.length > 0);
+
+            if (!q) {
+                categoryGrid.style.display = 'grid';
+                searchResultsContainer.style.display = 'none';
+                searchResultsContainer.innerHTML = '';
+                return;
+            }
+
+            categoryGrid.style.display = 'none';
+            searchResultsContainer.style.display = 'block';
+
+            const tokens = q.split(/\s+/).filter(Boolean);
+            const allItems = getAllSearchableProducts();
+
+            const matched = allItems.filter(entry => {
+                const m = entry.model;
+                const haystack = [
+                    entry.brand,
+                    m.name,
+                    m.desc,
+                    entry.catName,
+                    entry.categoryLabel,
+                    ...(m.colors || [])
+                ].join(' ').toLowerCase();
+                return tokens.every(t => haystack.includes(t));
+            });
+
+            matched.sort((a, b) => {
+                const aName = (a.model.name || '').toLowerCase();
+                const bName = (b.model.name || '').toLowerCase();
+                const aStarts = aName.startsWith(q) ? 0 : aName.includes(q) ? 1 : 2;
+                const bStarts = bName.startsWith(q) ? 0 : bName.includes(q) ? 1 : 2;
+                if (aStarts !== bStarts) return aStarts - bStarts;
+                return naturalCompare(a.model.name, b.model.name);
+            });
+
+            if (matched.length === 0) {
+                searchResultsContainer.innerHTML = `
+                    <div class="empty-state" style="padding: 40px 16px;">
+                        По запросу «${catalogSearchQuery.trim()}» ничего не найдено
+                    </div>
+                `;
+                return;
+            }
+
+            const freeLiquid = hasFreeLiquidReward();
+            const hasPodPromo = !freeLiquid && getUnusedPodPromoSlots() > 0;
+
+            searchResultsContainer.innerHTML = `
+                <div class="search-results-meta">Найдено товаров: ${matched.length}</div>
+                <div class="search-results-list">
+                    ${matched.map((entry, idx) => {
+                        const m = entry.model;
+                        const isLiquid = m.category === 'liquids';
+                        const isVape = m.category === 'vapes';
+                        const showPodDiscount = isLiquid && hasPodPromo && m.price > POD_LIQUID_TARGET_PRICE;
+                        const promoPrice = getPodPromoLiquidPrice(m.price);
+                        const fallbackIcon = m.icon || '📦';
+                        const tagText = entry.brand && entry.brand.toLowerCase() !== 'разное'
+                            ? `${entry.catName} · ${entry.brand}`
+                            : entry.catName;
+
+                        return `
+                        <div class="product-card" data-search-idx="${idx}">
+                            <div class="product-thumb">
+                                ${m.image
+                                    ? `<img src="${m.image}" class="${m.isCover ? 'full-cover' : ''}" alt="${m.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${fallbackIcon}</span>`
+                                    : `<span>${fallbackIcon}</span>`
+                                }
+                            </div>
+                            <div class="product-info">
+                                <div class="search-cat-tag">${tagText}</div>
+                                <div class="product-title">
+                                    ${m.name}
+                                    ${isVape ? `<span class="promo-badge">🤑 жижа за ${POD_LIQUID_TARGET_PRICE} BYN</span>` : ''}
+                                </div>
+                                <div class="product-desc">${m.desc || ''}${m.colors && (m.colors.length > 1 || (m.colors[0] && m.colors[0] !== 'Стандарт')) ? ` · ${m.colors.length} вар.` : ''}</div>
+                                <div class="product-price">
+                                    ${isLiquid && freeLiquid
+                                        ? `<span class="old-price">${m.price} BYN</span><span class="free-badge">БЕСПЛАТНО</span>`
+                                        : showPodDiscount
+                                            ? `<span class="old-price">${m.price} BYN</span><span style="color:#69f07a;">${formatMoney(promoPrice)} BYN</span><span class="pod-promo-badge">ЗА ${POD_LIQUID_TARGET_PRICE} BYN К ПОДУ</span>`
+                                            : `${m.price} BYN`
+                                    }
+                                </div>
+                            </div>
+                            <div class="brand-card-arrow">›</div>
+                        </div>`;
+                    }).join('')}
+                </div>
+            `;
+
+            searchResultsContainer.querySelectorAll('.product-card[data-search-idx]').forEach(card => {
+                card.addEventListener('click', () => {
+                    const entry = matched[parseInt(card.dataset.searchIdx, 10)];
+                    if (!entry) return;
+                    detailBackPage = 'catalog';
+                    currentCategoryId = entry.model.category;
+                    openProductDetailObj(entry.model, entry.categoryLabel, entry.variantLabel);
+                });
+            });
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            catalogSearchQuery = e.target.value;
+            renderCatalogSearchResults();
+        });
+
+        searchClearBtn.addEventListener('click', () => {
+            catalogSearchQuery = '';
+            searchInput.value = '';
+            renderCatalogSearchResults();
+            searchInput.focus();
+        });
+
         function renderCategories() {
             categoryGrid.innerHTML = categories.map(cat => {
                 let count = 0;
-                const isBrandCat = (cat.id === 'vapes' || cat.id === 'liquids' || cat.id === 'consumables');
+                const isBrandCat = (cat.id === 'vapes' || cat.id === 'liquids' || cat.id === 'consumables' || cat.id === 'disposables');
                 if (cat.id === 'vapes') count = vapeBrands.length;
                 else if (cat.id === 'liquids') count = liquidBrands.length;
                 else if (cat.id === 'consumables') count = consumableBrands.length;
+                else if (cat.id === 'disposables') count = disposableBrands.length;
                 else count = catalogData[cat.id]?.length || 0;
 
                 return `
@@ -1543,9 +1722,13 @@
             const category = categories.find(c => c.id === categoryId);
             brandPageTitle.textContent = category.name;
 
-            if (categoryId === 'vapes' || categoryId === 'consumables') {
-                const brandsArr = categoryId === 'vapes' ? vapeBrands : consumableBrands;
-                const fallbackIcon = categoryId === 'vapes' ? '📱' : '🔧';
+            if (categoryId === 'vapes' || categoryId === 'consumables' || categoryId === 'disposables') {
+                const brandsArr = categoryId === 'vapes'
+                    ? vapeBrands
+                    : categoryId === 'consumables'
+                        ? consumableBrands
+                        : disposableBrands;
+                const fallbackIcon = categoryId === 'vapes' ? '📱' : categoryId === 'consumables' ? '🔧' : '🚬';
 
                 if (brandsArr.length === 0) {
                     brandList.innerHTML = `<div class="empty-state">В этой категории пока нет товаров в наличии</div>`;
@@ -1680,12 +1863,17 @@
             currentBrandIdx = brandIdx;
             currentBrandCategory = catId;
             const isConsumables = catId === 'consumables';
-            const brand = isConsumables ? consumableBrands[brandIdx] : vapeBrands[brandIdx];
+            const isDisposables = catId === 'disposables';
+            const brand = isConsumables
+                ? consumableBrands[brandIdx]
+                : isDisposables
+                    ? disposableBrands[brandIdx]
+                    : vapeBrands[brandIdx];
             if (!brand) return;
 
-            const categoryLabel = isConsumables ? 'РАСХОДНИКИ' : 'POD-СИСТЕМЫ';
-            const variantLabel = isConsumables ? 'ВАРИАНТ' : 'ЦВЕТ';
-            const fallbackIcon = isConsumables ? '🔧' : '📱';
+            const categoryLabel = isConsumables ? 'РАСХОДНИКИ' : isDisposables ? 'ОДНОРАЗКИ' : 'POD-СИСТЕМЫ';
+            const variantLabel = isConsumables ? 'ВАРИАНТ' : isDisposables ? 'ВКУС' : 'ЦВЕТ';
+            const fallbackIcon = isConsumables ? '🔧' : isDisposables ? '🚬' : '📱';
 
             if (brand.models.length === 1) {
                 detailBackPage = 'brand';
@@ -1704,7 +1892,7 @@
                     <div class="product-info">
                         <div class="product-title">
                             ${m.name}
-                            ${!isConsumables ? `<span class="promo-badge">🤑 жижа за ${POD_LIQUID_TARGET_PRICE} BYN</span>` : ''}
+                            ${catId === 'vapes' ? `<span class="promo-badge">🤑 жижа за ${POD_LIQUID_TARGET_PRICE} BYN</span>` : ''}
                         </div>
                         <div class="product-desc">${m.desc || ''}${m.colors.length > 1 ? ` · ${m.colors.length} вар.` : ''}</div>
                         <div class="product-price">${m.price} BYN</div>
@@ -1735,7 +1923,7 @@
             const freeLiquid = isLiquid && hasFreeLiquidReward();
             const hasPodPromo = isLiquid && !freeLiquid && getUnusedPodPromoSlots() > 0 && model.price > POD_LIQUID_TARGET_PRICE;
             const promoPrice = getPodPromoLiquidPrice(model.price);
-            const fallbackIcon = model.icon || (model.category === 'nicoboosters' ? '🧪' : model.category === 'consumables' ? '🔧' : '📦');
+            const fallbackIcon = model.icon || (model.category === 'nicoboosters' ? '🧪' : model.category === 'consumables' ? '🔧' : model.category === 'disposables' ? '🚬' : '📦');
 
             function getCurrentVariantData() {
                 const selectedColor = colors[selectedColorIdx];
