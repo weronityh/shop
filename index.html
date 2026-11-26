@@ -822,24 +822,24 @@
         const toast = document.getElementById('toast');
         const cartCountEl = document.getElementById('cartCount');
 
-        // --- СИСТЕМА РЕАЛИСТИЧНОГО ЛЁГКОГО ДЫМА ---
+        // --- СИСТЕМА РЕАЛИСТИЧНОГО ДЫМА ---
         function createSmokeSprite() {
             const sprite = document.createElement('canvas');
-            sprite.width = 160;
-            sprite.height = 160;
+            sprite.width = 180;
+            sprite.height = 180;
             const sctx = sprite.getContext('2d');
             const lobes = [
-                { x: 80, y: 80, r: 70, a: 0.22 },
-                { x: 56, y: 66, r: 50, a: 0.16 },
-                { x: 104, y: 70, r: 48, a: 0.15 },
-                { x: 70, y: 102, r: 52, a: 0.14 },
-                { x: 96, y: 98, r: 44, a: 0.12 }
+                { x: 90, y: 90, r: 78, a: 0.55 },
+                { x: 62, y: 74, r: 58, a: 0.45 },
+                { x: 118, y: 78, r: 55, a: 0.42 },
+                { x: 78, y: 116, r: 60, a: 0.38 },
+                { x: 110, y: 112, r: 52, a: 0.35 }
             ];
             lobes.forEach(l => {
                 const g = sctx.createRadialGradient(l.x, l.y, 0, l.x, l.y, l.r);
-                g.addColorStop(0, `rgba(235, 240, 245, ${l.a})`);
-                g.addColorStop(0.45, `rgba(210, 218, 226, ${l.a * 0.48})`);
-                g.addColorStop(1, 'rgba(200, 208, 218, 0)');
+                g.addColorStop(0, `rgba(245, 248, 255, ${l.a})`);
+                g.addColorStop(0.45, `rgba(220, 228, 238, ${l.a * 0.52})`);
+                g.addColorStop(1, 'rgba(205, 214, 224, 0)');
                 sctx.fillStyle = g;
                 sctx.beginPath();
                 sctx.arc(l.x, l.y, l.r, 0, Math.PI * 2);
@@ -936,23 +936,23 @@
         const globalSmokeCanvas = document.getElementById('globalSmokeCanvas');
 
         const welcomeSmokeLayer = createSmokeLayer(welcomeSmokeCanvas, {
-            count: 24,
-            minSize: 160,
-            maxSize: 310,
-            minSpeed: 22,
-            maxSpeed: 44,
-            minAlpha: 0.11,
-            maxAlpha: 0.21
+            count: 34,
+            minSize: 180,
+            maxSize: 360,
+            minSpeed: 24,
+            maxSpeed: 46,
+            minAlpha: 0.32,
+            maxAlpha: 0.55
         });
 
         const globalSmokeLayer = createSmokeLayer(globalSmokeCanvas, {
-            count: 20,
-            minSize: 170,
-            maxSize: 320,
-            minSpeed: 16,
-            maxSpeed: 32,
-            minAlpha: 0.055,
-            maxAlpha: 0.105
+            count: 28,
+            minSize: 190,
+            maxSize: 360,
+            minSpeed: 18,
+            maxSpeed: 34,
+            minAlpha: 0.18,
+            maxAlpha: 0.32
         });
 
         let lastSmokeFrame = performance.now();
@@ -3107,7 +3107,7 @@
 
         async function sendOrder(dayLabel, timeLabel) {
             const details = calculateCartDetails();
-            let orderText = 'Привет! Хочу оформить заказ:\n';
+            let orderText = 'Здравствуйте! Хочу оформить заказ:\n';
             const usedRewardIds = [];
 
             cart.forEach((item, i) => {
