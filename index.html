@@ -1,3 +1,6 @@
+Переместил блок **«📦 Заказы на подтверждение»** в самый верх админ-меню (сразу под заголовком). Вот полный обновлённый код `index.html`:
+
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -601,6 +604,13 @@
             <div class="page" id="adminPage">
                 <h1 class="section-title">МЕНЮ СОЗДАТЕЛЯ</h1>
 
+                <div class="profile-card" style="margin-bottom: 16px;">
+                    <div class="profile-card-title">📦 Заказы на подтверждение</div>
+                    <div id="adminOrdersList" style="display:flex; flex-direction:column; gap:8px;">
+                        <div style="font-size:12px; color:var(--text-gray);">Загрузка...</div>
+                    </div>
+                </div>
+
                 <div class="profile-card" id="superAdminBlock" style="display:none; margin-bottom: 16px;">
                     <div class="profile-card-title">👑 Управление админами</div>
                     <div style="display:flex; gap:8px; margin-bottom:10px;">
@@ -650,13 +660,6 @@
                         </label>
                         <input class="admin-input" id="admImage" placeholder="Ссылка на фото или имя файла (необязательно)">
                         <button class="profile-btn primary" id="admSaveBtn">Сохранить товар</button>
-                    </div>
-                </div>
-
-                <div class="profile-card" style="margin-bottom: 16px;">
-                    <div class="profile-card-title">📦 Заказы на подтверждение</div>
-                    <div id="adminOrdersList" style="display:flex; flex-direction:column; gap:8px;">
-                        <div style="font-size:12px; color:var(--text-gray);">Загрузка...</div>
                     </div>
                 </div>
 
