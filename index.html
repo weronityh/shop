@@ -1412,13 +1412,14 @@
                             modelsMap.set(mKey, {
                                 id: doc.id, category: 'vapes', name, desc: desc || 'Под-система', price, stock, image: resolvedImage,
                                 isCover: name.toLowerCase() === 'xros 6 mini',
-                                colors: [], colorImages: {}, colorStocks: {}
+                                colors: [], colorImages: {}, colorStocks: {}, colorDocIds: {}
                             });
                         }
                         const m = modelsMap.get(mKey);
                         if (!m.colors.includes(variantName)) m.colors.push(variantName);
                         m.colorImages[variantName] = resolvedImage;
                         m.colorStocks[variantName] = variantStock;
+                        m.colorDocIds[variantName] = doc.id;
                         if (m.image === defaultImages.vapes && resolvedImage !== defaultImages.vapes) m.image = resolvedImage;
                     } else if (siteCat === 'liquids') {
                         const bName = brand || 'Разное';
@@ -1429,13 +1430,14 @@
                         if (!modelsMap.has(mKey)) {
                             modelsMap.set(mKey, {
                                 id: doc.id, category: 'liquids', brand: bName, name, desc, price, stock, image: resolvedImage,
-                                isCover: false, colors: [], colorImages: {}, colorStocks: {}
+                                isCover: false, colors: [], colorImages: {}, colorStocks: {}, colorDocIds: {}
                             });
                         }
                         const m = modelsMap.get(mKey);
                         if (!m.colors.includes(variantName)) m.colors.push(variantName);
                         m.colorImages[variantName] = resolvedImage;
                         m.colorStocks[variantName] = variantStock;
+                        m.colorDocIds[variantName] = doc.id;
                         if (m.image === defaultImages.liquids && resolvedImage !== defaultImages.liquids) m.image = resolvedImage;
                     } else if (siteCat === 'consumables') {
                         const bName = brand || 'Разное';
@@ -1446,13 +1448,14 @@
                         if (!modelsMap.has(mKey)) {
                             modelsMap.set(mKey, {
                                 id: doc.id, category: 'consumables', brand: bName, name, desc: desc || 'Расходник', price, stock, image: resolvedImage,
-                                isCover: false, icon: '🔧', colors: [], colorImages: {}, colorStocks: {}
+                                isCover: false, icon: '🔧', colors: [], colorImages: {}, colorStocks: {}, colorDocIds: {}
                             });
                         }
                         const m = modelsMap.get(mKey);
                         if (!m.colors.includes(variantName)) m.colors.push(variantName);
                         m.colorImages[variantName] = resolvedImage;
                         m.colorStocks[variantName] = variantStock;
+                        m.colorDocIds[variantName] = doc.id;
                         if (m.image === defaultImages.consumables && resolvedImage !== defaultImages.consumables) m.image = resolvedImage;
                     } else if (groupedFlat[siteCat]) {
                         const map = groupedFlat[siteCat];
@@ -1462,13 +1465,14 @@
                                 id: doc.id, category: siteCat, brand, name, desc, price, stock, image: resolvedImage,
                                 isCover: name.toLowerCase() === 'xros 6 mini',
                                 icon: iconMap[siteCat] || '📦',
-                                colors: [], colorImages: {}, colorStocks: {}
+                                colors: [], colorImages: {}, colorStocks: {}, colorDocIds: {}
                             });
                         }
                         const m = map.get(mKey);
                         if (!m.colors.includes(variantName)) m.colors.push(variantName);
                         m.colorImages[variantName] = resolvedImage;
                         m.colorStocks[variantName] = variantStock;
+                        m.colorDocIds[variantName] = doc.id;
                         if (m.image === defaultImages[siteCat] && resolvedImage !== defaultImages[siteCat]) m.image = resolvedImage;
                     }
                 });
@@ -1491,6 +1495,11 @@
 
                 renderCategories();
                 if (currentCategoryId && pages.brand.classList.contains('active')) openCategory(currentCategoryId);
+                if (pages.brandModels.classList.contains('active') && currentBrandIdx !== null) {
+                    const arr = currentBrandCategory === 'consumables' ? consumableBrands : vapeBrands;
+                    if (arr[currentBrandIdx]) openBrandModels(currentBrandIdx, currentBrandCategory);
+                    else showPage('brand');
+                }
                 if (pages.admin.classList.contains('active')) renderAdminList();
             }, (err) => console.error('Ошибка Firestore:', err));
         }
@@ -1724,6 +1733,7 @@
                 const colorImages = model.colorImages || {};
                 const imageSrc = colorImages[selectedColor] || model.image;
                 const maxStock = (model.colorStocks && model.colorStocks[selectedColor] !== undefined) ? model.colorStocks[selectedColor] : (model.stock || 99);
+                const variantDocId = (model.colorDocIds && model.colorDocIds[selectedColor]) || model.id || '';
 
                 content.innerHTML = `
                     <div class="product-detail-image-wrap">
@@ -1787,6 +1797,7 @@
                 });
                 document.getElementById('addToCartMain').addEventListener('click', () => {
                     addToCart({
+                        docId: variantDocId,
                         category: model.category || currentCategoryId || (isLiquid ? 'liquids' : 'other'),
                         name: model.name,
                         price: model.price,
@@ -1870,3 +1881,1325 @@
                                                 ${hasDiscount ? `<div class="old-price" style="font-size:11px;">${m.price} BYN</div>` : ''}
                                                 <div class="upsell-new-price">${formatMoney(promoPrice)} BYN</div>
                                             </div>
+                                            <button type="button" class="upsell-add-btn" data-upsell-add="${idx}">+ Взять</button>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+
+                        <div class="upsell-footer">
+                            <button type="button" class="profile-btn primary" id="upsellAllLiquidsBtn">Выбрать в каталоге жидкостей →</button>
+                            <button type="button" class="profile-btn" id="upsellCloseBtn" style="padding:11px 14px; font-size:12px;">Нет, спасибо</button>
+                        </div>
+                    </div>
+                `;
+
+                modal.querySelectorAll('.upsell-flavor-select').forEach(sel => {
+                    sel.addEventListener('change', () => {
+                        const idx = parseInt(sel.dataset.upsellSelect, 10);
+                        const m = flatLiquids[idx].model;
+                        const cIdx = parseInt(sel.value, 10);
+                        const chosenColor = (m.colors && m.colors[cIdx]) || 'Стандарт';
+                        const imgEl = modal.querySelector(`#upsellImg_${idx}`);
+                        if (imgEl) {
+                            imgEl.src = (m.colorImages && m.colorImages[chosenColor]) || m.image || 'novayazhizha.png';
+                        }
+                    });
+                });
+
+                modal.querySelectorAll('[data-upsell-add]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const idx = parseInt(btn.dataset.upsellAdd, 10);
+                        const m = flatLiquids[idx].model;
+                        const sel = modal.querySelector(`[data-upsell-select="${idx}"]`);
+                        const cIdx = sel ? parseInt(sel.value, 10) : 0;
+                        const colors = m.colors && m.colors.length > 0 ? m.colors : ['Стандарт'];
+                        const chosenColor = colors[cIdx] || 'Стандарт';
+                        const maxStock = (m.colorStocks && m.colorStocks[chosenColor] !== undefined) ? m.colorStocks[chosenColor] : (m.stock || 99);
+                        const variantDocId = (m.colorDocIds && m.colorDocIds[chosenColor]) || m.id || '';
+
+                        const ok = addToCart({
+                            docId: variantDocId,
+                            category: 'liquids',
+                            name: m.name,
+                            price: m.price,
+                            desc: m.desc || '',
+                            color: chosenColor === 'Стандарт' ? null : chosenColor,
+                            image: (m.colorImages && m.colorImages[chosenColor]) || m.image,
+                            maxStock
+                        }, 1, { silentToast: true });
+
+                        if (ok) {
+                            showToast(`Жидкость добавлена за ${formatMoney(getPodPromoLiquidPrice(m.price))} BYN!`);
+                            if (pages.cart.classList.contains('active')) renderCart();
+                            if (getUnusedPodPromoSlots() <= 0) {
+                                modal.remove();
+                            } else {
+                                renderUpsellContent();
+                            }
+                        }
+                    });
+                });
+
+                modal.querySelector('#upsellAllLiquidsBtn').addEventListener('click', () => {
+                    modal.remove();
+                    openCategory('liquids');
+                });
+
+                modal.querySelector('#upsellCloseBtn').addEventListener('click', () => {
+                    modal.remove();
+                });
+            }
+
+            renderUpsellContent();
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
+            });
+            document.body.appendChild(modal);
+        }
+
+        function addToCart(product, qty = 1, options = {}) {
+            const count = Math.max(1, parseInt(qty, 10) || 1);
+            const maxStock = product.maxStock ?? product.stock ?? Infinity;
+            const category = product.category || currentCategoryId || 'other';
+            const existing = cart.find(item => item.name === product.name && item.color === product.color && item.category === category);
+            const currentQty = existing ? existing.qty : 0;
+            if (currentQty + count > maxStock) {
+                showToast(`Максимум в наличии: ${maxStock} шт.`);
+                return false;
+            }
+            if (existing) {
+                existing.qty += count;
+                if (!existing.image && product.image) existing.image = product.image;
+                if (!existing.docId && product.docId) existing.docId = product.docId;
+            } else {
+                cart.push({
+                    id: 'ci_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+                    docId: product.docId || '',
+                    category,
+                    name: product.name,
+                    desc: product.desc || '',
+                    price: product.price,
+                    qty: count,
+                    color: product.color || null,
+                    image: product.image || '',
+                    maxStock,
+                    appliedRewardId: null
+                });
+            }
+            updateCartCount();
+            if (!options.silentToast) {
+                showToast('Добавлено в корзину');
+            }
+
+            if (category === 'vapes' && getUnusedPodPromoSlots() > 0 && liquidBrands.length > 0) {
+                showLiquidUpsellModal(product.name);
+            }
+            return true;
+        }
+
+        function updateCartCount() {
+            const total = cart.reduce((sum, item) => sum + item.qty, 0);
+            if (cartCountEl) { cartCountEl.textContent = total; cartCountEl.style.display = total > 0 ? 'flex' : 'none'; }
+        }
+
+        function renderCart() {
+            const cartPage = document.getElementById('cartPage');
+            syncCartRewardsValidity();
+
+            if (cart.length === 0) {
+                selectedPickup = null;
+                cartPage.innerHTML = `<h1 class="section-title">КОРЗИНА</h1><div class="empty-state">Корзина пока пуста</div>`;
+                return;
+            }
+
+            const details = calculateCartDetails();
+            const unusedRewards = getUnusedRewards();
+            const unusedDiscounts = unusedRewards.filter(r => r.type === 'discount');
+            const unusedFreeLiquids = unusedRewards.filter(r => r.type === 'free_liquid');
+
+            const uniqueDiscountButtons = [];
+            const seenPercents = new Set();
+            unusedDiscounts.forEach(r => {
+                if (!seenPercents.has(r.percent)) {
+                    seenPercents.add(r.percent);
+                    uniqueDiscountButtons.push(r);
+                }
+            });
+
+            cartPage.innerHTML = `
+                <h1 class="section-title">КОРЗИНА</h1>
+                ${details.unusedPodPromoSlots > 0 && liquidBrands.length > 0 ? `
+                    <div class="cart-upsell-banner">
+                        <div style="font-size:13px; font-weight:700; color:#ffd180; line-height:1.35;">
+                            🔥 Акция: к вашей под-системе любая жидкость всего за <b>${POD_LIQUID_TARGET_PRICE} BYN</b>!
+                            ${details.unusedPodPromoSlots > 1 ? `<span style="color:#fff;">(доступно слотов: ${details.unusedPodPromoSlots})</span>` : ''}
+                        </div>
+                        <button type="button" class="cart-upsell-btn" id="cartUpsellLiquidBtn">Выбрать жидкость за ${POD_LIQUID_TARGET_PRICE} BYN</button>
+                    </div>
+                ` : ''}
+                ${userRewards.length > 0 ? `
+                    <div class="cart-bonus-banner">
+                        🎁 У вас есть активные призы рулетки (<b>${userRewards.length} шт.</b>). Нажмите кнопку напротив нужного товара, чтобы применить бонус!
+                    </div>
+                ` : ''}
+                <div class="cart-list" style="display:flex; flex-direction:column; gap:12px; padding:0 16px 240px;">
+                    ${cart.map(item => {
+                        const pricing = details.itemsMap.get(item.id);
+                        const isLiquid = item.category === 'liquids';
+
+                        let bonusButtonsHtml = '';
+                        if (pricing.reward) {
+                            const labelText = pricing.reward.type === 'free_liquid'
+                                ? '🎁 Бесплатно применено'
+                                : `🏷 Скидка -${pricing.reward.percent}% (−${formatMoney(pricing.rewardDiscountAmount)} BYN)`;
+                            bonusButtonsHtml = `
+                                <div class="cart-bonus-row">
+                                    <button class="cart-bonus-btn applied" data-cart-id="${item.id}" data-action="remove-reward">${labelText} · Снять ✕</button>
+                                </div>
+                            `;
+                        } else if ((isLiquid && unusedFreeLiquids.length > 0) || uniqueDiscountButtons.length > 0) {
+                            bonusButtonsHtml = `
+                                <div class="cart-bonus-row">
+                                    ${isLiquid && unusedFreeLiquids.length > 0 ? `
+                                        <button class="cart-bonus-btn free" data-cart-id="${item.id}" data-reward-id="${unusedFreeLiquids[0].id}" data-action="apply-reward">🎁 Сделать бесплатно (0 BYN)</button>
+                                    ` : ''}
+                                    ${uniqueDiscountButtons.map(r => `
+                                        <button class="cart-bonus-btn" data-cart-id="${item.id}" data-reward-id="${r.id}" data-action="apply-reward">🏷 Применить скидку -${r.percent}%</button>
+                                    `).join('')}
+                                </div>
+                            `;
+                        }
+
+                        return `
+                        <div class="cart-item" style="background:var(--bg-card); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid var(--border-card); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:10px; box-shadow:var(--shadow-card);">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+                                <div style="flex:1; min-width:0;">
+                                    <div style="font-size:15px; font-weight:700; text-transform:uppercase;">${item.name}</div>
+                                    ${item.color ? `<div style="font-size:12px; color:var(--text-gray); margin-top:2px;">Вариант: ${item.color}</div>` : ''}
+                                    ${item.desc ? `<div style="font-size:12px; color:var(--text-gray); margin-top:2px;">${item.desc}</div>` : ''}
+                                    ${pricing.podDiscountAmount > 0 ? `
+                                        <div style="margin-top:6px;">
+                                            <span class="pod-promo-badge">🔥 Акция к поду: ${POD_LIQUID_TARGET_PRICE} BYN (−${formatMoney(pricing.podDiscountAmount)} BYN)</span>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                                <div style="text-align:right; white-space:nowrap;">
+                                    ${pricing.discountAmount > 0 ? `<div class="old-price">${formatMoney(pricing.baseTotal)} BYN</div>` : ''}
+                                    <div style="font-size:16px; font-weight:700; color:${pricing.finalTotal === 0 ? '#69f07a' : 'var(--text-white)'};">
+                                        ${pricing.finalTotal === 0 ? 'БЕСПЛАТНО (0 BYN)' : `${formatMoney(pricing.finalTotal)} BYN`}
+                                    </div>
+                                </div>
+                            </div>
+                            ${bonusButtonsHtml}
+                            <div style="display:flex; align-items:center; gap:8px; border-top:1px solid var(--border-card); padding-top:10px;">
+                                <button class="qty-btn" data-id="${item.id}" data-action="decrease" style="width:36px; height:36px; border-radius:50%; background:var(--bg-dark); border:1px solid var(--border-card); color:var(--text-white); font-size:18px; display:flex; align-items:center; justify-content:center;">−</button>
+                                <span class="qty-value" style="min-width:24px; text-align:center; font-size:15px; font-weight:600;">${item.qty}</span>
+                                <button class="qty-btn" data-id="${item.id}" data-action="increase" style="width:36px; height:36px; border-radius:50%; background:var(--bg-dark); border:1px solid var(--border-card); color:var(--text-white); font-size:18px; display:flex; align-items:center; justify-content:center;">+</button>
+                                <button class="remove-btn" data-id="${item.id}" style="margin-left:auto; padding:6px 12px; background:transparent; border:1px solid var(--border-card); border-radius:12px; color:var(--text-gray); font-size:11px; text-transform:uppercase; letter-spacing:0.5px;">Удалить</button>
+                            </div>
+                        </div>`;
+                    }).join('')}
+                </div>
+                <div style="position:fixed; bottom:calc(68px + env(safe-area-inset-bottom)); left:0; right:0; background:var(--bg-card); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-top:1px solid var(--border-card); padding:14px 16px; display:flex; flex-direction:column; gap:10px; z-index:100; box-shadow:var(--shadow-card);">
+                    <div style="font-size:11px; color:var(--text-gray); text-transform:uppercase; letter-spacing:0.5px;">Способ получения *</div>
+                    <div class="pickup-methods">
+                        <button class="pickup-btn ${selectedPickup === 'ВОКЗАЛ' ? 'selected' : ''}" id="pickupVokzal">📍 ВОКЗАЛ</button>
+                        <button class="pickup-btn disabled" id="pickupDelivery">🚚 ДОСТАВКА СКОРО</button>
+                    </div>
+                    ${details.totalPodDiscount > 0 ? `
+                        <div style="display:flex; justify-content:space-between; font-size:13px; color:#ffb74d; font-weight:600;">
+                            <span>Скидка к под-системе (жижа ${POD_LIQUID_TARGET_PRICE} BYN)</span>
+                            <span>−${formatMoney(details.totalPodDiscount)} BYN</span>
+                        </div>
+                    ` : ''}
+                    ${details.totalRouletteDiscount > 0 ? `
+                        <div style="display:flex; justify-content:space-between; font-size:13px; color:#69f07a; font-weight:600;">
+                            <span>Скидка по рулетке</span>
+                            <span>−${formatMoney(details.totalRouletteDiscount)} BYN</span>
+                        </div>
+                    ` : ''}
+                    <div style="display:flex; justify-content:space-between; font-size:16px; font-weight:700; margin-top:2px;">
+                        <span>Итого</span>
+                        <span id="cartTotal">${formatMoney(details.finalTotal)} BYN</span>
+                    </div>
+                    <button class="checkout-btn" id="checkoutBtn" ${selectedPickup === 'ВОКЗАЛ' ? '' : 'disabled'} style="width:100%; padding:15px 24px; border:none; border-radius:16px; background:var(--text-white); color:var(--bg-dark); font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:1px; cursor:pointer;">ОФОРМИТЬ ЗАКАЗ</button>
+                </div>
+            `;
+
+            const upsellBtn = document.getElementById('cartUpsellLiquidBtn');
+            if (upsellBtn) {
+                upsellBtn.addEventListener('click', () => showLiquidUpsellModal());
+            }
+
+            document.getElementById('pickupVokzal').addEventListener('click', () => {
+                selectedPickup = 'ВОКЗАЛ';
+                renderCart();
+            });
+
+            document.getElementById('pickupDelivery').addEventListener('click', () => {
+                showToast('Доставка скоро появится');
+            });
+
+            cartPage.querySelectorAll('.cart-bonus-btn[data-action="apply-reward"]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const item = cart.find(i => i.id === btn.dataset.cartId);
+                    const rewardId = btn.dataset.rewardId;
+                    if (!item || !rewardId) return;
+                    item.appliedRewardId = rewardId;
+                    renderCart();
+                    showToast('Бонус применён к товару!');
+                });
+            });
+
+            cartPage.querySelectorAll('.cart-bonus-btn[data-action="remove-reward"]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const item = cart.find(i => i.id === btn.dataset.cartId);
+                    if (!item) return;
+                    item.appliedRewardId = null;
+                    renderCart();
+                    showToast('Бонус снят');
+                });
+            });
+
+            cartPage.querySelectorAll('.qty-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const item = cart.find(i => i.id === btn.dataset.id);
+                    if (!item) return;
+                    if (btn.dataset.action === 'increase') {
+                        if (item.maxStock && item.qty >= item.maxStock) { showToast(`Максимум в наличии: ${item.maxStock} шт.`); return; }
+                        item.qty += 1;
+                    } else {
+                        item.qty -= 1;
+                        if (item.qty <= 0) cart.splice(cart.indexOf(item), 1);
+                    }
+                    renderCart(); updateCartCount();
+                });
+            });
+
+            cartPage.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = cart.findIndex(i => i.id === btn.dataset.id);
+                    if (idx !== -1) { cart.splice(idx, 1); renderCart(); updateCartCount(); }
+                });
+            });
+
+            document.getElementById('checkoutBtn').addEventListener('click', checkout);
+        }
+
+        function checkout() {
+            if (cart.length === 0) { showToast('Корзина пуста'); return; }
+            if (selectedPickup !== 'ВОКЗАЛ') { showToast('Выберите способ получения: ВОКЗАЛ'); return; }
+            showDeliveryModal();
+        }
+
+        // --- АНИМИРОВАННАЯ РУЛЕТКА 7 СЕКУНД СО ЗВУКОМ ---
+        const ROULETTE_PRIZES = [
+            { type: 'discount', percent: 5, label: 'Скидка 5% на всё', short: '5% скидка', img: '5proc.png', weight: 50 },
+            { type: 'discount', percent: 10, label: 'Скидка 10% на всё', short: '10% скидка', img: '10proc.png', weight: 30 },
+            { type: 'discount', percent: 15, label: 'Скидка 15% на всё', short: '15% скидка', img: '15proc.png', weight: 15 },
+            { type: 'free_liquid', percent: 100, label: 'Бесплатная жидкость', short: 'Жижа 0 BYN', img: 'zhizhabesplatnaya.jpg', weight: 5 }
+        ];
+
+        function pickWeightedPrize() {
+            const r = Math.random() * 100;
+            if (r < 50) return ROULETTE_PRIZES[0];
+            if (r < 80) return ROULETTE_PRIZES[1];
+            if (r < 95) return ROULETTE_PRIZES[2];
+            return ROULETTE_PRIZES[3];
+        }
+
+        function playTickSound(audioCtx) {
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(520, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(180, audioCtx.currentTime + 0.03);
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.035);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.04);
+            } catch (e) {}
+        }
+
+        function playWinSound(audioCtx) {
+            try {
+                [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    const t = audioCtx.currentTime + idx * 0.08;
+                    osc.frequency.setValueAtTime(freq, t);
+                    gain.gain.setValueAtTime(0.14, t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(t);
+                    osc.stop(t + 0.36);
+                });
+            } catch (e) {}
+        }
+
+        function openRouletteModal() {
+            if (isRouletteSpinning) return;
+            if (!isAdminUser() && userPurchases < PURCHASES_PER_SPIN) {
+                showToast(`Нужно ${PURCHASES_PER_SPIN} подтверждённых покупок`);
+                return;
+            }
+            isRouletteSpinning = true;
+
+            const winPrize = pickWeightedPrize();
+            const totalItems = 50;
+            const winIndex = 42;
+            const strip = [];
+            for (let i = 0; i < totalItems; i++) {
+                strip.push(i === winIndex ? winPrize : ROULETTE_PRIZES[Math.floor(Math.random() * ROULETTE_PRIZES.length)]);
+            }
+
+            const modal = document.createElement('div');
+            modal.className = 'roulette-modal';
+            modal.innerHTML = `
+                <div class="roulette-box">
+                    <div class="profile-card-title" style="margin-bottom: 4px;">🎰 Колесо удачи</div>
+                    <div style="font-size:12px; color:var(--text-gray);">Крутим барабан...</div>
+                    <div class="roulette-viewport" id="rouletteViewport">
+                        <div class="roulette-pointer"></div>
+                        <div class="roulette-track" id="rouletteTrack">
+                            ${strip.map(p => `
+                                <div class="roulette-item">
+                                    <img src="${p.img}" alt="${p.short}" decoding="async">
+                                    <span>${p.short}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="roulette-result" id="modalRouletteResult" style="min-height:24px;"></div>
+                    <button class="profile-btn primary" id="closeRouletteModal" style="margin-top:12px; display:none;">Забрать приз</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            const track = modal.querySelector('#rouletteTrack');
+            const viewport = modal.querySelector('#rouletteViewport');
+            const closeBtn = modal.querySelector('#closeRouletteModal');
+            const itemStep = 112;
+            const centerOffset = (viewport.clientWidth / 2) - 52 - 8;
+            const targetX = -(winIndex * itemStep - centerOffset + (Math.random() * 24 - 12));
+
+            let audioCtx = null;
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            } catch (e) {}
+
+            const startTime = performance.now();
+            const duration = 7000;
+            let lastStepIndex = -1;
+            let rafId = null;
+
+            function tickLoop(now) {
+                const elapsed = now - startTime;
+                if (elapsed < duration && document.body.contains(modal)) {
+                    const progress = elapsed / duration;
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    const currentStep = Math.floor(eased * winIndex);
+                    if (currentStep > lastStepIndex) {
+                        lastStepIndex = currentStep;
+                        if (audioCtx) playTickSound(audioCtx);
+                    }
+                    rafId = requestAnimationFrame(tickLoop);
+                }
+            }
+
+            requestAnimationFrame(() => {
+                track.style.transition = 'transform 7s cubic-bezier(0.12, 0.85, 0.14, 1)';
+                track.style.transform = `translate3d(${targetX}px, 0, 0)`;
+                rafId = requestAnimationFrame(tickLoop);
+            });
+
+            closeBtn.addEventListener('click', () => {
+                if (rafId) cancelAnimationFrame(rafId);
+                isRouletteSpinning = false;
+                if (audioCtx) {
+                    try { audioCtx.close(); } catch (e) {}
+                    audioCtx = null;
+                }
+                modal.remove();
+                renderProfile();
+            });
+
+            setTimeout(() => {
+                if (rafId) cancelAnimationFrame(rafId);
+                if (audioCtx) {
+                    playWinSound(audioCtx);
+                    const ctxToClose = audioCtx;
+                    audioCtx = null;
+                    setTimeout(() => {
+                        try { ctxToClose.close(); } catch (e) {}
+                    }, 600);
+                }
+
+                const newReward = {
+                    id: 'rew_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                    type: winPrize.type,
+                    percent: winPrize.percent,
+                    label: winPrize.label,
+                    createdAt: Date.now()
+                };
+
+                if (!userRewards.some(r => r.id === newReward.id)) {
+                    userRewards.push(newReward);
+                }
+                const nextPurchases = isAdminUser() ? userPurchases : Math.max(0, userPurchases - PURCHASES_PER_SPIN);
+                if (!isAdminUser()) {
+                    userPurchases = nextPurchases;
+                }
+
+                isRouletteSpinning = false;
+                modal.querySelector('#modalRouletteResult').textContent = `🎉 Вы выиграли: ${winPrize.label}!`;
+                closeBtn.style.display = 'block';
+
+                const inlineRes = document.getElementById('rouletteResult');
+                if (inlineRes) inlineRes.textContent = `🎉 Ваш приз сохранён: ${winPrize.label}!`;
+                showToast(`Приз добавлен в профиль: ${winPrize.label}`);
+
+                const docId = getUserDocId();
+                const userRef = db.collection('users').doc(docId);
+                const updatePayload = {
+                    rewards: firebase.firestore.FieldValue.arrayUnion(newReward)
+                };
+                if (!isAdminUser()) {
+                    updatePayload.purchases = nextPurchases;
+                }
+                userRef.set(updatePayload, { merge: true }).catch((err) => {
+                    console.error('Ошибка сохранения приза:', err);
+                });
+            }, 7100);
+        }
+
+        function renderProfile() {
+            const container = document.getElementById('profileCard');
+            if (!container) return;
+            const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+            const username = tgUser?.username ? `@${tgUser.username}` : (tgUser?.first_name || 'Гость');
+            const avatarLetter = (tgUser?.first_name || tgUser?.username || 'W')[0].toUpperCase();
+            const tgPhoto = getTgPhotoUrl();
+
+            const spinsAvailable = Math.floor(userPurchases / PURCHASES_PER_SPIN);
+            const progressCount = spinsAvailable > 0 ? PURCHASES_PER_SPIN : (userPurchases % PURCHASES_PER_SPIN);
+            const canSpin = isAdminUser() || userPurchases >= PURCHASES_PER_SPIN;
+
+            const rewardsHtml = userRewards.length > 0 ? `
+                <div class="profile-card">
+                    <div class="profile-card-title">🎁 Мои активные призы (${userRewards.length})</div>
+                    ${userRewards.map(r => `
+                        <div class="reward-item-card">
+                            <div style="min-width:0;">
+                                <div style="font-size:13px; font-weight:700; color:${r.type === 'free_liquid' ? '#69f07a' : '#ffb74d'};">
+                                    ${r.type === 'free_liquid' ? '🎁 Бесплатная жидкость' : `🏷 Скидка ${r.percent}%`}
+                                </div>
+                                <div style="font-size:11px; color:var(--text-gray); margin-top:2px;">
+                                    ${r.type === 'free_liquid' ? 'Откройте раздел «Жидкости» и добавьте любую в корзину' : 'Примените в корзине напротив любого товара'}
+                                </div>
+                            </div>
+                            <button class="reward-use-btn" data-reward-action="${r.type === 'free_liquid' ? 'go-liquids' : 'go-cart'}">
+                                ${r.type === 'free_liquid' ? 'Выбрать' : 'В корзину'}
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : '';
+
+            container.innerHTML = `
+                <div class="profile-card">
+                    <div class="profile-user">
+                        <div class="profile-avatar">
+                            ${tgPhoto
+                                ? `<img src="${tgPhoto}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${avatarLetter}</span>`
+                                : `<span>${avatarLetter}</span>`
+                            }
+                        </div>
+                        <div>
+                            <div class="profile-username">${username}</div>
+                            <div class="profile-sub">Подтверждённых покупок: ${userPurchases}</div>
+                        </div>
+                    </div>
+                </div>
+                ${rewardsHtml}
+                <div class="profile-card"><div class="profile-card-title">Время работы</div><div style="font-size: 16px; font-weight: 700;">11:00 - 23:00</div></div>
+                <div class="profile-card">
+                    <div class="profile-card-title">Только честные отзывы</div>
+                    <button type="button" class="profile-btn primary" id="openReviewsPageBtn">Открыть отзывы покупателей →</button>
+                </div>
+                <div class="profile-card">
+                    <div class="profile-card-title">Рулетка после 5 покупок</div>
+                    <div style="font-size: 13px; color: #dcdcdc;">
+                        Прогресс: <b id="rouletteCount">${progressCount}</b> / ${PURCHASES_PER_SPIN}
+                        ${spinsAvailable > 0 ? `<span style="color:#69f07a; font-weight:700;"> · Доступно вращений: ${spinsAvailable}</span>` : ''}
+                    </div>
+                    <div class="roulette-bar"><div class="roulette-fill" style="width: ${progressCount * 20}%"></div></div>
+                    <div style="font-size: 12px; color: var(--text-gray); margin-bottom: 10px; line-height: 1.5;">
+                        Скидки: -5% / -10% / -15% на любой товар в корзине (на 1 шт.)<br>
+                        P.S. Также шанс бесплатной жидкости!
+                    </div>
+                    <button class="profile-btn primary" id="spinRouletteBtn" ${canSpin ? '' : 'disabled'}>
+                        ${canSpin ? 'Крутить рулетку 🎰' : `Осталось ${PURCHASES_PER_SPIN - progressCount} пок.`}
+                    </button>
+                    <div class="roulette-result" id="rouletteResult"></div>
+                    <div class="roulette-note">* Каждые 5 покупок дают 1 вращение. Покупки сверх 5 не сгорают, а все выпавшие призы сохраняются в вашем профиле.</div>
+                </div>
+                <div class="profile-card"><div class="profile-card-title">Обратная связь</div><button class="profile-btn" id="feedbackBtn">Написать в Telegram (@Seregablatnou)</button></div>
+            `;
+
+            container.querySelectorAll('.reward-use-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (btn.dataset.rewardAction === 'go-liquids') {
+                        openCategory('liquids');
+                    } else {
+                        showPage('cart');
+                        renderCart();
+                    }
+                });
+            });
+
+            document.getElementById('openReviewsPageBtn').addEventListener('click', () => {
+                showPage('reviews');
+                renderAllReviewsPage();
+            });
+
+            document.getElementById('feedbackBtn').addEventListener('click', () => {
+                const url = 'https://t.me/Seregablatnou';
+                if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
+                else window.open(url, '_blank');
+            });
+
+            document.getElementById('spinRouletteBtn').addEventListener('click', openRouletteModal);
+        }
+
+        // --- ОТДЕЛЬНАЯ СТРАНИЦА ОТЗЫВОВ ---
+        function resolveReviewProductInfo(review) {
+            const [keyName = '', keyVariant = ''] = String(review.productKey || '').split('||');
+            const norm = (s) => String(s || '').trim().toLowerCase();
+
+            let matched = allRawProducts.find(p =>
+                norm(p.name) === norm(keyName) && norm(p.color || 'Стандарт') === norm(keyVariant || 'Стандарт')
+            );
+            if (!matched) {
+                matched = allRawProducts.find(p => norm(p.name) === norm(keyName));
+            }
+
+            const defaultImages = {
+                vapes: 'vape.png', snus: 'snus.png', liquids: 'novayazhizha.png',
+                disposables: 'odnorazki.png', consumables: 'rashodniki.png', nicoboosters: 'nikobuster.png'
+            };
+
+            const name = review.productName || matched?.name || keyName.toUpperCase() || 'Товар';
+            const variant = review.productVariant || matched?.color || (keyVariant && keyVariant !== 'стандарт' ? keyVariant : '');
+            const cat = matched?.category === 'devices' ? 'vapes' : (matched?.category || 'vapes');
+            const image = review.productImage
+                || matched?.image
+                || (variant ? getFallbackColorImage(name, variant) : null)
+                || defaultImages[cat]
+                || 'vape.png';
+
+            return { name, variant, image };
+        }
+
+        async function renderAllReviewsPage() {
+            const listBox = document.getElementById('allReviewsList');
+            if (!listBox) return;
+            listBox.innerHTML = `<div class="empty-state">Загрузка отзывов...</div>`;
+
+            let reviews = [];
+            try {
+                const snap = await db.collection('reviews').get();
+                snap.forEach(d => reviews.push({ id: d.id, ...d.data() }));
+                reviews.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+            } catch (e) {
+                listBox.innerHTML = `<div class="empty-state">Не удалось загрузить отзывы</div>`;
+                return;
+            }
+
+            if (reviews.length === 0) {
+                listBox.innerHTML = `<div class="empty-state">Отзывов пока нет. После покупки товара вы сможете оставить первый отзыв!</div>`;
+                return;
+            }
+
+            const avg = (reviews.reduce((s, r) => s + (Number(r.rating) || 5), 0) / reviews.length).toFixed(1);
+
+            listBox.innerHTML = `
+                <div class="reviews-summary-card">
+                    <div>
+                        <div style="font-size:13px; font-weight:700; text-transform:uppercase;">Всего отзывов: ${reviews.length}</div>
+                        <div style="font-size:11px; color:var(--text-gray); margin-top:2px;">Только от реальных покупателей</div>
+                    </div>
+                    <div style="font-size:18px; font-weight:800; color:#ffb74d;">⭐ ${avg}</div>
+                </div>
+                ${reviews.map(r => {
+                    const info = resolveReviewProductInfo(r);
+                    const ratingNum = Math.max(1, Math.min(5, Number(r.rating) || 5));
+                    const starsHtml = '★'.repeat(ratingNum) + '<span style="color:#444;">' + '★'.repeat(5 - ratingNum) + '</span>';
+                    const dateStr = formatReviewDate(r.createdAt);
+
+                    return `
+                    <div class="full-review-card">
+                        <div class="full-review-product">
+                            <div class="full-review-thumb">
+                                <img src="${info.image}" alt="${info.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
+                                <span style="display:none;">📦</span>
+                            </div>
+                            <div class="full-review-meta">
+                                <div class="full-review-prod-name">${info.name}</div>
+                                ${info.variant && info.variant.toLowerCase() !== 'стандарт'
+                                    ? `<div class="full-review-prod-var">Вариант: ${info.variant}</div>`
+                                    : ''
+                                }
+                                <div class="full-review-stars">${starsHtml} <span style="color:var(--text-gray); font-size:11px; margin-left:4px;">(${ratingNum}/5)</span></div>
+                            </div>
+                            ${isAdminUser() ? `<button class="admin-del-btn" data-allrev-del="${r.id}" style="flex-shrink:0;">🗑</button>` : ''}
+                        </div>
+                        <div class="full-review-text">${r.text || ''}</div>
+                        <div class="full-review-footer">
+                            ${renderAuthorBadgeHtml(r.author, r.authorPhoto)}
+                            <span style="flex-shrink:0;">🕒 ${dateStr}</span>
+                        </div>
+                    </div>`;
+                }).join('')}
+            `;
+
+            listBox.querySelectorAll('[data-allrev-del]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    await db.collection('reviews').doc(btn.dataset.allrevDel).delete();
+                    showToast('Отзыв удалён');
+                    renderAllReviewsPage();
+                });
+            });
+        }
+
+        // --- АДМИНКА С ОТДЕЛАМИ И СОРТИРОВКОЙ ПО МОДЕЛЯМ И НАЗВАНИЯМ ---
+        function getAdminNormalizedCategory(cat) {
+            return cat === 'devices' ? 'vapes' : (cat || 'vapes');
+        }
+
+        function sortAdminItems(items) {
+            return [...items].sort((a, b) => {
+                const byBrand = naturalCompare(a.brand || 'zzz', b.brand || 'zzz');
+                if (byBrand !== 0) return byBrand;
+                const byName = naturalCompare(a.name, b.name);
+                if (byName !== 0) return byName;
+                return naturalCompare(a.color, b.color);
+            });
+        }
+
+        function renderAdminDeptTabs() {
+            const tabsBox = document.getElementById('adminDeptTabs');
+            if (!tabsBox) return;
+
+            const counts = { all: allRawProducts.length };
+            ADMIN_DEPARTMENTS.forEach(d => {
+                if (d.id !== 'all') counts[d.id] = 0;
+            });
+            allRawProducts.forEach(p => {
+                const c = getAdminNormalizedCategory(p.category);
+                counts[c] = (counts[c] || 0) + 1;
+            });
+
+            tabsBox.innerHTML = ADMIN_DEPARTMENTS.map(d => `
+                <button type="button" class="admin-dept-tab ${adminSelectedDept === d.id ? 'active' : ''}" data-dept="${d.id}">
+                    ${d.label} (${counts[d.id] || 0})
+                </button>
+            `).join('');
+
+            tabsBox.querySelectorAll('.admin-dept-tab').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    adminSelectedDept = btn.dataset.dept;
+                    renderAdminList();
+                });
+            });
+        }
+
+        function renderAdminItemHtml(p) {
+            const hasVariantStock = Boolean(p.color);
+            const currentStock = hasVariantStock ? (p.color_stock ?? p.stock ?? 0) : (p.stock ?? 0);
+            return `
+            <div class="admin-item">
+                <div class="admin-item-thumb">${p.image ? `<img src="${p.image}" alt="" onerror="this.style.opacity='0.25'">` : `<span>📦</span>`}</div>
+                <div class="admin-item-info">
+                    <div class="admin-item-title">${p.name || 'Без названия'}</div>
+                    <div class="admin-item-sub">${p.brand || ''} ${p.color ? '· ' + p.color : ''}</div>
+                    <div class="admin-price-edit">
+                        <input type="number" class="admin-price-input" id="priceInput_${p.docId}" value="${p.price || 0}" placeholder="BYN">
+                        <span style="font-size:11px; color:var(--text-gray);">BYN</span>
+                        <button class="admin-price-save" data-id="${p.docId}">OK</button>
+                    </div>
+                </div>
+                <div class="admin-stock-ctrl">
+                    <button class="admin-mini-btn" data-id="${p.docId}" data-has-var="${hasVariantStock ? '1' : '0'}" data-val="${currentStock}" data-act="dec">−</button>
+                    <span style="min-width: 22px; text-align:center; font-size:13px; font-weight:700;">${currentStock}</span>
+                    <button class="admin-mini-btn" data-id="${p.docId}" data-has-var="${hasVariantStock ? '1' : '0'}" data-val="${currentStock}" data-act="inc">+</button>
+                    <button class="admin-del-btn" data-id="${p.docId}" data-act="del">🗑</button>
+                </div>
+            </div>`;
+        }
+
+        function renderAdminItemsGroupedByModel(items) {
+            const sorted = sortAdminItems(items);
+            let lastGroupKey = '';
+            return sorted.map(p => {
+                const brandPart = (p.brand || '').trim().toUpperCase();
+                const namePart = (p.name || 'Без названия').trim().toUpperCase();
+                const groupKey = `${brandPart}||${namePart}`;
+                let subhead = '';
+                if (groupKey !== lastGroupKey) {
+                    lastGroupKey = groupKey;
+                    subhead = `<div class="admin-model-subhead">${brandPart ? `${brandPart} · ` : ''}${namePart}</div>`;
+                }
+                return subhead + renderAdminItemHtml(p);
+            }).join('');
+        }
+
+        function renderAdminList() {
+            const listEl = document.getElementById('adminProductList');
+            const countEl = document.getElementById('admTotalCount');
+            if (!listEl) return;
+            countEl.textContent = allRawProducts.length;
+            renderAdminDeptTabs();
+
+            const q = adminSearchQuery.trim().toLowerCase();
+            let filtered = allRawProducts.filter(p => {
+                const cat = getAdminNormalizedCategory(p.category);
+                if (adminSelectedDept !== 'all' && cat !== adminSelectedDept) return false;
+                if (q) {
+                    const hay = `${p.name || ''} ${p.brand || ''} ${p.color || ''}`.toLowerCase();
+                    if (!hay.includes(q)) return false;
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `<div class="empty-state" style="padding: 30px 10px;">В этом отделе пока ничего не найдено</div>`;
+                return;
+            }
+
+            if (adminSelectedDept === 'all') {
+                const sectionsHtml = ADMIN_DEPARTMENTS
+                    .filter(d => d.id !== 'all')
+                    .map(dept => {
+                        const items = filtered.filter(p => getAdminNormalizedCategory(p.category) === dept.id);
+                        if (items.length === 0) return '';
+                        return `
+                            <div class="admin-dept-group-title">
+                                <span>${dept.label}</span>
+                                <span>${items.length} поз.</span>
+                            </div>
+                            ${renderAdminItemsGroupedByModel(items)}
+                        `;
+                    }).join('');
+                listEl.innerHTML = sectionsHtml;
+            } else {
+                listEl.innerHTML = renderAdminItemsGroupedByModel(filtered);
+            }
+
+            listEl.querySelectorAll('.admin-price-save').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.dataset.id;
+                    const input = document.getElementById(`priceInput_${id}`);
+                    const newPrice = Number(input.value);
+                    if (isNaN(newPrice) || newPrice < 0) {
+                        showToast('Введите корректную цену');
+                        return;
+                    }
+                    await db.collection('products').doc(id).update({ price: newPrice });
+                    showToast(`Цена обновлена: ${newPrice} BYN`);
+                });
+            });
+
+            listEl.querySelectorAll('.admin-mini-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.dataset.id;
+                    const hasVar = btn.dataset.hasVar === '1';
+                    const cur = Number(btn.dataset.val) || 0;
+                    const next = btn.dataset.act === 'inc' ? cur + 1 : Math.max(0, cur - 1);
+                    await db.collection('products').doc(id).update(hasVar ? { color_stock: next } : { stock: next });
+                    showToast(`Сток обновлён: ${next}`);
+                });
+            });
+
+            listEl.querySelectorAll('.admin-del-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    await db.collection('products').doc(btn.dataset.id).delete();
+                    showToast('Удалено');
+                });
+            });
+        }
+
+        document.getElementById('admSearchInput').addEventListener('input', (e) => {
+            adminSearchQuery = e.target.value;
+            renderAdminList();
+        });
+
+        document.getElementById('admPhotoFile').addEventListener('change', async (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            showToast('Загрузка фото...');
+            const formData = new FormData();
+            formData.append('image', file);
+            try {
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
+                const json = await res.json();
+                if (json.success) {
+                    document.getElementById('admImage').value = json.data.url;
+                    showToast('Фото загружено!');
+                } else showToast('Ошибка загрузки фото');
+            } catch (err) {
+                console.error(err);
+                showToast('Ошибка сети при загрузке');
+            }
+        });
+
+        document.getElementById('admSaveBtn').addEventListener('click', async () => {
+            const category = document.getElementById('admCategory').value;
+            const brand = document.getElementById('admBrand').value.trim();
+            const name = document.getElementById('admName').value.trim();
+            const desc = document.getElementById('admDesc').value.trim();
+            const price = Number(document.getElementById('admPrice').value) || 0;
+            const stock = Number(document.getElementById('admStock').value) || 0;
+            const color = document.getElementById('admColor').value.trim();
+            const colorStockRaw = document.getElementById('admColorStock').value.trim();
+            const color_stock = colorStockRaw !== '' ? (Number(colorStockRaw) || 0) : stock;
+            const image = document.getElementById('admImage').value.trim();
+
+            if (!name || !price) { showToast('Укажите название и цену'); return; }
+
+            try {
+                await db.collection('products').add({
+                    category, brand, name, desc, price, stock, color, color_stock, image,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                document.getElementById('admColor').value = '';
+                document.getElementById('admColorStock').value = '';
+                document.getElementById('admImage').value = '';
+                document.getElementById('admPhotoFile').value = '';
+                showToast('Товар добавлен в базу!');
+            } catch (err) {
+                console.error(err);
+                showToast('Ошибка сохранения в Firebase');
+            }
+        });
+
+        function showDeliveryModal() {
+            const now = new Date();
+            const pad = (n) => String(n).padStart(2, '0');
+            const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+
+            const modal = document.createElement('div');
+            modal.className = 'delivery-modal';
+            modal.style.cssText = `position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 16px; animation: fadeIn 0.2s ease;`;
+            modal.innerHTML = `
+                <div style="background: var(--bg-card); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border-card); border-radius: 22px; padding: 20px; width: 100%; max-width: 380px; animation: slideUp 0.25s cubic-bezier(0.22, 1, 0.36, 1); box-shadow: var(--shadow-card); display:flex; flex-direction:column; gap:16px;">
+                    <div>
+                        <div style="font-size:16px; font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+                            <span>🕒 Когда заберёте</span><span style="color:#ff453a;">*</span>
+                        </div>
+                        <div class="delivery-datetime-grid">
+                            <div class="delivery-field">
+                                <label class="delivery-label">Дата</label>
+                                <input type="date" id="orderDateInput" class="delivery-input" value="${todayStr}" min="${todayStr}">
+                            </div>
+                            <div class="delivery-field">
+                                <label class="delivery-label">Время</label>
+                                <input type="time" id="orderTimeInput" class="delivery-input">
+                            </div>
+                        </div>
+                        <div id="timeErrorMsg" style="display:none; color:#ff453a; font-size:12px; margin-top:8px;">Это время уже прошло — выберите позже</div>
+                    </div>
+
+                    <button type="button" id="confirmOrderModalBtn" disabled style="width:100%; padding:15px; border-radius:16px; border:none; background:var(--text-white); color:var(--bg-dark); font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; cursor:pointer; opacity:0.45;">ПОДТВЕРДИТЬ ЗАКАЗ</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            const dateInput = modal.querySelector('#orderDateInput');
+            const timeInput = modal.querySelector('#orderTimeInput');
+            const timeError = modal.querySelector('#timeErrorMsg');
+            const confirmBtn = modal.querySelector('#confirmOrderModalBtn');
+
+            function validateDateTime() {
+                const dVal = dateInput.value;
+                const tVal = timeInput.value;
+                if (!dVal || !tVal) {
+                    timeError.style.display = 'none';
+                    confirmBtn.disabled = true;
+                    confirmBtn.style.opacity = '0.45';
+                    return false;
+                }
+                const chosen = new Date(`${dVal}T${tVal}:00`);
+                const current = new Date();
+                if (chosen < current) {
+                    timeError.style.display = 'block';
+                    dateInput.style.borderColor = '#ff453a';
+                    timeInput.style.borderColor = '#ff453a';
+                    confirmBtn.disabled = true;
+                    confirmBtn.style.opacity = '0.45';
+                    return false;
+                }
+                timeError.style.display = 'none';
+                dateInput.style.borderColor = 'var(--border-card)';
+                timeInput.style.borderColor = 'var(--border-card)';
+                confirmBtn.disabled = false;
+                confirmBtn.style.opacity = '1';
+                return true;
+            }
+
+            dateInput.addEventListener('change', validateDateTime);
+            timeInput.addEventListener('change', validateDateTime);
+            timeInput.addEventListener('input', validateDateTime);
+
+            confirmBtn.addEventListener('click', () => {
+                if (!validateDateTime()) return;
+                const [y, m, d] = dateInput.value.split('-');
+                const formattedDate = `${d}.${m}.${y}`;
+                sendOrder(formattedDate, timeInput.value);
+                modal.remove();
+            });
+
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+        }
+
+        async function sendOrder(dayLabel, timeLabel) {
+            const details = calculateCartDetails();
+            let orderText = 'Здравствуйте! Хочу оформить заказ:\n';
+            const usedRewardIds = [];
+
+            cart.forEach((item, i) => {
+                const pricing = details.itemsMap.get(item.id);
+                const colorStr = item.color ? ` (${item.color})` : '';
+                const notes = [];
+                if (pricing.podDiscountAmount > 0) {
+                    notes.push(`🔥 Акция к поду: ${POD_LIQUID_TARGET_PRICE} BYN (−${formatMoney(pricing.podDiscountAmount)} BYN)`);
+                }
+                if (pricing.reward) {
+                    usedRewardIds.push(pricing.reward.id);
+                    notes.push(
+                        pricing.reward.type === 'free_liquid'
+                            ? '🎁 Бесплатная жижа по рулетке'
+                            : `🏷 Скидка -${pricing.reward.percent}% на 1 шт.`
+                    );
+                }
+                const bonusNote = notes.length ? ` [${notes.join(' | ')}]` : '';
+                orderText += `${i + 1}. ${item.name}${colorStr} × ${item.qty} — ${formatMoney(pricing.finalTotal)} BYN${bonusNote}\n`;
+            });
+
+            orderText += `\nИтого: ${formatMoney(details.finalTotal)} BYN\n📍 Способ получения: ${selectedPickup || 'ВОКЗАЛ'}\n📅 Дата: ${dayLabel}\n⏰ Время: ${timeLabel}`;
+
+            if (usedRewardIds.length > 0) {
+                const usedSet = new Set(usedRewardIds);
+                const remainingRewards = userRewards.filter(r => !usedSet.has(r.id));
+                userRewards = remainingRewards;
+                try {
+                    await db.collection('users').doc(getUserDocId()).set({
+                        rewards: remainingRewards
+                    }, { merge: true });
+                } catch (err) {
+                    console.error('Ошибка списания бонусов:', err);
+                }
+            }
+
+            try {
+                await db.collection('orders').add({
+                    userId: getUserDocId(),
+                    username: getTgUsername() || getUserDocId(),
+                    items: cart.map(i => ({
+                        docId: i.docId || '',
+                        name: i.name,
+                        color: i.color || 'Стандарт',
+                        qty: i.qty,
+                        price: i.price,
+                        image: i.image || resolveOrderItemImage(i.name, i.color)
+                    })),
+                    total: formatMoney(details.finalTotal),
+                    pickup: selectedPickup || 'ВОКЗАЛ',
+                    date: dayLabel,
+                    time: timeLabel,
+                    status: 'pending',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (err) {
+                console.error('Ошибка сохранения заказа:', err);
+            }
+
+            const url = 'https://t.me/Seregablatnou?text=' + encodeURIComponent(orderText);
+            if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
+            else window.open(url, '_blank');
+
+            cart = []; selectedPickup = null; updateCartCount(); renderCart(); showToast('Заказ сформирован');
+        }
+
+        document.getElementById('goToCatalogBtn').addEventListener('click', () => { renderCategories(); showPage('catalog'); });
+        document.getElementById('backToCatalog').addEventListener('click', () => showPage('catalog'));
+        document.getElementById('backToBrands').addEventListener('click', () => showPage('brand'));
+        document.getElementById('backToModels').addEventListener('click', () => showPage(detailBackPage));
+        document.getElementById('backToProfileFromReviews').addEventListener('click', () => { showPage('profile'); renderProfile(); });
+
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                if (tab === 'home') showPage('welcome');
+                if (tab === 'catalog') showPage('catalog');
+                if (tab === 'cart') { showPage('cart'); renderCart(); }
+                if (tab === 'profile') { showPage('profile'); renderProfile(); }
+                if (tab === 'admin' && isAdminUser()) { showPage('admin'); renderAdminList(); renderAdminsList(); renderAdminOrders(); }
+            });
+        });
+
+        if (window.Telegram?.WebApp) {
+            const tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
+            if (tg.setHeaderColor) tg.setHeaderColor('#000000');
+            if (tg.setBackgroundColor) tg.setBackgroundColor('#000000');
+        }
+
+        updateAdminVisibility();
+        startAdminsSync();
+        startUserPurchasesSync();
+        startFirestoreSync();
+
+        const initialCat = document.getElementById('catImage');
+        if (initialCat) {
+            if (initialCat.complete) initialCat.classList.add('loaded');
+            else initialCat.addEventListener('load', () => initialCat.classList.add('loaded'), { once: true });
+            initialCat.addEventListener('error', () => initialCat.classList.add('loaded'), { once: true });
+        }
+
+        async function loadAndRenderReviews(container, productKey, productMeta = {}) {
+            let list = [];
+            try {
+                const snap = await db.collection('reviews').where('productKey', '==', productKey).get();
+                snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+                list.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+            } catch (e) {}
+
+            const canReview = isAdminUser() || userPurchasedKeys.includes(productKey);
+            const avg = list.length ? (list.reduce((s, r) => s + (Number(r.rating) || 5), 0) / list.length).toFixed(1) : '—';
+            let chosenRating = 5;
+
+            container.innerHTML = `
+                <div class="reviews-header">
+                    <div class="reviews-title">Отзывы (${list.length})</div>
+                    <div class="reviews-avg">⭐ ${avg}</div>
+                </div>
+                ${canReview ? `
+                    <div class="review-form">
+                        <div style="font-size:12px; color:#69f07a; font-weight:600;">✓ Проверенная покупка — вы можете оставить отзыв</div>
+                        <div class="star-picker" id="starPicker">
+                            ${[1,2,3,4,5].map(n => `<button type="button" class="star-btn active" data-star="${n}">★</button>`).join('')}
+                        </div>
+                        <input type="text" class="admin-input" id="reviewTextInput" placeholder="Напишите впечатление о вкусе/цвете...">
+                        <button type="button" class="profile-btn primary" id="sendReviewBtn" style="padding:10px;">Отправить отзыв</button>
+                    </div>
+                ` : `<div style="font-size:12px; color:var(--text-gray); margin-bottom:12px;">Оставить отзыв можно только после подтверждённой покупки этого варианта.</div>`}
+                <div>
+                    ${list.length === 0 ? `<div style="font-size:12px; color:var(--text-gray);">Отзывов пока нет</div>` : list.map(r => `
+                        <div class="review-card">
+                            <div class="review-top">
+                                ${renderAuthorBadgeHtml(r.author, r.authorPhoto)}
+                                <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+                                    <span class="review-stars">${'★'.repeat(r.rating || 5)}</span>
+                                    ${isAdminUser() ? `<button class="admin-del-btn" data-rev-id="${r.id}" style="width:24px;height:24px;font-size:11px;">🗑</button>` : ''}
+                                </div>
+                            </div>
+                            <div class="review-text">${r.text}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            if (canReview) {
+                container.querySelectorAll('.star-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        chosenRating = Number(btn.dataset.star);
+                        container.querySelectorAll('.star-btn').forEach(b => b.classList.toggle('active', Number(b.dataset.star) <= chosenRating));
+                    });
+                });
+                container.querySelector('#sendReviewBtn').addEventListener('click', async () => {
+                    if (!isAdminUser() && !userPurchasedKeys.includes(productKey)) {
+                        showToast('Оставить отзыв можно только на купленный товар');
+                        return;
+                    }
+                    const txt = container.querySelector('#reviewTextInput').value.trim();
+                    if (!txt) { showToast('Напишите текст отзыва'); return; }
+                    await db.collection('reviews').add({
+                        productKey,
+                        productName: productMeta.name || '',
+                        productVariant: productMeta.variant || 'Стандарт',
+                        productImage: productMeta.image || '',
+                        rating: chosenRating,
+                        text: txt,
+                        author: getTgAuthorLabel(),
+                        authorPhoto: getTgPhotoUrl(),
+                        userId: getUserDocId(),
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    if (userPendingReviews.some(p => p.productKey === productKey)) {
+                        const rest = userPendingReviews.filter(p => p.productKey !== productKey);
+                        await db.collection('users').doc(getUserDocId()).set({ pendingReviews: rest }, { merge: true });
+                    }
+                    showToast('Отзыв опубликован!');
+                    loadAndRenderReviews(container, productKey, productMeta);
+                });
+            }
+
+            container.querySelectorAll('[data-rev-id]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    await db.collection('reviews').doc(btn.dataset.revId).delete();
+                    showToast('Отзыв удалён');
+                    loadAndRenderReviews(container, productKey, productMeta);
+                });
+            });
+        }
+
+        // --- АВТОМАТИЧЕСКОЕ СПИСАНИЕ ОСТАТКОВ ПРИ ВЫДАЧЕ ЗАКАЗА ---
+        async function deductOrderStockFromFirestore(orderItems) {
+            const norm = (s) => String(s || '').trim().toLowerCase();
+            const qtyByDocId = new Map();
+
+            for (const item of (orderItems || [])) {
+                const qty = Math.max(1, Number(item.qty) || 1);
+                let targetDocId = item.docId || '';
+
+                if (targetDocId) {
+                    const check = await db.collection('products').doc(targetDocId).get();
+                    if (!check.exists) targetDocId = '';
+                }
+
+                if (!targetDocId) {
+                    const itemColorNorm = norm(item.color || 'Стандарт');
+                    const matched = allRawProducts.find(p => {
+                        if (norm(p.name) !== norm(item.name)) return false;
+                        const pColorNorm = norm(p.color || 'Стандарт');
+                        return pColorNorm === itemColorNorm;
+                    }) || allRawProducts.find(p => norm(p.name) === norm(item.name));
+
+                    if (matched?.docId) {
+                        targetDocId = matched.docId;
+                    }
+                }
+
+                if (targetDocId) {
+                    qtyByDocId.set(targetDocId, (qtyByDocId.get(targetDocId) || 0) + qty);
+                }
+            }
+
+            for (const [docId, totalQty] of qtyByDocId.entries()) {
+                const ref = db.collection('products').doc(docId);
+                try {
+                    await db.runTransaction(async (tx) => {
+                        const snap = await tx.get(ref);
+                        if (!snap.exists) return;
+                        const d = snap.data();
+                        const hasVar = Boolean(String(d.color || '').trim());
+                        if (hasVar) {
+                            const cur = d.color_stock !== undefined && d.color_stock !== ''
+                                ? (Number(d.color_stock) || 0)
+                                : (Number(d.stock) || 0);
+                            const next = Math.max(0, cur - totalQty);
+                            tx.update(ref, { color_stock: next });
+                        } else {
+                            const cur = d.stock !== undefined && d.stock !== '' ? (Number(d.stock) || 0) : 0;
+                            const next = Math.max(0, cur - totalQty);
+                            tx.update(ref, { stock: next });
+                        }
+                    });
+                } catch (err) {
+                    console.error('Ошибка списания стока для', docId, err);
+                }
+            }
+        }
+
+        async function renderAdminOrders() {
+            const box = document.getElementById('adminOrdersList');
+            if (!box || !isAdminUser()) return;
+            const snap = await db.collection('orders').where('status', '==', 'pending').get();
+            const orders = [];
+            snap.forEach(d => orders.push({ id: d.id, ...d.data() }));
+            orders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+            if (orders.length === 0) {
+                box.innerHTML = `<div style="font-size:12px; color:var(--text-gray);">Новых заказов нет</div>`;
+                return;
+            }
+            box.innerHTML = orders.map(o => `
+                <div class="order-card">
+                    <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:700;">
+                        <span>@${o.username}</span>
+                        <span>${o.total} BYN</span>
+                    </div>
+                    <div style="font-size:11px; color:#ffb74d;">
+                        📅 ${o.date || '—'} · ⏰ ${o.time || '—'} · 📍 ${o.pickup || 'ВОКЗАЛ'}
+                    </div>
+                    <div style="font-size:12px; color:var(--text-gray);">
+                        ${(o.items || []).map(i => `${i.name} (${i.color}) × ${i.qty}`).join(', ')}
+                    </div>
+                    <div style="display:flex; gap:8px; margin-top:4px;">
+                        <button class="profile-btn primary" data-confirm-order="${o.id}" style="padding:8px; font-size:11px;">✓ Забрал заказ (+баллы и отзыв)</button>
+                        <button class="profile-btn" data-cancel-order="${o.id}" style="padding:8px; font-size:11px; width:auto; border-color:rgba(255,59,48,0.4); color:#ff6961;">✕</button>
+                    </div>
+                </div>
+            `).join('');
+
+            box.querySelectorAll('[data-confirm-order]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const ord = orders.find(x => x.id === btn.dataset.confirmOrder);
+                    if (!ord) return;
+                    btn.disabled = true;
+
+                    const uniqueItemsMap = new Map();
+                    (ord.items || []).forEach((i, idx) => {
+                        const variant = i.color || 'Стандарт';
+                        const key = `${i.name}||${variant}`.toLowerCase();
+                        if (!uniqueItemsMap.has(key)) {
+                            uniqueItemsMap.set(key, {
+                                id: `rp_${ord.id}_${idx}`,
+                                orderId: ord.id,
+                                productKey: key,
+                                productName: i.name || '',
+                                productVariant: variant,
+                                productImage: i.image || resolveOrderItemImage(i.name, variant)
+                            });
+                        }
+                    });
+
+                    const keys = Array.from(uniqueItemsMap.keys());
+                    const pendingReviewItems = Array.from(uniqueItemsMap.values());
+                    const itemsCount = (ord.items || []).reduce((sum, i) => sum + (Number(i.qty) || 1), 0) || 1;
+
+                    await deductOrderStockFromFirestore(ord.items);
+                    await db.collection('orders').doc(ord.id).update({ status: 'confirmed' });
+                    await db.collection('users').doc(ord.userId).set({
+                        purchases: firebase.firestore.FieldValue.increment(itemsCount),
+                        totalPurchases: firebase.firestore.FieldValue.increment(itemsCount),
+                        purchasedKeys: firebase.firestore.FieldValue.arrayUnion(...keys),
+                        pendingReviews: firebase.firestore.FieldValue.arrayUnion(...pendingReviewItems)
+                    }, { merge: true });
+
+                    showToast(`Заказ @${ord.username} выдан! Остаток обновлён`);
+                    renderAdminOrders();
+                });
+            });
+
+            box.querySelectorAll('[data-cancel-order]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    await db.collection('orders').doc(btn.dataset.cancelOrder).update({ status: 'cancelled' });
+                    showToast('Заказ отменён');
+                    renderAdminOrders();
+                });
+            });
+        }
+    </script>
+</body>
+</html>
