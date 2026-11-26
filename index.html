@@ -750,6 +750,7 @@
         let userPendingReviews = [];
         let isReviewModalOpen = false;
         let isRouletteSpinning = false;
+        let isSubmittingOrder = false;
         let allRawProducts = [];
         let vapeBrands = [];
         let liquidBrands = [];
@@ -827,17 +828,120 @@
             const first = (window.Telegram?.WebApp?.initDataUnsafe?.user?.first_name || '').trim();
             return first || 'Покупатель';
         }
+        function getTgId() {
+            return window.Telegram?.WebApp?.initDataUnsafe?.user?.id || null;
+        }
+        // Основной ключ документа — постоянный Telegram ID (username может меняться)
         function getUserDocId() {
+            const tgId = getTgId();
+            if (tgId) return `id_${tgId}`;
             const uname = getTgUsername();
             if (uname) return uname;
-            const tgId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-            if (tgId) return `id_${tgId}`;
             let guestId = localStorage.getItem('weggew_guest_id');
             if (!guestId) {
                 guestId = 'guest_' + Math.random().toString(36).slice(2, 10);
                 localStorage.setItem('weggew_guest_id', guestId);
             }
             return guestId;
+        }
+        function escHtml(s) {
+            return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        // Миграция старого документа users/{username} -> users/id_<tgId> (старый НЕ удаляется)
+        async function migrateLegacyUserDoc() {
+            const tgId = getTgId();
+            const uname = getTgUsername();
+            if (!tgId || !uname) return;
+            const newId = `id_${tgId}`;
+            if (uname === newId) return;
+            const oldRef = db.collection('users').doc(uname);
+            const newRef = db.collection('users').doc(newId);
+            try {
+                await db.runTransaction(async (tx) => {
+                    const oldSnap = await tx.get(oldRef);
+                    if (!oldSnap.exists) return;
+                    const old = oldSnap.data() || {};
+                    if (old.migrated === true) return;
+                    const newSnap = await tx.get(newRef);
+                    const cur = newSnap.exists ? (newSnap.data() || {}) : {};
+
+                    const mergeById = (a, b) => {
+                        const seen = new Set();
+                        return [...(Array.isArray(a) ? a : []), ...(Array.isArray(b) ? b : [])].filter(x => {
+                            const k = x && x.id ? x.id : JSON.stringify(x);
+                            if (seen.has(k)) return false;
+                            seen.add(k);
+                            return true;
+                        });
+                    };
+                    const uniq = (a, b) => Array.from(new Set([...(Array.isArray(a) ? a : []), ...(Array.isArray(b) ? b : [])]));
+
+                    tx.set(newRef, {
+                        username: uname,
+                        purchases: (Number(cur.purchases) || 0) + (Number(old.purchases) || 0),
+                        totalPurchases: (Number(cur.totalPurchases) || 0) + (Number(old.totalPurchases) || 0),
+                        rewards: mergeById(cur.rewards, old.rewards),
+                        purchasedKeys: uniq(cur.purchasedKeys, old.purchasedKeys),
+                        pendingReviews: mergeById(cur.pendingReviews, old.pendingReviews)
+                    }, { merge: true });
+                    tx.set(oldRef, { migrated: true, migratedTo: newId, purchases: 0, rewards: [] }, { merge: true });
+                });
+            } catch (err) {
+                console.error('Ошибка миграции пользователя:', err);
+            }
+        }
+        // Для заказов со старым userId (username): если документ уже мигрировал — берём новый
+        async function resolveUserRef(userId) {
+            let ref = db.collection('users').doc(userId);
+            try {
+                const s = await ref.get();
+                if (s.exists && s.data().migrated === true && s.data().migratedTo) {
+                    ref = db.collection('users').doc(s.data().migratedTo);
+                }
+            } catch (e) {}
+            return ref;
+        }
+
+        // --- АКТУАЛЬНЫЙ ОСТАТОК ПО ПОЗИЦИИ КОРЗИНЫ (из allRawProducts) ---
+        function getLiveStockForItem(item) {
+            const norm = (s) => String(s || '').trim().toLowerCase();
+            let p = item.docId ? allRawProducts.find(x => x.docId === item.docId) : null;
+            if (!p) {
+                p = allRawProducts.find(x => norm(x.name) === norm(item.name) && norm(x.color || 'Стандарт') === norm(item.color || 'Стандарт'));
+            }
+            if (!p) return null;
+            const stock = p.stock !== undefined && p.stock !== '' ? (Number(p.stock) || 0) : 99;
+            if (stock <= 0) return 0;
+            const hasVar = Boolean(String(p.color || '').trim());
+            if (hasVar && p.color_stock !== undefined && p.color_stock !== '') return Math.max(0, Number(p.color_stock) || 0);
+            return stock;
+        }
+        function checkItemsStock(items) {
+            const problems = [];
+            items.forEach(item => {
+                const live = getLiveStockForItem(item);
+                const qty = Number(item.qty) || 1;
+                if (live === null || live <= 0) problems.push({ item, live: 0 });
+                else if (live < qty) problems.push({ item, live });
+            });
+            return problems;
+        }
+        function validateCartStock() {
+            const problems = checkItemsStock(cart);
+            if (problems.length === 0) return true;
+            problems.forEach(({ item, live }) => {
+                item.maxStock = live;
+                if (live > 0 && item.qty > live) item.qty = live;
+            });
+            updateCartCount();
+            renderCart();
+            const p = problems[0];
+            const label = `${p.item.name}${p.item.color ? ` (${p.item.color})` : ''}`;
+            showToast(p.live <= 0
+                ? `«${label}» закончился — удалите из корзины`
+                : `«${label}»: в наличии только ${p.live} шт.`);
+            return false;
         }
         function isSuperAdmin() {
             return getTgUsername() === SUPER_ADMIN;
@@ -870,9 +974,11 @@
             });
         }
         function renderAuthorBadgeHtml(author, authorPhoto) {
-            const displayAuthor = author || 'Покупатель';
-            const cleanForLetter = displayAuthor.replace(/^@+/, '').trim();
-            const letter = (cleanForLetter[0] || 'W').toUpperCase();
+            const displayAuthorRaw = author || 'Покупатель';
+            const cleanForLetter = displayAuthorRaw.replace(/^@+/, '').trim();
+            const letter = escHtml((cleanForLetter[0] || 'W').toUpperCase());
+            const displayAuthor = escHtml(displayAuthorRaw);
+            authorPhoto = authorPhoto ? escHtml(authorPhoto) : authorPhoto;
             return `
                 <div class="review-author-wrap">
                     <div class="review-user-avatar">
@@ -1055,9 +1161,11 @@
             });
         }
 
-        function startUserPurchasesSync() {
+        async function startUserPurchasesSync() {
             const docId = getUserDocId();
             if (!docId) return;
+
+            await migrateLegacyUserDoc();
 
             const tgU = getTgUsername();
             const tgPhoto = getTgPhotoUrl();
@@ -1087,6 +1195,19 @@
                     }
                 }
             });
+        }
+
+        // Уже есть отзыв этого пользователя на этот вариант товара?
+        async function hasUserReviewed(productKey) {
+            if (isAdminUser()) return false;
+            const ids = Array.from(new Set([getUserDocId(), getTgUsername()].filter(Boolean)));
+            try {
+                for (const id of ids) {
+                    const s = await db.collection('reviews').where('productKey', '==', productKey).where('userId', '==', id).limit(1).get();
+                    if (!s.empty) return true;
+                }
+            } catch (e) { console.error(e); }
+            return false;
         }
 
         // --- АВТОМАТИЧЕСКОЕ ОКНО ОТЗЫВА ПОСЛЕ ТОГО КАК АДМИН ПОДТВЕРДИЛ ЧТО ЧЕЛОВЕК ЗАБРАЛ ЗАКАЗ ---
@@ -1136,7 +1257,7 @@
                     if (it.done) {
                         return `
                             <div class="review-prompt-card">
-                                <div class="review-prompt-done">✓ Отзыв на «${it.productName}» опубликован!</div>
+                                <div class="review-prompt-done">✓ Отзыв на «${escHtml(it.productName)}» ${it.dup ? 'уже был оставлен ранее' : 'опубликован!'}</div>
                             </div>
                         `;
                     }
@@ -1199,7 +1320,8 @@
                         const img = it.productImage || resolveOrderItemImage(it.productName, it.productVariant);
 
                         try {
-                            await db.collection('reviews').add({
+                            const dup = await hasUserReviewed(it.productKey);
+                            if (!dup) await db.collection('reviews').add({
                                 productKey: it.productKey,
                                 productName: it.productName || '',
                                 productVariant: it.productVariant || 'Стандарт',
@@ -1214,6 +1336,7 @@
                             });
 
                             it.done = true;
+                            if (dup) { it.dup = true; showToast('Вы уже оставили отзыв на этот вариант товара'); }
                             const remaining = state.filter(x => !x.done).map(x => ({
                                 id: x.id,
                                 orderId: x.orderId || '',
@@ -1227,7 +1350,7 @@
                                 pendingReviews: remaining
                             }, { merge: true });
 
-                            showToast('Спасибо! Отзыв опубликован');
+                            if (!dup) showToast('Спасибо! Отзыв опубликован');
                             renderCards();
 
                             if (remaining.length === 0) {
@@ -1316,17 +1439,28 @@
             subBtn.disabled = true;
 
             try {
-                const userRef = db.collection('users').doc(clean);
-                const snap = await userRef.get();
-                const current = snap.exists ? (Number(snap.data().purchases) || 0) : 0;
-                const next = Math.max(0, current + delta);
-
-                const payload = { purchases: next };
-                if (delta > 0) {
-                    payload.totalPurchases = firebase.firestore.FieldValue.increment(1);
+                // 1) ищем по полю username (документ id_<tgId>), 2) иначе — документ users/{clean}
+                let userRef = null;
+                const q = await db.collection('users').where('username', '==', clean).get();
+                const cands = [];
+                q.forEach(d => cands.push(d));
+                const active = cands.filter(d => d.data().migrated !== true);
+                const found = active.find(d => d.id.startsWith('id_')) || active[0];
+                if (found) {
+                    userRef = found.ref;
+                } else {
+                    userRef = await resolveUserRef(clean);
                 }
 
-                await userRef.set(payload, { merge: true });
+                let next = 0;
+                await db.runTransaction(async (tx) => {
+                    const snap = await tx.get(userRef);
+                    const current = snap.exists ? (Number(snap.data().purchases) || 0) : 0;
+                    next = Math.max(0, current + delta);
+                    const payload = { purchases: next };
+                    if (delta > 0) payload.totalPurchases = firebase.firestore.FieldValue.increment(1);
+                    tx.set(userRef, payload, { merge: true });
+                });
                 input.value = '';
                 showToast(`${delta > 0 ? '+1' : '−1'} покупка для @${clean} (баланс: ${next} пок.)`);
             } catch (err) {
@@ -2434,8 +2568,10 @@
         }
 
         function checkout() {
+            if (isSubmittingOrder) { showToast('Заказ уже отправляется...'); return; }
             if (cart.length === 0) { showToast('Корзина пуста'); return; }
             if (selectedPickup !== 'ВОКЗАЛ') { showToast('Выберите способ получения: ВОКЗАЛ'); return; }
+            if (!validateCartStock()) return;
             showDeliveryModal();
         }
 
@@ -2489,15 +2625,49 @@
             } catch (e) {}
         }
 
-        function openRouletteModal() {
+        async function openRouletteModal() {
             if (isRouletteSpinning) return;
             if (!isAdminUser() && userPurchases < PURCHASES_PER_SPIN) {
                 showToast(`Нужно ${PURCHASES_PER_SPIN} подтверждённых покупок`);
                 return;
             }
             isRouletteSpinning = true;
+            const spinBtn = document.getElementById('spinRouletteBtn');
+            if (spinBtn) spinBtn.disabled = true;
 
+            // Приз определяется и сохраняется ДО анимации; списание покупок — атомарно в транзакции
             const winPrize = pickWeightedPrize();
+            const newReward = {
+                id: 'rew_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                type: winPrize.type,
+                percent: winPrize.percent,
+                label: winPrize.label,
+                createdAt: Date.now()
+            };
+            const userRef = db.collection('users').doc(getUserDocId());
+            try {
+                const left = await db.runTransaction(async (tx) => {
+                    const snap = await tx.get(userRef);
+                    const cur = snap.exists ? (Number(snap.data().purchases) || 0) : 0;
+                    if (!isAdminUser() && cur < PURCHASES_PER_SPIN) throw new Error('NOT_ENOUGH_PURCHASES');
+                    const payload = { rewards: firebase.firestore.FieldValue.arrayUnion(newReward) };
+                    const next = isAdminUser() ? cur : cur - PURCHASES_PER_SPIN;
+                    if (!isAdminUser()) payload.purchases = next;
+                    tx.set(userRef, payload, { merge: true });
+                    return next;
+                });
+                if (!isAdminUser()) userPurchases = left;
+                if (!userRewards.some(r => r.id === newReward.id)) userRewards.push(newReward);
+            } catch (err) {
+                console.error('Ошибка сохранения приза рулетки:', err);
+                isRouletteSpinning = false;
+                if (spinBtn) spinBtn.disabled = false;
+                showToast(err && err.message === 'NOT_ENOUGH_PURCHASES'
+                    ? `Нужно ${PURCHASES_PER_SPIN} подтверждённых покупок`
+                    : 'Не удалось запустить рулетку. Попробуйте ещё раз');
+                return;
+            }
+
             const totalItems = 50;
             const winIndex = 42;
             const strip = [];
@@ -2588,22 +2758,6 @@
                     }, 600);
                 }
 
-                const newReward = {
-                    id: 'rew_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-                    type: winPrize.type,
-                    percent: winPrize.percent,
-                    label: winPrize.label,
-                    createdAt: Date.now()
-                };
-
-                if (!userRewards.some(r => r.id === newReward.id)) {
-                    userRewards.push(newReward);
-                }
-                const nextPurchases = isAdminUser() ? userPurchases : Math.max(0, userPurchases - PURCHASES_PER_SPIN);
-                if (!isAdminUser()) {
-                    userPurchases = nextPurchases;
-                }
-
                 isRouletteSpinning = false;
                 modal.querySelector('#modalRouletteResult').textContent = `🎉 Вы выиграли: ${winPrize.label}!`;
                 closeBtn.style.display = 'block';
@@ -2612,17 +2766,6 @@
                 if (inlineRes) inlineRes.textContent = `🎉 Ваш приз сохранён: ${winPrize.label}!`;
                 showToast(`Приз добавлен в профиль: ${winPrize.label}`);
 
-                const docId = getUserDocId();
-                const userRef = db.collection('users').doc(docId);
-                const updatePayload = {
-                    rewards: firebase.firestore.FieldValue.arrayUnion(newReward)
-                };
-                if (!isAdminUser()) {
-                    updatePayload.purchases = nextPurchases;
-                }
-                userRef.set(updatePayload, { merge: true }).catch((err) => {
-                    console.error('Ошибка сохранения приза:', err);
-                });
             }, 7100);
         }
 
@@ -3037,6 +3180,7 @@
         });
 
         function showDeliveryModal() {
+            if (document.querySelector('.delivery-modal')) return;
             const now = new Date();
             const pad = (n) => String(n).padStart(2, '0');
             const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
@@ -3057,7 +3201,7 @@
                             </div>
                             <div class="delivery-field">
                                 <label class="delivery-label">Время</label>
-                                <input type="time" id="orderTimeInput" class="delivery-input">
+                                <input type="time" id="orderTimeInput" class="delivery-input" min="11:00" max="23:00">
                             </div>
                         </div>
                         <div id="timeErrorMsg" style="display:none; color:#ff453a; font-size:12px; margin-top:8px;">Это время уже прошло — выберите позже</div>
@@ -3084,7 +3228,11 @@
                 }
                 const chosen = new Date(`${dVal}T${tVal}:00`);
                 const current = new Date();
-                if (chosen < current) {
+                const outOfHours = tVal < '11:00' || tVal > '23:00';
+                if (outOfHours || isNaN(chosen.getTime()) || chosen < current) {
+                    timeError.textContent = outOfHours
+                        ? 'Мы работаем с 11:00 до 23:00 — выберите время в этом интервале'
+                        : 'Это время уже прошло — выберите позже';
                     timeError.style.display = 'block';
                     dateInput.style.borderColor = '#ff453a';
                     timeInput.style.borderColor = '#ff453a';
@@ -3105,83 +3253,168 @@
             timeInput.addEventListener('input', validateDateTime);
 
             confirmBtn.addEventListener('click', () => {
+                if (isSubmittingOrder || confirmBtn.dataset.sent === '1') return;
                 if (!validateDateTime()) return;
+                confirmBtn.dataset.sent = '1';
+                confirmBtn.disabled = true;
                 const [y, m, d] = dateInput.value.split('-');
                 const formattedDate = `${d}.${m}.${y}`;
-                sendOrder(formattedDate, timeInput.value);
+                const timeVal = timeInput.value;
                 modal.remove();
+                sendOrder(formattedDate, timeVal);
             });
 
             modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
         }
 
         async function sendOrder(dayLabel, timeLabel) {
-            const details = calculateCartDetails();
-            let orderText = 'Привет! Хочу оформить заказ:\n';
-            const usedRewardIds = [];
+            if (isSubmittingOrder) return;
+            if (cart.length === 0) { showToast('Корзина пуста'); return; }
+            isSubmittingOrder = true;
+            const checkoutBtnEl = document.getElementById('checkoutBtn');
+            if (checkoutBtnEl) checkoutBtnEl.disabled = true;
 
-            cart.forEach((item, i) => {
-                const pricing = details.itemsMap.get(item.id);
-                const colorStr = item.color ? ` (${item.color})` : '';
-                const notes = [];
-                if (pricing.podDiscountAmount > 0) {
-                    notes.push(`🔥 Акция к поду: ${POD_LIQUID_TARGET_PRICE} BYN (−${formatMoney(pricing.podDiscountAmount)} BYN)`);
-                }
-                if (pricing.reward) {
-                    usedRewardIds.push(pricing.reward.id);
-                    notes.push(
-                        pricing.reward.type === 'free_liquid'
-                            ? '🎁 Бесплатная жижа по рулетке'
-                            : `🏷 Скидка -${pricing.reward.percent}% на 1 шт.`
-                    );
-                }
-                const bonusNote = notes.length ? ` [${notes.join(' | ')}]` : '';
-                orderText += `${i + 1}. ${item.name}${colorStr} × ${item.qty} — ${formatMoney(pricing.finalTotal)} BYN${bonusNote}\n`;
-            });
-
-            orderText += `\nИтого: ${formatMoney(details.finalTotal)} BYN\n📍 Способ получения: ${selectedPickup || 'ВОКЗАЛ'}\n📅 Дата: ${dayLabel}\n⏰ Время: ${timeLabel}`;
-
-            if (usedRewardIds.length > 0) {
-                const usedSet = new Set(usedRewardIds);
-                const remainingRewards = userRewards.filter(r => !usedSet.has(r.id));
-                userRewards = remainingRewards;
-                try {
-                    await db.collection('users').doc(getUserDocId()).set({
-                        rewards: remainingRewards
-                    }, { merge: true });
-                } catch (err) {
-                    console.error('Ошибка списания бонусов:', err);
-                }
-            }
+            let rewardsConsumed = false;
+            const userId = getUserDocId();
+            const userRef = db.collection('users').doc(userId);
+            let consumedRewardObjs = [];
 
             try {
-                await db.collection('orders').add({
-                    userId: getUserDocId(),
-                    username: getTgUsername() || getUserDocId(),
-                    items: cart.map(i => ({
-                        docId: i.docId || '',
-                        name: i.name,
-                        color: i.color || 'Стандарт',
-                        qty: i.qty,
-                        price: i.price,
-                        image: i.image || resolveOrderItemImage(i.name, i.color)
-                    })),
-                    total: formatMoney(details.finalTotal),
-                    pickup: selectedPickup || 'ВОКЗАЛ',
-                    date: dayLabel,
-                    time: timeLabel,
-                    status: 'pending',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                // Актуальные остатки (может скорректировать корзину)
+                if (!validateCartStock()) return;
+
+                // --- СНИМОК корзины и расчётов ДО любых await ---
+                const cartSnap = cart.map(i => ({ ...i }));
+                const details = calculateCartDetails();
+                const username = getTgUsername() || userId;
+                const pickup = selectedPickup || 'ВОКЗАЛ';
+                const usedRewards = [];
+                consumedRewardObjs = [];
+                let orderText = 'Привет! Хочу оформить заказ:\n';
+
+                cartSnap.forEach((item, i) => {
+                    const pricing = details.itemsMap.get(item.id);
+                    const colorStr = item.color ? ` (${item.color})` : '';
+                    const notes = [];
+                    if (pricing.podDiscountAmount > 0) {
+                        notes.push(`🔥 Акция к поду: ${POD_LIQUID_TARGET_PRICE} BYN (−${formatMoney(pricing.podDiscountAmount)} BYN)`);
+                    }
+                    if (pricing.reward) {
+                        usedRewards.push({
+                            id: pricing.reward.id,
+                            type: pricing.reward.type || '',
+                            percent: Number(pricing.reward.percent) || 0,
+                            label: pricing.reward.label || ''
+                        });
+                        consumedRewardObjs.push(pricing.reward);
+                        notes.push(
+                            pricing.reward.type === 'free_liquid'
+                                ? '🎁 Бесплатная жижа по рулетке'
+                                : `🏷 Скидка -${pricing.reward.percent}% на 1 шт.`
+                        );
+                    }
+                    const bonusNote = notes.length ? ` [${notes.join(' | ')}]` : '';
+                    orderText += `${i + 1}. ${item.name}${colorStr} × ${item.qty} — ${formatMoney(pricing.finalTotal)} BYN${bonusNote}\n`;
                 });
-            } catch (err) {
-                console.error('Ошибка сохранения заказа:', err);
+                orderText += `\nИтого: ${formatMoney(details.finalTotal)} BYN\n📍 Способ получения: ${pickup}\n📅 Дата: ${dayLabel}\n⏰ Время: ${timeLabel}`;
+
+                const orderItems = cartSnap.map(i => ({
+                    docId: i.docId || '',
+                    name: i.name,
+                    color: i.color || 'Стандарт',
+                    qty: i.qty,
+                    price: i.price,
+                    image: i.image || resolveOrderItemImage(i.name, i.color)
+                }));
+                const discountInfo = {
+                    subtotal: Number(details.subtotal) || 0,
+                    podDiscount: Number(details.totalPodDiscount) || 0,
+                    rouletteDiscount: Number(details.totalRouletteDiscount) || 0
+                };
+                const totalLabel = formatMoney(details.finalTotal);
+
+                // --- Лимит активных заявок (pending) ---
+                const idsToCheck = Array.from(new Set([userId, getTgUsername()].filter(Boolean)));
+                let pendingCount = 0;
+                try {
+                    for (const id of idsToCheck) {
+                        const ps = await db.collection('orders').where('userId', '==', id).where('status', '==', 'pending').get();
+                        pendingCount += ps.size;
+                    }
+                } catch (err) {
+                    console.error('Не удалось проверить активные заказы:', err);
+                }
+                if (pendingCount >= 2) {
+                    showToast('У вас уже 2 активных заказа — дождитесь их обработки');
+                    return;
+                }
+
+                // --- Атомарное списание использованных наград ---
+                if (usedRewards.length > 0) {
+                    const ids = new Set(usedRewards.map(r => r.id));
+                    try {
+                        await db.runTransaction(async (tx) => {
+                            const snap = await tx.get(userRef);
+                            const cur = snap.exists && Array.isArray(snap.data().rewards) ? snap.data().rewards : [];
+                            const have = new Set(cur.map(r => r.id));
+                            for (const id of ids) if (!have.has(id)) throw new Error('REWARD_GONE');
+                            tx.set(userRef, { rewards: cur.filter(r => !ids.has(r.id)) }, { merge: true });
+                        });
+                        rewardsConsumed = true;
+                    } catch (err) {
+                        console.error('Ошибка списания бонусов:', err);
+                        showToast(err && err.message === 'REWARD_GONE'
+                            ? 'Награда уже использована — обновите корзину'
+                            : 'Не удалось списать бонусы. Попробуйте ещё раз');
+                        return;
+                    }
+                }
+
+                // --- Повторная сверка остатков непосредственно перед записью заказа ---
+                const problems = checkItemsStock(cartSnap);
+                if (problems.length > 0) {
+                    if (rewardsConsumed) {
+                        await userRef.set({ rewards: firebase.firestore.FieldValue.arrayUnion(...consumedRewardObjs) }, { merge: true }).catch(() => {});
+                        rewardsConsumed = false;
+                    }
+                    validateCartStock();
+                    return;
+                }
+
+                try {
+                    await db.collection('orders').add({
+                        userId,
+                        username,
+                        items: orderItems,
+                        total: totalLabel,
+                        usedRewards,
+                        discountInfo,
+                        pickup,
+                        date: dayLabel,
+                        time: timeLabel,
+                        status: 'pending',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } catch (err) {
+                    console.error('Ошибка сохранения заказа:', err);
+                    if (rewardsConsumed) {
+                        await userRef.set({ rewards: firebase.firestore.FieldValue.arrayUnion(...consumedRewardObjs) }, { merge: true }).catch(() => {});
+                        rewardsConsumed = false;
+                    }
+                    showToast('Не удалось сохранить заказ. Попробуйте ещё раз');
+                    return;
+                }
+
+                const url = 'https://t.me/Seregablatnou?text=' + encodeURIComponent(orderText);
+                if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
+                else window.open(url, '_blank');
+
+                cart = []; selectedPickup = null; updateCartCount(); renderCart(); showToast('Заказ сформирован');
+            } finally {
+                isSubmittingOrder = false;
+                const b = document.getElementById('checkoutBtn');
+                if (b && cart.length > 0 && selectedPickup === 'ВОКЗАЛ') b.disabled = false;
             }
-
-            const url = 'https://t.me/Seregablatnou?text=' + encodeURIComponent(orderText);
-            if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
-            else window.open(url, '_blank');
-
-            cart = []; selectedPickup = null; updateCartCount(); renderCart(); showToast('Заказ сформирован');
         }
 
         document.getElementById('goToCatalogBtn').addEventListener('click', () => { renderCategories(); showPage('catalog'); });
@@ -3229,7 +3462,9 @@
                 list.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
             } catch (e) {}
 
-            const canReview = isAdminUser() || userPurchasedKeys.includes(productKey);
+            const myIds = [getUserDocId(), getTgUsername()].filter(Boolean);
+            const alreadyReviewed = !isAdminUser() && list.some(r => myIds.includes(r.userId));
+            const canReview = (isAdminUser() || userPurchasedKeys.includes(productKey)) && !alreadyReviewed;
             const avg = list.length ? (list.reduce((s, r) => s + (Number(r.rating) || 5), 0) / list.length).toFixed(1) : '—';
             let chosenRating = 5;
 
@@ -3247,7 +3482,9 @@
                         <input type="text" class="admin-input" id="reviewTextInput" placeholder="Напишите впечатление о вкусе/цвете...">
                         <button type="button" class="profile-btn primary" id="sendReviewBtn" style="padding:10px;">Отправить отзыв</button>
                     </div>
-                ` : `<div style="font-size:12px; color:var(--text-gray); margin-bottom:12px;">Оставить отзыв можно только после подтверждённой покупки этого варианта.</div>`}
+                ` : (alreadyReviewed
+                    ? `<div style="font-size:12px; color:var(--text-gray); margin-bottom:12px;">Вы уже оставили отзыв на этот вариант товара</div>`
+                    : `<div style="font-size:12px; color:var(--text-gray); margin-bottom:12px;">Оставить отзыв можно только после подтверждённой покупки этого варианта.</div>`)}
                 <div>
                     ${list.length === 0 ? `<div style="font-size:12px; color:var(--text-gray);">Отзывов пока нет</div>` : list.map(r => `
                         <div class="review-card">
@@ -3258,7 +3495,7 @@
                                     ${isAdminUser() ? `<button class="admin-del-btn" data-rev-id="${r.id}" style="width:24px;height:24px;font-size:11px;">🗑</button>` : ''}
                                 </div>
                             </div>
-                            <div class="review-text">${r.text}</div>
+                            <div class="review-text">${escHtml(r.text)}</div>
                         </div>
                     `).join('')}
                 </div>
@@ -3278,6 +3515,15 @@
                     }
                     const txt = container.querySelector('#reviewTextInput').value.trim();
                     if (!txt) { showToast('Напишите текст отзыва'); return; }
+                    const sendBtn = container.querySelector('#sendReviewBtn');
+                    if (sendBtn.disabled) return;
+                    sendBtn.disabled = true;
+                    if (await hasUserReviewed(productKey)) {
+                        showToast('Вы уже оставили отзыв на этот вариант товара');
+                        loadAndRenderReviews(container, productKey, productMeta);
+                        return;
+                    }
+                    try {
                     await db.collection('reviews').add({
                         productKey,
                         productName: productMeta.name || '',
@@ -3295,6 +3541,10 @@
                         await db.collection('users').doc(getUserDocId()).set({ pendingReviews: rest }, { merge: true });
                     }
                     showToast('Отзыв опубликован!');
+                    } catch (err) {
+                        console.error(err);
+                        showToast('Ошибка отправки отзыва');
+                    }
                     loadAndRenderReviews(container, productKey, productMeta);
                 });
             }
@@ -3378,18 +3628,36 @@
                 box.innerHTML = `<div style="font-size:12px; color:var(--text-gray);">Новых заказов нет</div>`;
                 return;
             }
+            const renderOrderDiscountHtml = (o) => {
+                const di = o.discountInfo;
+                const ur = Array.isArray(o.usedRewards) ? o.usedRewards : [];
+                if (!di && ur.length === 0) return '';
+                const lines = [];
+                if (di) {
+                    lines.push(`Сумма без скидок: ${formatMoney(di.subtotal)} BYN`);
+                    if (Number(di.podDiscount) > 0) lines.push(`🔥 Акция «под + жижа за ${POD_LIQUID_TARGET_PRICE} BYN»: −${formatMoney(di.podDiscount)} BYN`);
+                    if (Number(di.rouletteDiscount) > 0) lines.push(`🎰 Награда рулетки: −${formatMoney(di.rouletteDiscount)} BYN`);
+                }
+                ur.forEach(r => {
+                    const t = r.type === 'free_liquid' ? 'Бесплатная жижа' : (Number(r.percent) ? `Скидка ${Number(r.percent)}%` : '');
+                    lines.push(`🎁 Использован приз: ${escHtml(r.label || t || r.id)}`);
+                });
+                return `<div style="font-size:11px; color:#69f07a; line-height:1.5;">${lines.join('<br>')}</div>`;
+            };
+
             box.innerHTML = orders.map(o => `
                 <div class="order-card">
                     <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:700;">
-                        <span>@${o.username}</span>
-                        <span>${o.total} BYN</span>
+                        <span>@${escHtml(o.username)}</span>
+                        <span>${escHtml(o.total)} BYN</span>
                     </div>
                     <div style="font-size:11px; color:#ffb74d;">
-                        📅 ${o.date || '—'} · ⏰ ${o.time || '—'} · 📍 ${o.pickup || 'ВОКЗАЛ'}
+                        📅 ${escHtml(o.date || '—')} · ⏰ ${escHtml(o.time || '—')} · 📍 ${escHtml(o.pickup || 'ВОКЗАЛ')}
                     </div>
                     <div style="font-size:12px; color:var(--text-gray);">
-                        ${(o.items || []).map(i => `${i.name} (${i.color}) × ${i.qty}`).join(', ')}
+                        ${(o.items || []).map(i => `${escHtml(i.name)} (${escHtml(i.color)}) × ${Number(i.qty) || 1}`).join(', ')}
                     </div>
+                    ${renderOrderDiscountHtml(o)}
                     <div style="display:flex; gap:8px; margin-top:4px;">
                         <button class="profile-btn primary" data-confirm-order="${o.id}" style="padding:8px; font-size:11px;">✓ Забрал заказ (+баллы и отзыв)</button>
                         <button class="profile-btn" data-cancel-order="${o.id}" style="padding:8px; font-size:11px; width:auto; border-color:rgba(255,59,48,0.4); color:#ff6961;">✕</button>
@@ -3402,6 +3670,19 @@
                     const ord = orders.find(x => x.id === btn.dataset.confirmOrder);
                     if (!ord) return;
                     btn.disabled = true;
+
+                    // Предупреждение, если текущего стока уже не хватает
+                    const lowItems = (ord.items || []).filter(i => {
+                        const live = getLiveStockForItem(i);
+                        return live !== null && live < (Number(i.qty) || 1);
+                    });
+                    if (lowItems.length > 0) {
+                        const list = lowItems.map(i => `• ${i.name} (${i.color || 'Стандарт'}): нужно ${Number(i.qty) || 1}, в наличии ${getLiveStockForItem(i)}`).join('\n');
+                        if (!confirm(`Остатка по некоторым позициям не хватает:\n${list}\n\nВсё равно завершить заказ?`)) {
+                            btn.disabled = false;
+                            return;
+                        }
+                    }
 
                     const uniqueItemsMap = new Map();
                     (ord.items || []).forEach((i, idx) => {
@@ -3421,16 +3702,35 @@
 
                     const keys = Array.from(uniqueItemsMap.keys());
                     const pendingReviewItems = Array.from(uniqueItemsMap.values());
-                    const itemsCount = (ord.items || []).reduce((sum, i) => sum + (Number(i.qty) || 1), 0) || 1;
+                    const orderTotalNum = parseFloat(String(ord.total).replace(',', '.')) || 0;
+                    const earnsPoint = orderTotalNum > 0;
 
-                    await deductOrderStockFromFirestore(ord.items);
-                    await db.collection('orders').doc(ord.id).update({ status: 'confirmed' });
-                    await db.collection('users').doc(ord.userId).set({
-                        purchases: firebase.firestore.FieldValue.increment(itemsCount),
-                        totalPurchases: firebase.firestore.FieldValue.increment(itemsCount),
-                        purchasedKeys: firebase.firestore.FieldValue.arrayUnion(...keys),
-                        pendingReviews: firebase.firestore.FieldValue.arrayUnion(...pendingReviewItems)
-                    }, { merge: true });
+                    try {
+                        // Атомарно «забираем» заказ: защита от двойного начисления
+                        const orderRef = db.collection('orders').doc(ord.id);
+                        await db.runTransaction(async (tx) => {
+                            const s = await tx.get(orderRef);
+                            if (!s.exists || s.data().status !== 'pending') throw new Error('ORDER_NOT_PENDING');
+                            tx.update(orderRef, { status: 'confirmed' });
+                        });
+
+                        await deductOrderStockFromFirestore(ord.items);
+
+                        const userRef = await resolveUserRef(ord.userId);
+                        const payload = {};
+                        if (earnsPoint) {
+                            payload.purchases = firebase.firestore.FieldValue.increment(1);
+                            payload.totalPurchases = firebase.firestore.FieldValue.increment(1);
+                        }
+                        if (keys.length > 0) payload.purchasedKeys = firebase.firestore.FieldValue.arrayUnion(...keys);
+                        if (pendingReviewItems.length > 0) payload.pendingReviews = firebase.firestore.FieldValue.arrayUnion(...pendingReviewItems);
+                        await userRef.set(payload, { merge: true });
+                    } catch (err) {
+                        console.error(err);
+                        showToast(err && err.message === 'ORDER_NOT_PENDING' ? 'Заказ уже обработан' : 'Ошибка при подтверждении заказа');
+                        renderAdminOrders();
+                        return;
+                    }
 
                     showToast(`Заказ @${ord.username} выдан! Остаток обновлён`);
                     renderAdminOrders();
@@ -3439,8 +3739,34 @@
 
             box.querySelectorAll('[data-cancel-order]').forEach(btn => {
                 btn.addEventListener('click', async () => {
-                    await db.collection('orders').doc(btn.dataset.cancelOrder).update({ status: 'cancelled' });
-                    showToast('Заказ отменён');
+                    const ord = orders.find(x => x.id === btn.dataset.cancelOrder);
+                    if (!ord) return;
+                    btn.disabled = true;
+                    try {
+                        const orderRef = db.collection('orders').doc(ord.id);
+                        const userRef = await resolveUserRef(ord.userId);
+                        const refund = (Array.isArray(ord.usedRewards) ? ord.usedRewards : []).map(r => ({
+                            id: r.id,
+                            type: r.type || '',
+                            percent: Number(r.percent) || 0,
+                            label: r.label || '',
+                            createdAt: Date.now()
+                        }));
+                        await db.runTransaction(async (tx) => {
+                            const s = await tx.get(orderRef);
+                            if (!s.exists || s.data().status !== 'pending') throw new Error('ORDER_NOT_PENDING');
+                            tx.update(orderRef, { status: 'cancelled' });
+                            if (refund.length > 0) {
+                                tx.set(userRef, { rewards: firebase.firestore.FieldValue.arrayUnion(...refund) }, { merge: true });
+                            }
+                        });
+                    } catch (err) {
+                        console.error(err);
+                        showToast(err && err.message === 'ORDER_NOT_PENDING' ? 'Заказ уже обработан' : 'Ошибка отмены заказа');
+                        renderAdminOrders();
+                        return;
+                    }
+                    showToast(Array.isArray(ord.usedRewards) && ord.usedRewards.length ? 'Заказ отменён, призы возвращены' : 'Заказ отменён');
                     renderAdminOrders();
                 });
             });
