@@ -203,8 +203,8 @@
         }
         .cart-upsell-btn:active { transform: scale(0.98); }
 
-        /* МОДАЛКА ПРЕДЛОЖЕНИЯ ЖИДКОСТИ К ПОД-СИСТЕМЕ */
-        .upsell-modal {
+        /* МОДАЛКА ПРЕДЛОЖЕНИЯ ЖИДКОСТИ И ПОПАП ОТЗЫВА ПОСЛЕ ЗАКАЗА */
+        .upsell-modal, .review-prompt-modal {
             position: fixed; inset: 0; z-index: 1100;
             background: rgba(0, 0, 0, 0.86);
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
@@ -212,8 +212,9 @@
             padding: 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom));
             animation: fadeIn 0.2s ease;
         }
+        .review-prompt-modal { z-index: 1300; }
         @media (min-width: 520px) {
-            .upsell-modal { align-items: center; }
+            .upsell-modal, .review-prompt-modal { align-items: center; }
         }
         .upsell-box {
             width: 100%; max-width: 440px; max-height: 84dvh;
@@ -224,12 +225,19 @@
             box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85), 0 0 28px rgba(255, 152, 0, 0.14);
             animation: slideUp 0.28s cubic-bezier(0.22, 1, 0.36, 1);
         }
+        .review-prompt-box {
+            border-color: rgba(40, 205, 65, 0.45);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.88), 0 0 28px rgba(40, 205, 65, 0.15);
+        }
         .upsell-header { text-align: center; }
         .upsell-pill {
             display: inline-block; padding: 4px 10px; border-radius: 999px;
             background: linear-gradient(135deg, #ff9800, #ff6d00); color: #000;
             font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px;
             margin-bottom: 8px;
+        }
+        .review-prompt-pill {
+            background: linear-gradient(135deg, #28cd41, #1e9e32); color: #fff;
         }
         .upsell-title { font-size: 18px; font-weight: 800; text-transform: uppercase; line-height: 1.25; margin-bottom: 4px; }
         .upsell-sub { font-size: 12px; color: #bdbdbd; line-height: 1.4; }
@@ -265,6 +273,16 @@
         }
         .upsell-add-btn:active { transform: scale(0.95); }
         .upsell-footer { display: flex; flex-direction: column; gap: 8px; padding-top: 4px; }
+
+        .review-prompt-card {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 18px; padding: 12px; display: flex; flex-direction: column; gap: 10px;
+        }
+        .review-prompt-prod { display: flex; align-items: center; gap: 10px; }
+        .review-prompt-done {
+            text-align: center; padding: 10px; font-size: 13px; font-weight: 700; color: #69f07a;
+            background: rgba(40, 205, 65, 0.12); border-radius: 12px; border: 1px solid rgba(40, 205, 65, 0.3);
+        }
 
         /* МОДАЛКА ДАТЫ И ВРЕМЕНИ (ФИКС ДЛЯ IPHONE) */
         .delivery-datetime-grid {
@@ -698,6 +716,8 @@
         let userPurchases = 0;
         let userRewards = [];
         let userPurchasedKeys = [];
+        let userPendingReviews = [];
+        let isReviewModalOpen = false;
         let isRouletteSpinning = false;
         let allRawProducts = [];
         let vapeBrands = [];
@@ -795,6 +815,24 @@
                 day: '2-digit', month: '2-digit', year: 'numeric',
                 hour: '2-digit', minute: '2-digit'
             });
+        }
+        function resolveOrderItemImage(name, color) {
+            const norm = (s) => String(s || '').trim().toLowerCase();
+            let matched = allRawProducts.find(p =>
+                norm(p.name) === norm(name) && norm(p.color || 'Стандарт') === norm(color || 'Стандарт')
+            );
+            if (!matched) {
+                matched = allRawProducts.find(p => norm(p.name) === norm(name));
+            }
+            const defaultImages = {
+                vapes: 'vape.png', snus: 'snus.png', liquids: 'novayazhizha.png',
+                disposables: 'odnorazki.png', consumables: 'rashodniki.png', nicoboosters: 'nikobuster.png'
+            };
+            const cat = matched?.category === 'devices' ? 'vapes' : (matched?.category || 'vapes');
+            return matched?.image
+                || (color ? getFallbackColorImage(name, color) : null)
+                || defaultImages[cat]
+                || 'vape.png';
         }
 
         // --- РАСЧЁТ АКЦИИ «ПОД-СИСТЕМА + ЛЮБАЯ ЖИДКОСТЬ ЗА 15 BYN» ---
@@ -954,12 +992,184 @@
                 userPurchases = Number(data.purchases) || 0;
                 userRewards = Array.isArray(data.rewards) ? data.rewards : [];
                 userPurchasedKeys = Array.isArray(data.purchasedKeys) ? data.purchasedKeys : [];
+                userPendingReviews = Array.isArray(data.pendingReviews) ? data.pendingReviews : [];
                 syncCartRewardsValidity();
 
                 if (!isRouletteSpinning && pages.profile.classList.contains('active')) renderProfile();
                 if (pages.cart.classList.contains('active')) renderCart();
                 if (currentCategoryId === 'liquids' && pages.brand.classList.contains('active')) openCategory('liquids');
+
+                if (userPendingReviews.length > 0 && !isReviewModalOpen && !isRouletteSpinning) {
+                    const eligible = userPendingReviews.filter(p => userPurchasedKeys.includes(p.productKey) || isAdminUser());
+                    if (eligible.length > 0) {
+                        openPendingReviewsModal(eligible);
+                    }
+                }
             });
+        }
+
+        // --- АВТОМАТИЧЕСКОЕ ОКНО ОТЗЫВА ПОСЛЕ ТОГО КАК АДМИН ПОДТВЕРДИЛ ЧТО ЧЕЛОВЕК ЗАБРАЛ ЗАКАЗ ---
+        function openPendingReviewsModal(items) {
+            if (isReviewModalOpen || !items || items.length === 0) return;
+            isReviewModalOpen = true;
+
+            const existing = document.querySelector('.review-prompt-modal');
+            if (existing) existing.remove();
+
+            const modal = document.createElement('div');
+            modal.className = 'review-prompt-modal';
+
+            const state = items.map(it => ({
+                ...it,
+                rating: 5,
+                done: false
+            }));
+
+            function closeAndDismissRemaining() {
+                isReviewModalOpen = false;
+                modal.remove();
+                db.collection('users').doc(getUserDocId()).set({
+                    pendingReviews: []
+                }, { merge: true }).catch(err => console.error(err));
+            }
+
+            modal.innerHTML = `
+                <div class="upsell-box review-prompt-box">
+                    <div class="upsell-header">
+                        <div class="upsell-pill review-prompt-pill">✅ ЗАКАЗ ПОЛУЧЕН</div>
+                        <div class="upsell-title">Оставьте отзыв о покупке</div>
+                        <div class="upsell-sub">Оцените только те товары, которые вы только что забрали:</div>
+                    </div>
+                    <div class="upsell-list" id="reviewPromptList"></div>
+                    <div class="upsell-footer">
+                        <button type="button" class="profile-btn" id="dismissReviewPromptBtn" style="padding:11px 14px; font-size:12px;">Закрыть (оставить позже)</button>
+                    </div>
+                </div>
+            `;
+
+            const listBox = modal.querySelector('#reviewPromptList');
+
+            function renderCards() {
+                listBox.innerHTML = state.map((it, idx) => {
+                    const img = it.productImage || resolveOrderItemImage(it.productName, it.productVariant);
+                    if (it.done) {
+                        return `
+                            <div class="review-prompt-card">
+                                <div class="review-prompt-done">✓ Отзыв на «${it.productName}» опубликован!</div>
+                            </div>
+                        `;
+                    }
+                    return `
+                        <div class="review-prompt-card" data-rp-idx="${idx}">
+                            <div class="review-prompt-prod">
+                                <div class="upsell-thumb"><img src="${img}" alt="${it.productName}"></div>
+                                <div style="flex:1; min-width:0;">
+                                    <div class="upsell-name">${it.productName}</div>
+                                    ${it.productVariant && it.productVariant.toLowerCase() !== 'стандарт'
+                                        ? `<div style="font-size:11px; color:var(--text-gray);">Вариант: ${it.productVariant}</div>`
+                                        : ''
+                                    }
+                                </div>
+                            </div>
+                            <div class="star-picker" data-rp-stars="${idx}">
+                                ${[1,2,3,4,5].map(n => `
+                                    <button type="button" class="star-btn ${n <= it.rating ? 'active' : ''}" data-rp-idx="${idx}" data-star="${n}">★</button>
+                                `).join('')}
+                            </div>
+                            <input type="text" class="admin-input" id="rpText_${idx}" placeholder="Поделитесь впечатлением о вкусе / товаре...">
+                            <button type="button" class="profile-btn primary" data-rp-send="${idx}" style="padding:11px; font-size:12px;">Опубликовать отзыв</button>
+                        </div>
+                    `;
+                }).join('');
+
+                listBox.querySelectorAll('.star-btn[data-rp-idx]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const idx = parseInt(btn.dataset.rpIdx, 10);
+                        const star = parseInt(btn.dataset.star, 10);
+                        state[idx].rating = star;
+                        const row = listBox.querySelector(`[data-rp-stars="${idx}"]`);
+                        if (row) {
+                            row.querySelectorAll('.star-btn').forEach(b => {
+                                b.classList.toggle('active', parseInt(b.dataset.star, 10) <= star);
+                            });
+                        }
+                    });
+                });
+
+                listBox.querySelectorAll('[data-rp-send]').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const idx = parseInt(btn.dataset.rpSend, 10);
+                        const it = state[idx];
+                        if (!it || it.done) return;
+
+                        if (!isAdminUser() && !userPurchasedKeys.includes(it.productKey)) {
+                            showToast('Нельзя оставить отзыв на товар, который вы не покупали');
+                            return;
+                        }
+
+                        const textInput = listBox.querySelector(`#rpText_${idx}`);
+                        const txt = (textInput?.value || '').trim();
+                        if (!txt) {
+                            showToast('Напишите пару слов в отзыве');
+                            return;
+                        }
+
+                        btn.disabled = true;
+                        const tgU = getTgUsername();
+                        const img = it.productImage || resolveOrderItemImage(it.productName, it.productVariant);
+
+                        try {
+                            await db.collection('reviews').add({
+                                productKey: it.productKey,
+                                productName: it.productName || '',
+                                productVariant: it.productVariant || 'Стандарт',
+                                productImage: img || '',
+                                rating: it.rating,
+                                text: txt,
+                                author: tgU ? `@${tgU}` : (window.Telegram?.WebApp?.initDataUnsafe?.user?.first_name || 'Покупатель'),
+                                userId: getUserDocId(),
+                                orderId: it.orderId || '',
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+
+                            it.done = true;
+                            const remaining = state.filter(x => !x.done).map(x => ({
+                                id: x.id,
+                                orderId: x.orderId || '',
+                                productKey: x.productKey,
+                                productName: x.productName,
+                                productVariant: x.productVariant,
+                                productImage: x.productImage || ''
+                            }));
+
+                            await db.collection('users').doc(getUserDocId()).set({
+                                pendingReviews: remaining
+                            }, { merge: true });
+
+                            showToast('Спасибо! Отзыв опубликован');
+                            renderCards();
+
+                            if (remaining.length === 0) {
+                                setTimeout(() => {
+                                    isReviewModalOpen = false;
+                                    modal.remove();
+                                }, 900);
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            btn.disabled = false;
+                            showToast('Ошибка отправки отзыва');
+                        }
+                    });
+                });
+            }
+
+            renderCards();
+            modal.querySelector('#dismissReviewPromptBtn').addEventListener('click', closeAndDismissRemaining);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeAndDismissRemaining();
+            });
+            document.body.appendChild(modal);
         }
 
         function startAdminsSync() {
@@ -1656,6 +1866,7 @@
             }
             if (existing) {
                 existing.qty += count;
+                if (!existing.image && product.image) existing.image = product.image;
             } else {
                 cart.push({
                     id: 'ci_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
@@ -1665,6 +1876,7 @@
                     price: product.price,
                     qty: count,
                     color: product.color || null,
+                    image: product.image || '',
                     maxStock,
                     appliedRewardId: null
                 });
@@ -2562,7 +2774,13 @@
                 await db.collection('orders').add({
                     userId: getUserDocId(),
                     username: getTgUsername() || getUserDocId(),
-                    items: cart.map(i => ({ name: i.name, color: i.color || 'Стандарт', qty: i.qty, price: i.price })),
+                    items: cart.map(i => ({
+                        name: i.name,
+                        color: i.color || 'Стандарт',
+                        qty: i.qty,
+                        price: i.price,
+                        image: i.image || resolveOrderItemImage(i.name, i.color)
+                    })),
                     total: formatMoney(details.finalTotal),
                     pickup: selectedPickup || 'ВОКЗАЛ',
                     date: dayLabel,
@@ -2644,7 +2862,7 @@
                         <input type="text" class="admin-input" id="reviewTextInput" placeholder="Напишите впечатление о вкусе/цвете...">
                         <button type="button" class="profile-btn primary" id="sendReviewBtn" style="padding:10px;">Отправить отзыв</button>
                     </div>
-                ` : `<div style="font-size:12px; color:var(--text-gray); margin-bottom:12px;">Оставить отзыв можно после подтверждённой покупки этого варианта.</div>`}
+                ` : `<div style="font-size:12px; color:var(--text-gray); margin-bottom:12px;">Оставить отзыв можно только после подтверждённой покупки этого варианта.</div>`}
                 <div>
                     ${list.length === 0 ? `<div style="font-size:12px; color:var(--text-gray);">Отзывов пока нет</div>` : list.map(r => `
                         <div class="review-card">
@@ -2669,6 +2887,10 @@
                     });
                 });
                 container.querySelector('#sendReviewBtn').addEventListener('click', async () => {
+                    if (!isAdminUser() && !userPurchasedKeys.includes(productKey)) {
+                        showToast('Оставить отзыв можно только на купленный товар');
+                        return;
+                    }
                     const txt = container.querySelector('#reviewTextInput').value.trim();
                     if (!txt) { showToast('Напишите текст отзыва'); return; }
                     const tgU = getTgUsername();
@@ -2683,6 +2905,10 @@
                         userId: getUserDocId(),
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
+                    if (userPendingReviews.some(p => p.productKey === productKey)) {
+                        const rest = userPendingReviews.filter(p => p.productKey !== productKey);
+                        await db.collection('users').doc(getUserDocId()).set({ pendingReviews: rest }, { merge: true });
+                    }
                     showToast('Отзыв опубликован!');
                     loadAndRenderReviews(container, productKey, productMeta);
                 });
@@ -2703,6 +2929,8 @@
             const snap = await db.collection('orders').where('status', '==', 'pending').get();
             const orders = [];
             snap.forEach(d => orders.push({ id: d.id, ...d.data() }));
+            orders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
             if (orders.length === 0) {
                 box.innerHTML = `<div style="font-size:12px; color:var(--text-gray);">Новых заказов нет</div>`;
                 return;
@@ -2713,11 +2941,14 @@
                         <span>@${o.username}</span>
                         <span>${o.total} BYN</span>
                     </div>
+                    <div style="font-size:11px; color:#ffb74d;">
+                        📅 ${o.date || '—'} · ⏰ ${o.time || '—'} · 📍 ${o.pickup || 'ВОКЗАЛ'}
+                    </div>
                     <div style="font-size:12px; color:var(--text-gray);">
                         ${(o.items || []).map(i => `${i.name} (${i.color}) × ${i.qty}`).join(', ')}
                     </div>
                     <div style="display:flex; gap:8px; margin-top:4px;">
-                        <button class="profile-btn primary" data-confirm-order="${o.id}" style="padding:8px; font-size:11px;">✓ Подтвердить (+баллы и отзыв)</button>
+                        <button class="profile-btn primary" data-confirm-order="${o.id}" style="padding:8px; font-size:11px;">✓ Забрал заказ (+баллы и отзыв)</button>
                         <button class="profile-btn" data-cancel-order="${o.id}" style="padding:8px; font-size:11px; width:auto; border-color:rgba(255,59,48,0.4); color:#ff6961;">✕</button>
                     </div>
                 </div>
@@ -2727,17 +2958,37 @@
                 btn.addEventListener('click', async () => {
                     const ord = orders.find(x => x.id === btn.dataset.confirmOrder);
                     if (!ord) return;
-                    const keys = (ord.items || []).map(i => `${i.name}||${i.color || 'Стандарт'}`.toLowerCase());
+                    btn.disabled = true;
+
+                    const uniqueItemsMap = new Map();
+                    (ord.items || []).forEach((i, idx) => {
+                        const variant = i.color || 'Стандарт';
+                        const key = `${i.name}||${variant}`.toLowerCase();
+                        if (!uniqueItemsMap.has(key)) {
+                            uniqueItemsMap.set(key, {
+                                id: `rp_${ord.id}_${idx}`,
+                                orderId: ord.id,
+                                productKey: key,
+                                productName: i.name || '',
+                                productVariant: variant,
+                                productImage: i.image || resolveOrderItemImage(i.name, variant)
+                            });
+                        }
+                    });
+
+                    const keys = Array.from(uniqueItemsMap.keys());
+                    const pendingReviewItems = Array.from(uniqueItemsMap.values());
                     const itemsCount = (ord.items || []).reduce((sum, i) => sum + (Number(i.qty) || 1), 0) || 1;
 
                     await db.collection('orders').doc(ord.id).update({ status: 'confirmed' });
                     await db.collection('users').doc(ord.userId).set({
                         purchases: firebase.firestore.FieldValue.increment(itemsCount),
                         totalPurchases: firebase.firestore.FieldValue.increment(itemsCount),
-                        purchasedKeys: firebase.firestore.FieldValue.arrayUnion(...keys)
+                        purchasedKeys: firebase.firestore.FieldValue.arrayUnion(...keys),
+                        pendingReviews: firebase.firestore.FieldValue.arrayUnion(...pendingReviewItems)
                     }, { merge: true });
 
-                    showToast(`Заказ @${ord.username} подтверждён! +${itemsCount} к рулетке и доступ к отзывам`);
+                    showToast(`Заказ @${ord.username} выдан! Отправлено окно отзыва`);
                     renderAdminOrders();
                 });
             });
