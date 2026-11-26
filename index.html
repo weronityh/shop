@@ -115,11 +115,11 @@
 
         /* АККОРДЕОН БРЕНДОВ */
         .brand-group { display: flex; flex-direction: column; gap: 8px; }
-        .brand-group-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: background 0.2s, border-color 0.2s; box-shadow: var(--shadow-card); }
+        .brand-group-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: background 0.2s, border-color 0.2s; box-shadow: var(--shadow-card); }
         .brand-group-card:active { background: var(--bg-card-hover); }
         .brand-group-card.open { border-color: var(--text-white); }
-        .brand-group-title { font-size: 18px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
-        .brand-group-arrow { font-size: 18px; color: var(--text-gray); transition: transform 0.2s; }
+        .brand-group-title { font-size: 16px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+        .brand-group-arrow { font-size: 20px; color: var(--text-gray); transition: transform 0.2s; margin-left: auto; }
         .brand-group-card.open .brand-group-arrow { transform: rotate(90deg); color: var(--text-white); }
         .brand-models-list { display: none; flex-direction: column; gap: 8px; padding-left: 12px; }
         .brand-models-list.open { display: flex; }
@@ -188,6 +188,47 @@
         .cart-bonus-btn.applied { border-color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.12); color: #ffffff; }
         .cart-bonus-banner { background: rgba(255,152,0,0.12); border: 1px solid rgba(255,152,0,0.35); border-radius: 14px; padding: 10px 14px; margin: 0 16px 12px; font-size: 12px; color: #ffd180; line-height: 1.4; }
 
+        /* МОДАЛКА ДАТЫ И ВРЕМЕНИ (ФИКС ДЛЯ IPHONE) */
+        .delivery-datetime-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 10px;
+            width: 100%;
+        }
+        .delivery-field {
+            min-width: 0;
+            width: 100%;
+        }
+        .delivery-label {
+            font-size: 12px;
+            color: var(--text-gray);
+            display: block;
+            margin-bottom: 6px;
+        }
+        .delivery-input {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            height: 46px;
+            padding: 10px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border-card);
+            color: #fff;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            color-scheme: dark;
+            display: block;
+            -webkit-appearance: none;
+            appearance: none;
+            text-align: left;
+        }
+        .delivery-input::-webkit-date-and-time-value {
+            text-align: left;
+            min-height: 1.2em;
+        }
+
         /* ПРОФИЛЬ */
         .profile-cards { display: flex; flex-direction: column; gap: 12px; }
         .profile-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 18px; box-shadow: var(--shadow-card); }
@@ -212,18 +253,19 @@
         /* ГОРИЗОНТАЛЬНАЯ РУЛЕТКА */
         .roulette-modal {
             position: fixed; inset: 0; z-index: 1200;
-            background: rgba(0,0,0,0.88); backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.92);
             display: flex; align-items: center; justify-content: center; padding: 16px;
         }
         .roulette-box {
-            width: 100%; max-width: 420px; background: var(--bg-card);
+            width: 100%; max-width: 420px; background: #101010;
             border: 1px solid var(--border-card); border-radius: 24px;
             padding: 20px 16px; box-shadow: var(--shadow-card); text-align: center;
         }
         .roulette-viewport {
             position: relative; width: 100%; height: 136px; overflow: hidden;
-            border-radius: 16px; background: rgba(0,0,0,0.6);
+            border-radius: 16px; background: rgba(0,0,0,0.65);
             border: 1px solid rgba(255,255,255,0.14); margin: 16px 0;
+            contain: layout style;
         }
         .roulette-pointer {
             position: absolute; top: 0; bottom: 0; left: 50%; width: 3px;
@@ -670,7 +712,7 @@
                 userPurchasedKeys = Array.isArray(data.purchasedKeys) ? data.purchasedKeys : [];
                 syncCartRewardsValidity();
 
-                if (pages.profile.classList.contains('active')) renderProfile();
+                if (!isRouletteSpinning && pages.profile.classList.contains('active')) renderProfile();
                 if (pages.cart.classList.contains('active')) renderCart();
                 if (currentCategoryId === 'liquids' && pages.brand.classList.contains('active')) openCategory('liquids');
             });
@@ -928,15 +970,22 @@
                 const freeLiquid = hasFreeLiquidReward();
                 brandList.innerHTML = `
                     ${freeLiquid ? `<div class="free-hint-box">🎁 У вас есть приз «Бесплатная жидкость» — выберите любую и примените в корзине!</div>` : ''}
-                    ${liquidBrands.map((b, bIdx) => `
+                    ${liquidBrands.map((b, bIdx) => {
+                        const brandImage = (b.models.find(m => m.image && m.image !== 'novayazhizha.png')?.image) || b.models[0]?.image || 'novayazhizha.png';
+                        return `
                         <div class="brand-group">
                             <div class="brand-group-card" data-brand-idx="${bIdx}">
-                                <div class="brand-group-title">${b.brand}</div>
+                                <div class="brand-card-thumb"><img src="${brandImage}" alt="${b.brand}"></div>
+                                <div class="brand-card-info">
+                                    <div class="brand-group-title">${b.brand}</div>
+                                    <div class="brand-card-count">${b.models.length} ${b.models.length === 1 ? 'линейка' : b.models.length < 5 ? 'линейки' : 'линеек'}</div>
+                                </div>
                                 <div class="brand-group-arrow">›</div>
                             </div>
                             <div class="brand-models-list" id="liquidFlavors_${bIdx}">
                                 ${b.models.map((m, mIdx) => `
                                     <div class="product-card" data-liq-brand="${bIdx}" data-liq-model="${mIdx}">
+                                        <div class="product-thumb"><img src="${m.image}" alt="${m.name}"></div>
                                         <div class="product-info">
                                             <div class="product-title">${m.name}</div>
                                             <div class="product-desc">${m.desc || ''} ${m.colors.length > 1 || m.colors[0] !== 'Стандарт' ? `· ${m.colors.length} вкус.` : ''}</div>
@@ -952,7 +1001,8 @@
                                 `).join('')}
                             </div>
                         </div>
-                    `).join('')}
+                    `;
+                    }).join('')}
                 `;
                 brandList.querySelectorAll('.brand-group-card').forEach(card => {
                     card.addEventListener('click', () => {
@@ -1428,7 +1478,7 @@
                         <div class="roulette-track" id="rouletteTrack">
                             ${strip.map(p => `
                                 <div class="roulette-item">
-                                    <img src="${p.img}" alt="${p.short}">
+                                    <img src="${p.img}" alt="${p.short}" decoding="async">
                                     <span>${p.short}</span>
                                 </div>
                             `).join('')}
@@ -1442,6 +1492,7 @@
 
             const track = modal.querySelector('#rouletteTrack');
             const viewport = modal.querySelector('#rouletteViewport');
+            const closeBtn = modal.querySelector('#closeRouletteModal');
             const itemStep = 112;
             const centerOffset = (viewport.clientWidth / 2) - 52 - 8;
             const targetX = -(winIndex * itemStep - centerOffset + (Math.random() * 24 - 12));
@@ -1455,10 +1506,11 @@
             const startTime = performance.now();
             const duration = 7000;
             let lastStepIndex = -1;
+            let rafId = null;
 
             function tickLoop(now) {
                 const elapsed = now - startTime;
-                if (elapsed < duration) {
+                if (elapsed < duration && document.body.contains(modal)) {
                     const progress = elapsed / duration;
                     const eased = 1 - Math.pow(1 - progress, 3);
                     const currentStep = Math.floor(eased * winIndex);
@@ -1466,18 +1518,37 @@
                         lastStepIndex = currentStep;
                         if (audioCtx) playTickSound(audioCtx);
                     }
-                    requestAnimationFrame(tickLoop);
+                    rafId = requestAnimationFrame(tickLoop);
                 }
             }
 
             requestAnimationFrame(() => {
                 track.style.transition = 'transform 7s cubic-bezier(0.12, 0.85, 0.14, 1)';
                 track.style.transform = `translate3d(${targetX}px, 0, 0)`;
-                requestAnimationFrame(tickLoop);
+                rafId = requestAnimationFrame(tickLoop);
             });
 
-            setTimeout(async () => {
-                if (audioCtx) playWinSound(audioCtx);
+            closeBtn.addEventListener('click', () => {
+                if (rafId) cancelAnimationFrame(rafId);
+                isRouletteSpinning = false;
+                if (audioCtx) {
+                    try { audioCtx.close(); } catch (e) {}
+                    audioCtx = null;
+                }
+                modal.remove();
+                renderProfile();
+            });
+
+            setTimeout(() => {
+                if (rafId) cancelAnimationFrame(rafId);
+                if (audioCtx) {
+                    playWinSound(audioCtx);
+                    const ctxToClose = audioCtx;
+                    audioCtx = null;
+                    setTimeout(() => {
+                        try { ctxToClose.close(); } catch (e) {}
+                    }, 600);
+                }
 
                 const newReward = {
                     id: 'rew_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
@@ -1487,33 +1558,33 @@
                     createdAt: Date.now()
                 };
 
-                try {
-                    const docId = getUserDocId();
-                    const userRef = db.collection('users').doc(docId);
-                    const updatePayload = {
-                        rewards: firebase.firestore.FieldValue.arrayUnion(newReward)
-                    };
-                    if (!isAdminUser()) {
-                        updatePayload.purchases = Math.max(0, userPurchases - PURCHASES_PER_SPIN);
-                    }
-                    await userRef.set(updatePayload, { merge: true });
-                } catch (err) {
-                    console.error('Ошибка сохранения приза:', err);
+                if (!userRewards.some(r => r.id === newReward.id)) {
                     userRewards.push(newReward);
-                    if (!isAdminUser()) userPurchases = Math.max(0, userPurchases - PURCHASES_PER_SPIN);
+                }
+                const nextPurchases = isAdminUser() ? userPurchases : Math.max(0, userPurchases - PURCHASES_PER_SPIN);
+                if (!isAdminUser()) {
+                    userPurchases = nextPurchases;
                 }
 
                 isRouletteSpinning = false;
                 modal.querySelector('#modalRouletteResult').textContent = `🎉 Вы выиграли: ${winPrize.label}!`;
-                const closeBtn = modal.querySelector('#closeRouletteModal');
                 closeBtn.style.display = 'block';
-                closeBtn.addEventListener('click', () => {
-                    modal.remove();
-                    renderProfile();
-                });
+
                 const inlineRes = document.getElementById('rouletteResult');
                 if (inlineRes) inlineRes.textContent = `🎉 Ваш приз сохранён: ${winPrize.label}!`;
                 showToast(`Приз добавлен в профиль: ${winPrize.label}`);
+
+                const docId = getUserDocId();
+                const userRef = db.collection('users').doc(docId);
+                const updatePayload = {
+                    rewards: firebase.firestore.FieldValue.arrayUnion(newReward)
+                };
+                if (!isAdminUser()) {
+                    updatePayload.purchases = nextPurchases;
+                }
+                userRef.set(updatePayload, { merge: true }).catch((err) => {
+                    console.error('Ошибка сохранения приза:', err);
+                });
             }, 7100);
         }
 
@@ -1708,8 +1779,6 @@
                     category, brand, name, desc, price, stock, color, color_stock, image,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                document.getElementById('admName').value = '';
-                document.getElementById('admDesc').value = '';
                 document.getElementById('admColor').value = '';
                 document.getElementById('admColorStock').value = '';
                 document.getElementById('admImage').value = '';
@@ -1721,7 +1790,7 @@
             }
         });
 
-                function showDeliveryModal() {
+        function showDeliveryModal() {
             const now = new Date();
             const pad = (n) => String(n).padStart(2, '0');
             const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
@@ -1735,14 +1804,14 @@
                         <div style="font-size:16px; font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
                             <span>🕒 Когда заберёте</span><span style="color:#ff453a;">*</span>
                         </div>
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                            <div>
-                                <label style="font-size:12px; color:var(--text-gray); display:block; margin-bottom:6px;">Дата</label>
-                                <input type="date" id="orderDateInput" value="${todayStr}" min="${todayStr}" style="width:100%; padding:12px 10px; border-radius:14px; background:rgba(255,255,255,0.06); border:1px solid var(--border-card); color:#fff; font-size:14px; font-family:inherit; outline:none; color-scheme:dark;">
+                        <div class="delivery-datetime-grid">
+                            <div class="delivery-field">
+                                <label class="delivery-label">Дата</label>
+                                <input type="date" id="orderDateInput" class="delivery-input" value="${todayStr}" min="${todayStr}">
                             </div>
-                            <div>
-                                <label style="font-size:12px; color:var(--text-gray); display:block; margin-bottom:6px;">Время</label>
-                                <input type="time" id="orderTimeInput" style="width:100%; padding:12px 10px; border-radius:14px; background:rgba(255,255,255,0.06); border:1px solid var(--border-card); color:#fff; font-size:14px; font-family:inherit; outline:none; color-scheme:dark;">
+                            <div class="delivery-field">
+                                <label class="delivery-label">Время</label>
+                                <input type="time" id="orderTimeInput" class="delivery-input">
                             </div>
                         </div>
                         <div id="timeErrorMsg" style="display:none; color:#ff453a; font-size:12px; margin-top:8px;">Это время уже прошло — выберите позже</div>
@@ -1800,7 +1869,7 @@
             modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
         }
 
-                async function sendOrder(dayLabel, timeLabel) {
+        async function sendOrder(dayLabel, timeLabel) {
             let orderText = 'Здравствуйте! Хочу оформить заказ:\n';
             let total = 0;
             const usedRewardIds = [];
@@ -1819,7 +1888,7 @@
                 orderText += `${i + 1}. ${item.name}${colorStr} × ${item.qty} — ${formatMoney(pricing.finalTotal)} BYN${bonusNote}\n`;
             });
 
-                       orderText += `\nИтого: ${formatMoney(total)} BYN\n📍 Способ получения: ${selectedPickup || 'ВОКЗАЛ'}\n📅 Дата: ${dayLabel}\n⏰ Время: ${timeLabel}`;
+            orderText += `\nИтого: ${formatMoney(total)} BYN\n📍 Способ получения: ${selectedPickup || 'ВОКЗАЛ'}\n📅 Дата: ${dayLabel}\n⏰ Время: ${timeLabel}`;
 
             if (usedRewardIds.length > 0) {
                 const usedSet = new Set(usedRewardIds);
