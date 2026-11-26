@@ -42,6 +42,8 @@
             height: 100%;
             pointer-events: none;
             z-index: 2;
+            mix-blend-mode: screen;
+            opacity: 1;
         }
         .global-smoke-canvas {
             position: fixed;
@@ -49,8 +51,9 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 55;
+            z-index: 0;
             display: none;
+            opacity: 0.8;
         }
 
         /* КОТ НА ГЛАВНОЙ */
@@ -64,6 +67,28 @@
             transition: opacity 0.9s ease, transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
         }
         .cat-mask::after { content: ""; position: absolute; left: -6%; right: -6%; bottom: -1px; height: 22%; pointer-events: none; z-index: 1; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.18) 46%, rgba(0,0,0,0.62) 82%, #000 100%); }
+        /* Дым прямо по картинке кота — струится поверх неё */
+        .cat-smoke {
+            position: absolute;
+            inset: -8%;
+            z-index: 2;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            filter: blur(16px);
+            opacity: .8;
+            background:
+                radial-gradient(ellipse 34% 18% at 30% 78%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.06) 46%, transparent 74%),
+                radial-gradient(ellipse 30% 16% at 72% 66%, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.05) 48%, transparent 76%),
+                radial-gradient(ellipse 46% 20% at 50% 94%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.06) 50%, transparent 78%),
+                radial-gradient(ellipse 26% 44% at 13% 52%, rgba(255,255,255,0.11) 0%, transparent 76%),
+                radial-gradient(ellipse 24% 40% at 88% 44%, rgba(255,255,255,0.09) 0%, transparent 76%);
+            animation: catSmokeDrift 11s ease-in-out infinite alternate;
+        }
+        @keyframes catSmokeDrift {
+            0%   { transform: translate3d(-1.5%, 1.5%, 0) scale(1.04); opacity: .55; }
+            50%  { transform: translate3d(0.8%, -1.5%, 0) scale(1.1); opacity: .95; }
+            100% { transform: translate3d(1.8%, -3%, 0) scale(1.06); opacity: .72; }
+        }
         .cat-image.loaded { opacity: 1; transform: scale(1.06) translateY(0); }
 
         /* ЭКРАН 1: ПРИВЕТСТВИЕ */
@@ -524,6 +549,7 @@
                 <div class="welcome-hero">
                     <div class="cat-mask">
                         <img src="kotii.png" alt="WEGGEW" class="cat-image" id="catImage">
+                        <div class="cat-smoke" aria-hidden="true"></div>
                     </div>
                 </div>
                 <canvas class="welcome-smoke-canvas" id="welcomeSmokeCanvas" aria-hidden="true"></canvas>
@@ -824,27 +850,33 @@
 
         // --- СИСТЕМА РЕАЛИСТИЧНОГО ДЫМА ---
         function createSmokeSprite() {
+            const size = 256;
             const sprite = document.createElement('canvas');
-            sprite.width = 180;
-            sprite.height = 180;
+            sprite.width = sprite.height = size;
             const sctx = sprite.getContext('2d');
             const lobes = [
-                { x: 90, y: 90, r: 78, a: 0.55 },
-                { x: 62, y: 74, r: 58, a: 0.45 },
-                { x: 118, y: 78, r: 55, a: 0.42 },
-                { x: 78, y: 116, r: 60, a: 0.38 },
-                { x: 110, y: 112, r: 52, a: 0.35 }
+                { x: 128, y: 132, r: 112, a: 0.5 },
+                { x: 86, y: 104, r: 82, a: 0.4 },
+                { x: 172, y: 108, r: 78, a: 0.37 },
+                { x: 102, y: 166, r: 84, a: 0.34 },
+                { x: 160, y: 170, r: 76, a: 0.32 },
+                { x: 62, y: 142, r: 58, a: 0.24 },
+                { x: 196, y: 148, r: 56, a: 0.22 },
+                { x: 128, y: 78, r: 60, a: 0.26 }
             ];
+            sctx.filter = 'blur(7px)';
             lobes.forEach(l => {
                 const g = sctx.createRadialGradient(l.x, l.y, 0, l.x, l.y, l.r);
-                g.addColorStop(0, `rgba(245, 248, 255, ${l.a})`);
-                g.addColorStop(0.45, `rgba(220, 228, 238, ${l.a * 0.52})`);
+                g.addColorStop(0, `rgba(240, 245, 252, ${l.a})`);
+                g.addColorStop(0.42, `rgba(214, 223, 234, ${l.a * 0.46})`);
+                g.addColorStop(0.78, `rgba(198, 208, 220, ${l.a * 0.12})`);
                 g.addColorStop(1, 'rgba(205, 214, 224, 0)');
                 sctx.fillStyle = g;
                 sctx.beginPath();
                 sctx.arc(l.x, l.y, l.r, 0, Math.PI * 2);
                 sctx.fill();
             });
+            sctx.filter = 'none';
             return sprite;
         }
 
@@ -856,6 +888,7 @@
             let width = 0;
             let height = 0;
             const particles = [];
+            const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
             function resize() {
                 const rect = canvas.getBoundingClientRect();
@@ -866,21 +899,26 @@
             }
 
             function spawnParticle(randomY = false) {
-                const baseSize = opts.minSize + Math.random() * (opts.maxSize - opts.minSize);
+                const sizeRoll = Math.random();
+                const baseSize = opts.minSize + sizeRoll * (opts.maxSize - opts.minSize);
                 const startY = randomY
                     ? (Math.random() * (height + baseSize) - baseSize * 0.4)
-                    : (height + baseSize * (0.2 + Math.random() * 0.4));
+                    : (height + baseSize * (0.15 + Math.random() * 0.35));
+                const depth = 1 - sizeRoll;
                 return {
                     x: Math.random() * width,
                     y: startY,
                     baseSize,
-                    speedY: opts.minSpeed + Math.random() * (opts.maxSpeed - opts.minSpeed),
-                    driftAmp: 10 + Math.random() * 22,
-                    driftFreq: 0.4 + Math.random() * 0.8,
+                    speedY: (opts.minSpeed + Math.random() * (opts.maxSpeed - opts.minSpeed)) * (0.7 + sizeRoll * 0.55),
+                    driftAmp: 8 + Math.random() * 26,
+                    driftFreq: 0.25 + Math.random() * 0.7,
                     phase: Math.random() * Math.PI * 2,
                     rot: Math.random() * Math.PI * 2,
-                    rotSpeed: (Math.random() - 0.5) * 0.16,
-                    maxAlpha: opts.minAlpha + Math.random() * (opts.maxAlpha - opts.minAlpha)
+                    rotSpeed: (Math.random() - 0.5) * 0.09,
+                    stretchX: 0.75 + Math.random() * 0.7,
+                    stretchY: 0.88 + Math.random() * 0.5,
+                    wind: (Math.random() - 0.5) * 10,
+                    maxAlpha: (opts.minAlpha + Math.random() * (opts.maxAlpha - opts.minAlpha)) * (0.72 + depth * 0.48)
                 };
             }
 
@@ -900,29 +938,30 @@
                     const p = particles[i];
                     p.y -= p.speedY * dt;
                     p.rot += p.rotSpeed * dt;
-                    const sway = Math.sin(nowSec * p.driftFreq + p.phase) * p.driftAmp * dt;
-                    p.x += sway;
+                    p.x += (Math.sin(nowSec * p.driftFreq + p.phase) * p.driftAmp + p.wind) * dt;
 
-                    const progress = 1 - Math.max(0, Math.min(1, p.y / height));
-                    const size = p.baseSize * (0.85 + progress * 0.65);
+                    if (p.x < -p.baseSize) p.x = width + p.baseSize * 0.2;
+                    else if (p.x > width + p.baseSize) p.x = -p.baseSize * 0.2;
 
-                    let alpha = p.maxAlpha;
-                    if (p.y > height * 0.82) {
-                        alpha *= Math.max(0, 1 - (p.y - height * 0.82) / (height * 0.35));
-                    } else if (p.y < height * 0.18) {
-                        alpha *= Math.max(0, (p.y + size * 0.4) / (height * 0.18 + size * 0.4));
-                    }
+                    const progress = clamp(1 - p.y / height, 0, 1);
+                    const size = p.baseSize * (0.82 + progress * 0.72);
+
+                    // мягко проявляется у нижней кромки и растворяется только у самого верха
+                    const bottomFade = clamp((height * 1.03 - p.y) / (height * 0.14), 0, 1);
+                    const topFade = clamp((p.y + size * 0.6) / (height * 0.11), 0, 1);
+                    const alpha = p.maxAlpha * bottomFade * topFade;
 
                     if (alpha > 0.002) {
                         ctx.save();
                         ctx.globalAlpha = alpha;
                         ctx.translate(p.x, p.y);
                         ctx.rotate(p.rot);
+                        ctx.scale(p.stretchX, p.stretchY);
                         ctx.drawImage(smokeSprite, -size * 0.5, -size * 0.5, size, size);
                         ctx.restore();
                     }
 
-                    if (p.y < -size * 0.6) {
+                    if (p.y < -size * 0.75) {
                         particles[i] = spawnParticle(false);
                     }
                 }
@@ -937,22 +976,22 @@
 
         const welcomeSmokeLayer = createSmokeLayer(welcomeSmokeCanvas, {
             count: 34,
-            minSize: 180,
-            maxSize: 360,
-            minSpeed: 24,
-            maxSpeed: 46,
-            minAlpha: 0.32,
-            maxAlpha: 0.55
+            minSize: 170,
+            maxSize: 400,
+            minSpeed: 22,
+            maxSpeed: 44,
+            minAlpha: 0.14,
+            maxAlpha: 0.28
         });
 
         const globalSmokeLayer = createSmokeLayer(globalSmokeCanvas, {
-            count: 28,
-            minSize: 190,
-            maxSize: 360,
-            minSpeed: 18,
-            maxSpeed: 34,
-            minAlpha: 0.18,
-            maxAlpha: 0.32
+            count: 20,
+            minSize: 220,
+            maxSize: 470,
+            minSpeed: 8,
+            maxSpeed: 18,
+            minAlpha: 0.05,
+            maxAlpha: 0.12
         });
 
         let lastSmokeFrame = performance.now();
