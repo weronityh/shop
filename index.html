@@ -34,6 +34,25 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* СЛОИ ДЫМА */
+        .welcome-smoke-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .global-smoke-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 55;
+            display: none;
+        }
+
         /* КОТ НА ГЛАВНОЙ */
         .cat-mask { width: 100%; height: 100%; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; position: relative; }
         .cat-image {
@@ -50,6 +69,7 @@
         /* ЭКРАН 1: ПРИВЕТСТВИЕ */
         #welcomePage { justify-content: space-between; align-items: center; padding: 0 0 calc(env(safe-area-inset-bottom, 0px) + 8px); text-align: center; position: relative; overflow: hidden; height: 100%; max-height: 100%; min-height: 100%; }
         .welcome-hero { position: relative; flex: 1; min-height: 0; width: 100%; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; z-index: 1; }
+        .welcome-bottom { position: relative; z-index: 3; width: 100%; }
         @media (max-height: 700px) {
             #welcomePage { padding-top: calc(env(safe-area-inset-top, 0px) + 4px); }
             .welcome-title { font-size: clamp(24px, 7.2vw, 32px); }
@@ -495,6 +515,8 @@
 </head>
 <body>
 
+    <canvas class="global-smoke-canvas" id="globalSmokeCanvas" aria-hidden="true"></canvas>
+
     <div class="app">
         <main id="mainScroll">
             <!-- ЭКРАН 1: ПРИВЕТСТВИЕ -->
@@ -504,6 +526,7 @@
                         <img src="kotii.png" alt="WEGGEW" class="cat-image" id="catImage">
                     </div>
                 </div>
+                <canvas class="welcome-smoke-canvas" id="welcomeSmokeCanvas" aria-hidden="true"></canvas>
                 <div class="welcome-bottom">
                     <div class="welcome-title" aria-label="WEGGEW">
                         <span class="title-char" style="--i:0">W</span>
@@ -751,6 +774,7 @@
         let detailBackPage = 'brand';
         let adminSelectedDept = 'all';
         let adminSearchQuery = '';
+        let activePageName = 'welcome';
 
         const VAPE_COLOR_IMAGES = {
             'PASITO 3': {
@@ -797,6 +821,159 @@
         const brandPageTitle = document.getElementById('brandPageTitle');
         const toast = document.getElementById('toast');
         const cartCountEl = document.getElementById('cartCount');
+
+        // --- СИСТЕМА РЕАЛИСТИЧНОГО ЛЁГКОГО ДЫМА ---
+        function createSmokeSprite() {
+            const sprite = document.createElement('canvas');
+            sprite.width = 160;
+            sprite.height = 160;
+            const sctx = sprite.getContext('2d');
+            const lobes = [
+                { x: 80, y: 80, r: 70, a: 0.22 },
+                { x: 56, y: 66, r: 50, a: 0.16 },
+                { x: 104, y: 70, r: 48, a: 0.15 },
+                { x: 70, y: 102, r: 52, a: 0.14 },
+                { x: 96, y: 98, r: 44, a: 0.12 }
+            ];
+            lobes.forEach(l => {
+                const g = sctx.createRadialGradient(l.x, l.y, 0, l.x, l.y, l.r);
+                g.addColorStop(0, `rgba(235, 240, 245, ${l.a})`);
+                g.addColorStop(0.45, `rgba(210, 218, 226, ${l.a * 0.48})`);
+                g.addColorStop(1, 'rgba(200, 208, 218, 0)');
+                sctx.fillStyle = g;
+                sctx.beginPath();
+                sctx.arc(l.x, l.y, l.r, 0, Math.PI * 2);
+                sctx.fill();
+            });
+            return sprite;
+        }
+
+        const smokeSprite = createSmokeSprite();
+
+        function createSmokeLayer(canvas, opts) {
+            if (!canvas) return null;
+            const ctx = canvas.getContext('2d');
+            let width = 0;
+            let height = 0;
+            const particles = [];
+
+            function resize() {
+                const rect = canvas.getBoundingClientRect();
+                width = Math.max(1, Math.floor(rect.width || window.innerWidth));
+                height = Math.max(1, Math.floor(rect.height || window.innerHeight));
+                canvas.width = width;
+                canvas.height = height;
+            }
+
+            function spawnParticle(randomY = false) {
+                const baseSize = opts.minSize + Math.random() * (opts.maxSize - opts.minSize);
+                const startY = randomY
+                    ? (Math.random() * (height + baseSize) - baseSize * 0.4)
+                    : (height + baseSize * (0.2 + Math.random() * 0.4));
+                return {
+                    x: Math.random() * width,
+                    y: startY,
+                    baseSize,
+                    speedY: opts.minSpeed + Math.random() * (opts.maxSpeed - opts.minSpeed),
+                    driftAmp: 10 + Math.random() * 22,
+                    driftFreq: 0.4 + Math.random() * 0.8,
+                    phase: Math.random() * Math.PI * 2,
+                    rot: Math.random() * Math.PI * 2,
+                    rotSpeed: (Math.random() - 0.5) * 0.16,
+                    maxAlpha: opts.minAlpha + Math.random() * (opts.maxAlpha - opts.minAlpha)
+                };
+            }
+
+            function init() {
+                resize();
+                particles.length = 0;
+                for (let i = 0; i < opts.count; i++) {
+                    particles.push(spawnParticle(true));
+                }
+            }
+
+            function step(dt, nowSec) {
+                if (width <= 1 || height <= 1) resize();
+                ctx.clearRect(0, 0, width, height);
+
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+                    p.y -= p.speedY * dt;
+                    p.rot += p.rotSpeed * dt;
+                    const sway = Math.sin(nowSec * p.driftFreq + p.phase) * p.driftAmp * dt;
+                    p.x += sway;
+
+                    const progress = 1 - Math.max(0, Math.min(1, p.y / height));
+                    const size = p.baseSize * (0.85 + progress * 0.65);
+
+                    let alpha = p.maxAlpha;
+                    if (p.y > height * 0.82) {
+                        alpha *= Math.max(0, 1 - (p.y - height * 0.82) / (height * 0.35));
+                    } else if (p.y < height * 0.18) {
+                        alpha *= Math.max(0, (p.y + size * 0.4) / (height * 0.18 + size * 0.4));
+                    }
+
+                    if (alpha > 0.002) {
+                        ctx.save();
+                        ctx.globalAlpha = alpha;
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate(p.rot);
+                        ctx.drawImage(smokeSprite, -size * 0.5, -size * 0.5, size, size);
+                        ctx.restore();
+                    }
+
+                    if (p.y < -size * 0.6) {
+                        particles[i] = spawnParticle(false);
+                    }
+                }
+            }
+
+            init();
+            return { resize, step };
+        }
+
+        const welcomeSmokeCanvas = document.getElementById('welcomeSmokeCanvas');
+        const globalSmokeCanvas = document.getElementById('globalSmokeCanvas');
+
+        const welcomeSmokeLayer = createSmokeLayer(welcomeSmokeCanvas, {
+            count: 24,
+            minSize: 160,
+            maxSize: 310,
+            minSpeed: 22,
+            maxSpeed: 44,
+            minAlpha: 0.11,
+            maxAlpha: 0.21
+        });
+
+        const globalSmokeLayer = createSmokeLayer(globalSmokeCanvas, {
+            count: 20,
+            minSize: 170,
+            maxSize: 320,
+            minSpeed: 16,
+            maxSpeed: 32,
+            minAlpha: 0.055,
+            maxAlpha: 0.105
+        });
+
+        let lastSmokeFrame = performance.now();
+        function runSmokeAnimation(now) {
+            const dt = Math.min(0.05, Math.max(0.001, (now - lastSmokeFrame) / 1000));
+            lastSmokeFrame = now;
+            const nowSec = now * 0.001;
+
+            if (activePageName === 'welcome') {
+                if (welcomeSmokeLayer) welcomeSmokeLayer.step(dt, nowSec);
+            } else {
+                if (globalSmokeLayer) globalSmokeLayer.step(dt, nowSec);
+            }
+            requestAnimationFrame(runSmokeAnimation);
+        }
+
+        window.addEventListener('resize', () => {
+            if (welcomeSmokeLayer) welcomeSmokeLayer.resize();
+            if (globalSmokeLayer) globalSmokeLayer.resize();
+        });
+        requestAnimationFrame(runSmokeAnimation);
 
         function getTgUsername() {
             return (window.Telegram?.WebApp?.initDataUnsafe?.user?.username || '').toLowerCase().trim();
@@ -977,9 +1154,14 @@
         }
 
         function showPage(name) {
+            activePageName = name;
             Object.values(pages).forEach(p => p.classList.remove('active'));
             pages[name].classList.add('active');
             mainScroll.scrollTop = 0;
+
+            if (globalSmokeCanvas) {
+                globalSmokeCanvas.style.display = name === 'welcome' ? 'none' : 'block';
+            }
 
             if (name === 'welcome') {
                 const catImg = document.getElementById('catImage');
@@ -988,6 +1170,9 @@
                     requestAnimationFrame(() => catImg.classList.add('loaded'));
                 }
                 restartWelcomeAnimations();
+                if (welcomeSmokeLayer) requestAnimationFrame(() => welcomeSmokeLayer.resize());
+            } else {
+                if (globalSmokeLayer) requestAnimationFrame(() => globalSmokeLayer.resize());
             }
 
             document.body.classList.toggle('subtle-smoke', name === 'location');
