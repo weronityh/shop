@@ -1721,98 +1721,104 @@
             document.getElementById('productDetailTitle').textContent = model.name.toUpperCase();
 
             let selectedColorIdx = 0;
+            let qty = 1;
             const colors = model.colors && model.colors.length > 0 ? model.colors : ['Стандарт'];
+            const colorImages = model.colorImages || {};
             const isLiquid = model.category === 'liquids' || categoryLabel === 'ЖИДКОСТИ';
             const freeLiquid = isLiquid && hasFreeLiquidReward();
             const hasPodPromo = isLiquid && !freeLiquid && getUnusedPodPromoSlots() > 0 && model.price > POD_LIQUID_TARGET_PRICE;
             const promoPrice = getPodPromoLiquidPrice(model.price);
             const fallbackIcon = model.icon || (model.category === 'nicoboosters' ? '🧪' : model.category === 'consumables' ? '🔧' : '📦');
 
-            function renderContent() {
+            function getCurrentVariantData() {
                 const selectedColor = colors[selectedColorIdx];
-                const colorImages = model.colorImages || {};
                 const imageSrc = colorImages[selectedColor] || model.image;
                 const maxStock = (model.colorStocks && model.colorStocks[selectedColor] !== undefined) ? model.colorStocks[selectedColor] : (model.stock || 99);
                 const variantDocId = (model.colorDocIds && model.colorDocIds[selectedColor]) || model.id || '';
+                return { selectedColor, imageSrc, maxStock, variantDocId };
+            }
 
-                content.innerHTML = `
-                    <div class="product-detail-image-wrap">
-                        <img class="product-detail-image" id="productMainImage" src="${imageSrc}" alt="${model.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
-                        <span style="display:none; font-size:72px;">${fallbackIcon}</span>
-                    </div>
-                    <div class="product-detail-category">${categoryLabel}</div>
-                    <div class="product-detail-name">${model.name}</div>
-                    <div class="product-detail-price">
-                        ${freeLiquid
-                            ? `<span class="old-price">${model.price} BYN</span><span class="free-badge">БЕСПЛАТНО</span>`
-                            : hasPodPromo
-                                ? `<span class="old-price">${model.price} BYN</span><span style="color:#69f07a;">${formatMoney(promoPrice)} BYN</span><span class="pod-promo-badge">ЗА ${POD_LIQUID_TARGET_PRICE} BYN К ПОДУ</span>`
-                                : `${model.price} BYN`
-                        }
-                    </div>
-                    ${freeLiquid ? `<div class="free-hint-box">🎁 После добавления в корзину нажмите кнопку «Сделать бесплатно»</div>` : ''}
-                    ${hasPodPromo ? `<div class="pod-promo-hint-box">🔥 У вас в корзине под-система — цена этой жидкости будет <b>${POD_LIQUID_TARGET_PRICE} BYN</b>!</div>` : ''}
-                    <div class="product-detail-desc">${model.desc || ''}</div>
-                    <div class="color-selector">
-                        <div class="color-selector-label">
-                            <span>${variantLabel}: <b id="selectedColorName">${selectedColor}</b></span>
-                            <span>В наличии: ${maxStock} шт.</span>
-                        </div>
-                        <div class="color-thumbs" id="colorThumbs">
-                            ${colors.map((c, ci) => {
-                                const cImg = colorImages[c] || model.image;
-                                return `<div class="color-thumb ${ci === selectedColorIdx ? 'selected' : ''}" data-color-idx="${ci}"><img src="${cImg}" alt="${c}" onerror="this.style.opacity='0.2'"><div class="color-thumb-name">${c}</div></div>`;
-                            }).join('')}
-                        </div>
-                    </div>
-                `;
+            const initial = getCurrentVariantData();
 
-                footer.innerHTML = `
-                    <div class="purchase-panel">
-                        <div class="quantity-selector">
-                            <span class="quantity-selector-label">КОЛИЧЕСТВО</span>
-                            <div class="quantity-control">
-                                <button class="qty-btn" id="qtyDecrease">−</button>
-                                <span class="qty-value" id="qtyValue">1</span>
-                                <button class="qty-btn" id="qtyIncrease">+</button>
-                            </div>
-                        </div>
-                        <button class="add-to-cart-main" id="addToCartMain">В КОРЗИНУ</button>
+            content.innerHTML = `
+                <div class="product-detail-image-wrap">
+                    <img class="product-detail-image" id="productMainImage" src="${initial.imageSrc}" alt="${model.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
+                    <span id="productMainFallback" style="display:none; font-size:72px;">${fallbackIcon}</span>
+                </div>
+                <div class="product-detail-category">${categoryLabel}</div>
+                <div class="product-detail-name">${model.name}</div>
+                <div class="product-detail-price">
+                    ${freeLiquid
+                        ? `<span class="old-price">${model.price} BYN</span><span class="free-badge">БЕСПЛАТНО</span>`
+                        : hasPodPromo
+                            ? `<span class="old-price">${model.price} BYN</span><span style="color:#69f07a;">${formatMoney(promoPrice)} BYN</span><span class="pod-promo-badge">ЗА ${POD_LIQUID_TARGET_PRICE} BYN К ПОДУ</span>`
+                            : `${model.price} BYN`
+                    }
+                </div>
+                ${freeLiquid ? `<div class="free-hint-box">🎁 После добавления в корзину нажмите кнопку «Сделать бесплатно»</div>` : ''}
+                ${hasPodPromo ? `<div class="pod-promo-hint-box">🔥 У вас в корзине под-система — цена этой жидкости будет <b>${POD_LIQUID_TARGET_PRICE} BYN</b>!</div>` : ''}
+                <div class="product-detail-desc">${model.desc || ''}</div>
+                <div class="color-selector">
+                    <div class="color-selector-label">
+                        <span>${variantLabel}: <b id="selectedColorName">${initial.selectedColor}</b></span>
+                        <span id="selectedColorStock">В наличии: ${initial.maxStock} шт.</span>
                     </div>
-                `;
+                    <div class="color-thumbs" id="colorThumbs">
+                        ${colors.map((c, ci) => {
+                            const cImg = colorImages[c] || model.image;
+                            return `<div class="color-thumb ${ci === selectedColorIdx ? 'selected' : ''}" data-color-idx="${ci}"><img src="${cImg}" alt="${c}" onerror="this.style.opacity='0.2'"><div class="color-thumb-name">${c}</div></div>`;
+                        }).join('')}
+                    </div>
+                </div>
+                <div class="reviews-box" id="productReviewsBox">
+                    <div style="font-size:12px; color:var(--text-gray);">Загрузка отзывов...</div>
+                </div>
+            `;
 
-                document.querySelectorAll('#colorThumbs .color-thumb').forEach(thumb => {
-                    thumb.addEventListener('click', () => {
-                        selectedColorIdx = parseInt(thumb.dataset.colorIdx, 10);
-                        renderContent();
-                    });
+            footer.innerHTML = `
+                <div class="purchase-panel">
+                    <div class="quantity-selector">
+                        <span class="quantity-selector-label">КОЛИЧЕСТВО</span>
+                        <div class="quantity-control">
+                            <button class="qty-btn" id="qtyDecrease">−</button>
+                            <span class="qty-value" id="qtyValue">1</span>
+                            <button class="qty-btn" id="qtyIncrease">+</button>
+                        </div>
+                    </div>
+                    <button class="add-to-cart-main" id="addToCartMain">В КОРЗИНУ</button>
+                </div>
+            `;
+
+            const mainImg = document.getElementById('productMainImage');
+            const mainFallback = document.getElementById('productMainFallback');
+            const colorNameEl = document.getElementById('selectedColorName');
+            const colorStockEl = document.getElementById('selectedColorStock');
+            const thumbsEls = Array.from(document.querySelectorAll('#colorThumbs .color-thumb'));
+            const reviewsWrap = document.getElementById('productReviewsBox');
+            const qtyValue = document.getElementById('qtyValue');
+
+            function updateSelectedVariantUI(newIdx) {
+                selectedColorIdx = newIdx;
+                const { selectedColor, imageSrc, maxStock } = getCurrentVariantData();
+
+                if (mainImg && mainFallback) {
+                    mainImg.style.display = '';
+                    mainFallback.style.display = 'none';
+                    mainImg.src = imageSrc;
+                }
+                if (colorNameEl) colorNameEl.textContent = selectedColor;
+                if (colorStockEl) colorStockEl.textContent = `В наличии: ${maxStock} шт.`;
+
+                thumbsEls.forEach((thumb, i) => {
+                    thumb.classList.toggle('selected', i === selectedColorIdx);
                 });
 
-                let qty = 1;
-                const qtyValue = document.getElementById('qtyValue');
-                document.getElementById('qtyDecrease').addEventListener('click', () => { if (qty > 1) { qty--; qtyValue.textContent = qty; } });
-                document.getElementById('qtyIncrease').addEventListener('click', () => {
-                    if (qty < maxStock) { qty++; qtyValue.textContent = qty; }
-                    else showToast(`В наличии только ${maxStock} шт.`);
-                });
-                document.getElementById('addToCartMain').addEventListener('click', () => {
-                    addToCart({
-                        docId: variantDocId,
-                        category: model.category || currentCategoryId || (isLiquid ? 'liquids' : 'other'),
-                        name: model.name,
-                        price: model.price,
-                        desc: model.desc || '',
-                        color: selectedColor === 'Стандарт' ? null : selectedColor,
-                        image: model.colorImages?.[selectedColor] || model.image,
-                        maxStock
-                    }, qty);
-                });
+                if (qty > maxStock) {
+                    qty = Math.max(1, maxStock);
+                    qtyValue.textContent = qty;
+                }
 
                 const reviewKey = `${model.name}||${selectedColor}`.toLowerCase();
-                const reviewsWrap = document.createElement('div');
-                reviewsWrap.className = 'reviews-box';
-                reviewsWrap.innerHTML = `<div style="font-size:12px; color:var(--text-gray);">Загрузка отзывов...</div>`;
-                content.appendChild(reviewsWrap);
                 loadAndRenderReviews(reviewsWrap, reviewKey, {
                     name: model.name,
                     variant: selectedColor,
@@ -1820,7 +1826,51 @@
                 });
             }
 
-            renderContent();
+            thumbsEls.forEach(thumb => {
+                thumb.addEventListener('click', () => {
+                    const idx = parseInt(thumb.dataset.colorIdx, 10);
+                    if (idx !== selectedColorIdx) {
+                        updateSelectedVariantUI(idx);
+                    }
+                });
+            });
+
+            document.getElementById('qtyDecrease').addEventListener('click', () => {
+                if (qty > 1) {
+                    qty--;
+                    qtyValue.textContent = qty;
+                }
+            });
+            document.getElementById('qtyIncrease').addEventListener('click', () => {
+                const { maxStock } = getCurrentVariantData();
+                if (qty < maxStock) {
+                    qty++;
+                    qtyValue.textContent = qty;
+                } else {
+                    showToast(`В наличии только ${maxStock} шт.`);
+                }
+            });
+            document.getElementById('addToCartMain').addEventListener('click', () => {
+                const { selectedColor, imageSrc, maxStock, variantDocId } = getCurrentVariantData();
+                addToCart({
+                    docId: variantDocId,
+                    category: model.category || currentCategoryId || (isLiquid ? 'liquids' : 'other'),
+                    name: model.name,
+                    price: model.price,
+                    desc: model.desc || '',
+                    color: selectedColor === 'Стандарт' ? null : selectedColor,
+                    image: imageSrc,
+                    maxStock
+                }, qty);
+            });
+
+            const initReviewKey = `${model.name}||${initial.selectedColor}`.toLowerCase();
+            loadAndRenderReviews(reviewsWrap, initReviewKey, {
+                name: model.name,
+                variant: initial.selectedColor,
+                image: initial.imageSrc
+            });
+
             showPage('productDetail');
         }
 
