@@ -109,6 +109,7 @@
         .product-price { font-size: 16px; font-weight: 700; color: var(--text-white); display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
         .promo-badge { display: inline-block; background: #ff9800; color: #000; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px; text-transform: uppercase; }
         .free-badge { display: inline-block; background: linear-gradient(135deg, #28cd41, #1e9e32); color: #ffffff; font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 999px; letter-spacing: 0.6px; text-transform: uppercase; box-shadow: 0 2px 10px rgba(40, 205, 65, 0.35); }
+        .pod-promo-badge { display: inline-block; background: linear-gradient(135deg, #ff9800, #ff6d00); color: #000; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 999px; letter-spacing: 0.4px; text-transform: uppercase; }
         .old-price { text-decoration: line-through; color: var(--text-gray); font-size: 13px; font-weight: 500; }
         .add-to-cart-btn { margin-left: auto; padding: 8px 14px; background: var(--text-white); color: var(--bg-dark); border: none; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; flex-shrink: 0; transition: background 0.2s, transform 0.1s; }
         .add-to-cart-btn:active { background: #e0e0e0; transform: scale(0.98); }
@@ -145,6 +146,7 @@
         .product-detail-price { font-size: 20px; font-weight: 700; color: var(--text-white); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
         .product-detail-desc { font-size: 14px; color: var(--text-gray); text-align: center; margin-bottom: 24px; line-height: 1.4; }
         .free-hint-box { background: rgba(40, 205, 65, 0.14); border: 1px solid rgba(40, 205, 65, 0.45); color: #7ef28f; padding: 8px 14px; border-radius: 12px; font-size: 12px; font-weight: 600; text-align: center; margin-bottom: 14px; }
+        .pod-promo-hint-box { background: rgba(255, 152, 0, 0.14); border: 1px solid rgba(255, 152, 0, 0.45); color: #ffd180; padding: 8px 14px; border-radius: 12px; font-size: 12px; font-weight: 600; text-align: center; margin-bottom: 14px; }
 
         .color-selector { width: 100%; max-width: 360px; margin-bottom: 20px; }
         .color-selector-label { font-size: 12px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
@@ -172,7 +174,7 @@
         #cartPage, #profilePage, #adminPage { padding: 20px 16px 100px; }
         .empty-state { text-align: center; padding: 60px 20px; color: var(--text-gray); }
         .section-title { font-size: 22px; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; }
-        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text-white); color: var(--bg-dark); padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 1000; text-align: center; max-width: 90vw; }
+        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text-white); color: var(--bg-dark); padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 1500; text-align: center; max-width: 90vw; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         /* КНОПКИ СПОСОБА ПОЛУЧЕНИЯ И БОНУСОВ В КОРЗИНЕ */
@@ -187,6 +189,82 @@
         .cart-bonus-btn.free { border-color: rgba(40,205,65,0.55); background: rgba(40,205,65,0.16); color: #69f07a; }
         .cart-bonus-btn.applied { border-color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.12); color: #ffffff; }
         .cart-bonus-banner { background: rgba(255,152,0,0.12); border: 1px solid rgba(255,152,0,0.35); border-radius: 14px; padding: 10px 14px; margin: 0 16px 12px; font-size: 12px; color: #ffd180; line-height: 1.4; }
+        .cart-upsell-banner {
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.16), rgba(255, 109, 0, 0.08));
+            border: 1px solid rgba(255, 152, 0, 0.45);
+            border-radius: 18px; padding: 14px; margin: 0 16px 14px;
+            display: flex; flex-direction: column; gap: 10px;
+            box-shadow: 0 8px 20px rgba(255, 152, 0, 0.12);
+        }
+        .cart-upsell-btn {
+            width: 100%; padding: 11px 14px; border-radius: 12px; border: none;
+            background: linear-gradient(135deg, #ff9800, #ff6d00); color: #000;
+            font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;
+        }
+        .cart-upsell-btn:active { transform: scale(0.98); }
+
+        /* МОДАЛКА ПРЕДЛОЖЕНИЯ ЖИДКОСТИ К ПОД-СИСТЕМЕ */
+        .upsell-modal {
+            position: fixed; inset: 0; z-index: 1100;
+            background: rgba(0, 0, 0, 0.86);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            display: flex; align-items: flex-end; justify-content: center;
+            padding: 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            animation: fadeIn 0.2s ease;
+        }
+        @media (min-width: 520px) {
+            .upsell-modal { align-items: center; }
+        }
+        .upsell-box {
+            width: 100%; max-width: 440px; max-height: 84dvh;
+            background: linear-gradient(180deg, #161616 0%, #0b0b0b 100%);
+            border: 1px solid rgba(255, 152, 0, 0.4);
+            border-radius: 26px; padding: 18px 16px;
+            display: flex; flex-direction: column; gap: 12px;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85), 0 0 28px rgba(255, 152, 0, 0.14);
+            animation: slideUp 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .upsell-header { text-align: center; }
+        .upsell-pill {
+            display: inline-block; padding: 4px 10px; border-radius: 999px;
+            background: linear-gradient(135deg, #ff9800, #ff6d00); color: #000;
+            font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px;
+            margin-bottom: 8px;
+        }
+        .upsell-title { font-size: 18px; font-weight: 800; text-transform: uppercase; line-height: 1.25; margin-bottom: 4px; }
+        .upsell-sub { font-size: 12px; color: #bdbdbd; line-height: 1.4; }
+        .upsell-list {
+            flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+            display: flex; flex-direction: column; gap: 10px; padding-right: 2px;
+        }
+        .upsell-item {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px; padding: 10px; display: flex; align-items: center; gap: 10px;
+        }
+        .upsell-thumb {
+            width: 56px; height: 56px; border-radius: 12px; background: rgba(255, 255, 255, 0.06);
+            overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+        }
+        .upsell-thumb img { width: 100%; height: 100%; object-fit: contain; }
+        .upsell-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+        .upsell-brand { font-size: 10px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.6px; }
+        .upsell-name { font-size: 13px; font-weight: 800; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .upsell-flavor-select {
+            width: 100%; padding: 6px 8px; border-radius: 10px;
+            background: rgba(0, 0, 0, 0.55); border: 1px solid rgba(255, 255, 255, 0.16);
+            color: #fff; font-size: 11px; font-family: inherit; outline: none;
+        }
+        .upsell-flavor-select option { background: #121212; color: #fff; }
+        .upsell-price-action { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+        .upsell-prices { text-align: right; line-height: 1.15; }
+        .upsell-new-price { font-size: 14px; font-weight: 800; color: #69f07a; }
+        .upsell-add-btn {
+            padding: 8px 12px; border-radius: 10px; border: none;
+            background: var(--text-white); color: var(--bg-dark);
+            font-size: 11px; font-weight: 800; text-transform: uppercase; cursor: pointer;
+        }
+        .upsell-add-btn:active { transform: scale(0.95); }
+        .upsell-footer { display: flex; flex-direction: column; gap: 8px; padding-top: 4px; }
 
         /* МОДАЛКА ДАТЫ И ВРЕМЕНИ (ФИКС ДЛЯ IPHONE) */
         .delivery-datetime-grid {
@@ -520,6 +598,7 @@
         const SUPER_ADMIN = 'seregablatnou';
         const IMGBB_API_KEY = 'aa100eea73f466598cc1886be9d7466f';
         const PURCHASES_PER_SPIN = 5;
+        const POD_LIQUID_DISCOUNT = 5;
 
         const firebaseConfig = {
             apiKey: "AIzaSyCjs05afH0dhwWRYs9cq15rG9mi8fdZHfM",
@@ -629,6 +708,76 @@
         function formatMoney(val) {
             const num = Math.max(0, Number(val) || 0);
             return Number.isInteger(num) ? `${num}` : `${Number(num.toFixed(2))}`;
+        }
+
+        // --- РАСЧЁТ АКЦИИ «ПОД-СИСТЕМА + ЖИДКОСТЬ −5 BYN» ---
+        function getCartPodCount() {
+            return cart.reduce((sum, item) => sum + (item.category === 'vapes' ? item.qty : 0), 0);
+        }
+
+        function calculateCartDetails() {
+            let podPromoSlotsLeft = getCartPodCount();
+            let subtotal = 0;
+            let totalPodDiscount = 0;
+            let totalRouletteDiscount = 0;
+            const itemsMap = new Map();
+
+            cart.forEach(item => {
+                const baseTotal = +(item.price * item.qty).toFixed(2);
+                const reward = item.appliedRewardId ? findRewardById(item.appliedRewardId) : null;
+
+                let freeUnits = 0;
+                if (reward && reward.type === 'free_liquid' && item.category === 'liquids') {
+                    freeUnits = 1;
+                }
+
+                const eligibleForPodUnits = item.category === 'liquids' ? Math.max(0, item.qty - freeUnits) : 0;
+                const podDiscountUnits = Math.min(eligibleForPodUnits, podPromoSlotsLeft);
+                podPromoSlotsLeft -= podDiscountUnits;
+
+                const podDiscountAmount = +(Math.min(item.price, POD_LIQUID_DISCOUNT) * podDiscountUnits).toFixed(2);
+
+                let rewardDiscountAmount = 0;
+                if (freeUnits === 1) {
+                    rewardDiscountAmount = +item.price.toFixed(2);
+                } else if (reward && reward.type === 'discount') {
+                    const unitBaseForReward = (podDiscountUnits >= item.qty)
+                        ? Math.max(0, item.price - POD_LIQUID_DISCOUNT)
+                        : item.price;
+                    rewardDiscountAmount = +(unitBaseForReward * ((Number(reward.percent) || 0) / 100)).toFixed(2);
+                }
+
+                const totalItemDiscount = Math.min(baseTotal, +(podDiscountAmount + rewardDiscountAmount).toFixed(2));
+                const finalTotal = Math.max(0, +(baseTotal - totalItemDiscount).toFixed(2));
+
+                subtotal += baseTotal;
+                totalPodDiscount += podDiscountAmount;
+                totalRouletteDiscount += Math.max(0, +(totalItemDiscount - podDiscountAmount).toFixed(2));
+
+                itemsMap.set(item.id, {
+                    baseTotal,
+                    podDiscountUnits,
+                    podDiscountAmount,
+                    reward: (freeUnits === 1 || (reward && reward.type === 'discount')) ? reward : null,
+                    rewardDiscountAmount: Math.max(0, +(totalItemDiscount - podDiscountAmount).toFixed(2)),
+                    discountAmount: totalItemDiscount,
+                    finalTotal
+                });
+            });
+
+            return {
+                itemsMap,
+                subtotal: +subtotal.toFixed(2),
+                totalPodDiscount: +totalPodDiscount.toFixed(2),
+                totalRouletteDiscount: +totalRouletteDiscount.toFixed(2),
+                totalDiscount: +(totalPodDiscount + totalRouletteDiscount).toFixed(2),
+                finalTotal: Math.max(0, +(subtotal - totalPodDiscount - totalRouletteDiscount).toFixed(2)),
+                unusedPodPromoSlots: podPromoSlotsLeft
+            };
+        }
+
+        function getUnusedPodPromoSlots() {
+            return calculateCartDetails().unusedPodPromoSlots;
         }
 
         function updateAdminVisibility() {
@@ -868,7 +1017,7 @@
                         const mKey = name.toLowerCase();
                         if (!modelsMap.has(mKey)) {
                             modelsMap.set(mKey, {
-                                id: doc.id, category: 'liquids', name, desc, price, stock, image: resolvedImage,
+                                id: doc.id, category: 'liquids', brand: bName, name, desc, price, stock, image: resolvedImage,
                                 isCover: false, colors: [], colorImages: {}, colorStocks: {}
                             });
                         }
@@ -968,8 +1117,12 @@
                     showPage('brand'); return;
                 }
                 const freeLiquid = hasFreeLiquidReward();
+                const podPromoSlots = getUnusedPodPromoSlots();
+                const hasPodPromo = !freeLiquid && podPromoSlots > 0;
+
                 brandList.innerHTML = `
                     ${freeLiquid ? `<div class="free-hint-box">🎁 У вас есть приз «Бесплатная жидкость» — выберите любую и примените в корзине!</div>` : ''}
+                    ${hasPodPromo ? `<div class="pod-promo-hint-box">🔥 У вас в корзине под-система! Любая жидкость дешевле на <b>${POD_LIQUID_DISCOUNT} BYN</b> (доступно: ${podPromoSlots} шт.)</div>` : ''}
                     ${liquidBrands.map((b, bIdx) => {
                         const brandImage = (b.models.find(m => m.image && m.image !== 'novayazhizha.png')?.image) || b.models[0]?.image || 'novayazhizha.png';
                         return `
@@ -983,7 +1136,9 @@
                                 <div class="brand-group-arrow">›</div>
                             </div>
                             <div class="brand-models-list" id="liquidFlavors_${bIdx}">
-                                ${b.models.map((m, mIdx) => `
+                                ${b.models.map((m, mIdx) => {
+                                    const promoPrice = Math.max(0, +(m.price - POD_LIQUID_DISCOUNT).toFixed(2));
+                                    return `
                                     <div class="product-card" data-liq-brand="${bIdx}" data-liq-model="${mIdx}">
                                         <div class="product-thumb"><img src="${m.image}" alt="${m.name}"></div>
                                         <div class="product-info">
@@ -992,13 +1147,15 @@
                                             <div class="product-price">
                                                 ${freeLiquid
                                                     ? `<span class="old-price">${m.price} BYN</span><span class="free-badge">БЕСПЛАТНО</span>`
-                                                    : `${m.price} BYN`
+                                                    : hasPodPromo
+                                                        ? `<span class="old-price">${m.price} BYN</span><span style="color:#69f07a;">${formatMoney(promoPrice)} BYN</span><span class="pod-promo-badge">−${POD_LIQUID_DISCOUNT} BYN К ПОДУ</span>`
+                                                        : `${m.price} BYN`
                                                 }
                                             </div>
                                         </div>
                                         <div class="brand-card-arrow">›</div>
                                     </div>
-                                `).join('')}
+                                `;}).join('')}
                             </div>
                         </div>
                     `;
@@ -1065,7 +1222,7 @@
                 <div class="product-card" data-model-idx="${mIdx}">
                     <div class="product-thumb"><img src="${m.image}" class="${m.isCover ? 'full-cover' : ''}" alt="${m.name}"></div>
                     <div class="product-info">
-                        <div class="product-title">${m.name} <span class="promo-badge">🤑 скидка на жидкость</span></div>
+                        <div class="product-title">${m.name} <span class="promo-badge">🤑 −5 BYN на жидкость</span></div>
                         <div class="product-desc">${m.desc}</div>
                         <div class="product-price">${m.price} BYN</div>
                     </div>
@@ -1091,6 +1248,8 @@
             const colors = model.colors && model.colors.length > 0 ? model.colors : ['Стандарт'];
             const isLiquid = model.category === 'liquids' || categoryLabel === 'ЖИДКОСТИ';
             const freeLiquid = isLiquid && hasFreeLiquidReward();
+            const hasPodPromo = isLiquid && !freeLiquid && getUnusedPodPromoSlots() > 0;
+            const promoPrice = Math.max(0, +(model.price - POD_LIQUID_DISCOUNT).toFixed(2));
 
             function renderContent() {
                 const selectedColor = colors[selectedColorIdx];
@@ -1105,10 +1264,13 @@
                     <div class="product-detail-price">
                         ${freeLiquid
                             ? `<span class="old-price">${model.price} BYN</span><span class="free-badge">БЕСПЛАТНО</span>`
-                            : `${model.price} BYN`
+                            : hasPodPromo
+                                ? `<span class="old-price">${model.price} BYN</span><span style="color:#69f07a;">${formatMoney(promoPrice)} BYN</span><span class="pod-promo-badge">−${POD_LIQUID_DISCOUNT} BYN К ПОДУ</span>`
+                                : `${model.price} BYN`
                         }
                     </div>
                     ${freeLiquid ? `<div class="free-hint-box">🎁 После добавления в корзину нажмите кнопку «Сделать бесплатно»</div>` : ''}
+                    ${hasPodPromo ? `<div class="pod-promo-hint-box">🔥 У вас в корзине под-система — скидка −${POD_LIQUID_DISCOUNT} BYN применится автоматически!</div>` : ''}
                     <div class="product-detail-desc">${model.desc || ''}</div>
                     <div class="color-selector">
                         <div class="color-selector-label">
@@ -1176,18 +1338,154 @@
             showPage('productDetail');
         }
 
-        function addToCart(product, qty = 1) {
+        // --- МОДАЛЬНОЕ ОКНО ПРЕДЛОЖЕНИЯ ЖИДКОСТИ ПРИ ПОКУПКЕ ПОД-СИСТЕМЫ ---
+        function showLiquidUpsellModal(podName = '') {
+            if (liquidBrands.length === 0) return;
+
+            const existingModal = document.querySelector('.upsell-modal');
+            if (existingModal) existingModal.remove();
+
+            const flatLiquids = [];
+            liquidBrands.forEach(b => {
+                b.models.forEach(m => {
+                    flatLiquids.push({ brand: b.brand, model: m });
+                });
+            });
+            if (flatLiquids.length === 0) return;
+
+            const modal = document.createElement('div');
+            modal.className = 'upsell-modal';
+
+            function renderUpsellContent() {
+                const slots = getUnusedPodPromoSlots();
+                const headerSub = podName
+                    ? `Вы добавили «${podName}». Возьмите любую жидкость к ней со скидкой <b>−${POD_LIQUID_DISCOUNT} BYN</b>!`
+                    : `У вас в корзине под-система! Заберите любую жидкость со скидкой <b>−${POD_LIQUID_DISCOUNT} BYN</b>.`;
+
+                modal.innerHTML = `
+                    <div class="upsell-box">
+                        <div class="upsell-header">
+                            <div class="upsell-pill">🔥 АКЦИЯ К ПОД-СИСТЕМЕ</div>
+                            <div class="upsell-title">Жидкость дешевле на ${POD_LIQUID_DISCOUNT} BYN</div>
+                            <div class="upsell-sub">${headerSub}${slots > 1 ? ` (доступно: ${slots} шт.)` : ''}</div>
+                        </div>
+
+                        <div class="upsell-list">
+                            ${flatLiquids.map((entry, idx) => {
+                                const m = entry.model;
+                                const colors = m.colors && m.colors.length > 0 ? m.colors : ['Стандарт'];
+                                const firstColor = colors[0];
+                                const thumbImg = (m.colorImages && m.colorImages[firstColor]) || m.image || 'novayazhizha.png';
+                                const newPrice = Math.max(0, +(m.price - POD_LIQUID_DISCOUNT).toFixed(2));
+                                return `
+                                    <div class="upsell-item" data-upsell-idx="${idx}">
+                                        <div class="upsell-thumb"><img src="${thumbImg}" alt="${m.name}" id="upsellImg_${idx}"></div>
+                                        <div class="upsell-info">
+                                            <div class="upsell-brand">${entry.brand}</div>
+                                            <div class="upsell-name">${m.name}</div>
+                                            ${colors.length > 1 || firstColor !== 'Стандарт' ? `
+                                                <select class="upsell-flavor-select" data-upsell-select="${idx}">
+                                                    ${colors.map((c, ci) => `<option value="${ci}">${c}</option>`).join('')}
+                                                </select>
+                                            ` : `<div style="font-size:11px; color:var(--text-gray);">${m.desc || 'Жидкость'}</div>`}
+                                        </div>
+                                        <div class="upsell-price-action">
+                                            <div class="upsell-prices">
+                                                <div class="old-price" style="font-size:11px;">${m.price} BYN</div>
+                                                <div class="upsell-new-price">${formatMoney(newPrice)} BYN</div>
+                                            </div>
+                                            <button type="button" class="upsell-add-btn" data-upsell-add="${idx}">+ Взять</button>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+
+                        <div class="upsell-footer">
+                            <button type="button" class="profile-btn primary" id="upsellAllLiquidsBtn">Выбрать в каталоге жидкостей →</button>
+                            <button type="button" class="profile-btn" id="upsellCloseBtn" style="padding:11px 14px; font-size:12px;">Нет, спасибо</button>
+                        </div>
+                    </div>
+                `;
+
+                modal.querySelectorAll('.upsell-flavor-select').forEach(sel => {
+                    sel.addEventListener('change', () => {
+                        const idx = parseInt(sel.dataset.upsellSelect, 10);
+                        const m = flatLiquids[idx].model;
+                        const cIdx = parseInt(sel.value, 10);
+                        const chosenColor = (m.colors && m.colors[cIdx]) || 'Стандарт';
+                        const imgEl = modal.querySelector(`#upsellImg_${idx}`);
+                        if (imgEl) {
+                            imgEl.src = (m.colorImages && m.colorImages[chosenColor]) || m.image || 'novayazhizha.png';
+                        }
+                    });
+                });
+
+                modal.querySelectorAll('[data-upsell-add]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const idx = parseInt(btn.dataset.upsellAdd, 10);
+                        const m = flatLiquids[idx].model;
+                        const sel = modal.querySelector(`[data-upsell-select="${idx}"]`);
+                        const cIdx = sel ? parseInt(sel.value, 10) : 0;
+                        const colors = m.colors && m.colors.length > 0 ? m.colors : ['Стандарт'];
+                        const chosenColor = colors[cIdx] || 'Стандарт';
+                        const maxStock = (m.colorStocks && m.colorStocks[chosenColor] !== undefined) ? m.colorStocks[chosenColor] : (m.stock || 99);
+
+                        const ok = addToCart({
+                            category: 'liquids',
+                            name: m.name,
+                            price: m.price,
+                            desc: m.desc || '',
+                            color: chosenColor === 'Стандарт' ? null : chosenColor,
+                            image: (m.colorImages && m.colorImages[chosenColor]) || m.image,
+                            maxStock
+                        }, 1, { silentToast: true });
+
+                        if (ok) {
+                            showToast(`Жидкость добавлена со скидкой −${POD_LIQUID_DISCOUNT} BYN!`);
+                            if (pages.cart.classList.contains('active')) renderCart();
+                            if (getUnusedPodPromoSlots() <= 0) {
+                                modal.remove();
+                            } else {
+                                renderUpsellContent();
+                            }
+                        }
+                    });
+                });
+
+                modal.querySelector('#upsellAllLiquidsBtn').addEventListener('click', () => {
+                    modal.remove();
+                    openCategory('liquids');
+                });
+
+                modal.querySelector('#upsellCloseBtn').addEventListener('click', () => {
+                    modal.remove();
+                });
+            }
+
+            renderUpsellContent();
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
+            });
+            document.body.appendChild(modal);
+        }
+
+        function addToCart(product, qty = 1, options = {}) {
             const count = Math.max(1, parseInt(qty, 10) || 1);
             const maxStock = product.maxStock ?? product.stock ?? Infinity;
-            const existing = cart.find(item => item.name === product.name && item.color === product.color && item.category === (product.category || 'other'));
+            const category = product.category || currentCategoryId || 'other';
+            const existing = cart.find(item => item.name === product.name && item.color === product.color && item.category === category);
             const currentQty = existing ? existing.qty : 0;
-            if (currentQty + count > maxStock) { showToast(`Максимум в наличии: ${maxStock} шт.`); return; }
+            if (currentQty + count > maxStock) {
+                showToast(`Максимум в наличии: ${maxStock} шт.`);
+                return false;
+            }
             if (existing) {
                 existing.qty += count;
             } else {
                 cart.push({
                     id: 'ci_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
-                    category: product.category || currentCategoryId || 'other',
+                    category,
                     name: product.name,
                     desc: product.desc || '',
                     price: product.price,
@@ -1198,39 +1496,19 @@
                 });
             }
             updateCartCount();
-            showToast('Добавлено в корзину');
+            if (!options.silentToast) {
+                showToast('Добавлено в корзину');
+            }
+
+            if (category === 'vapes' && getUnusedPodPromoSlots() > 0 && liquidBrands.length > 0) {
+                showLiquidUpsellModal(product.name);
+            }
+            return true;
         }
 
         function updateCartCount() {
             const total = cart.reduce((sum, item) => sum + item.qty, 0);
             if (cartCountEl) { cartCountEl.textContent = total; cartCountEl.style.display = total > 0 ? 'flex' : 'none'; }
-        }
-
-        function calcItemPricing(item) {
-            const baseTotal = +(item.price * item.qty).toFixed(2);
-            const reward = item.appliedRewardId ? findRewardById(item.appliedRewardId) : null;
-            if (!reward) {
-                return { baseTotal, discountAmount: 0, finalTotal: baseTotal, reward: null };
-            }
-            if (reward.type === 'free_liquid' && item.category === 'liquids') {
-                const discountAmount = +item.price.toFixed(2);
-                return {
-                    baseTotal,
-                    discountAmount,
-                    finalTotal: Math.max(0, +(baseTotal - discountAmount).toFixed(2)),
-                    reward
-                };
-            }
-            if (reward.type === 'discount') {
-                const discountAmount = +(item.price * ((Number(reward.percent) || 0) / 100)).toFixed(2);
-                return {
-                    baseTotal,
-                    discountAmount,
-                    finalTotal: Math.max(0, +(baseTotal - discountAmount).toFixed(2)),
-                    reward
-                };
-            }
-            return { baseTotal, discountAmount: 0, finalTotal: baseTotal, reward: null };
         }
 
         function renderCart() {
@@ -1243,8 +1521,7 @@
                 return;
             }
 
-            let subtotal = 0;
-            let totalDiscount = 0;
+            const details = calculateCartDetails();
             const unusedRewards = getUnusedRewards();
             const unusedDiscounts = unusedRewards.filter(r => r.type === 'discount');
             const unusedFreeLiquids = unusedRewards.filter(r => r.type === 'free_liquid');
@@ -1260,23 +1537,30 @@
 
             cartPage.innerHTML = `
                 <h1 class="section-title">КОРЗИНА</h1>
+                ${details.unusedPodPromoSlots > 0 && liquidBrands.length > 0 ? `
+                    <div class="cart-upsell-banner">
+                        <div style="font-size:13px; font-weight:700; color:#ffd180; line-height:1.35;">
+                            🔥 Акция: к вашей под-системе любая жидкость со скидкой <b>−${POD_LIQUID_DISCOUNT} BYN</b>!
+                            ${details.unusedPodPromoSlots > 1 ? `<span style="color:#fff;">(доступно слотов: ${details.unusedPodPromoSlots})</span>` : ''}
+                        </div>
+                        <button type="button" class="cart-upsell-btn" id="cartUpsellLiquidBtn">Выбрать жидкость со скидкой −${POD_LIQUID_DISCOUNT} BYN</button>
+                    </div>
+                ` : ''}
                 ${userRewards.length > 0 ? `
                     <div class="cart-bonus-banner">
                         🎁 У вас есть активные призы рулетки (<b>${userRewards.length} шт.</b>). Нажмите кнопку напротив нужного товара, чтобы применить бонус!
                     </div>
                 ` : ''}
-                <div class="cart-list" style="display:flex; flex-direction:column; gap:12px; padding:0 16px 230px;">
+                <div class="cart-list" style="display:flex; flex-direction:column; gap:12px; padding:0 16px 240px;">
                     ${cart.map(item => {
-                        const pricing = calcItemPricing(item);
-                        subtotal += pricing.baseTotal;
-                        totalDiscount += pricing.discountAmount;
+                        const pricing = details.itemsMap.get(item.id);
                         const isLiquid = item.category === 'liquids';
 
                         let bonusButtonsHtml = '';
                         if (pricing.reward) {
                             const labelText = pricing.reward.type === 'free_liquid'
                                 ? '🎁 Бесплатно применено'
-                                : `🏷 Скидка -${pricing.reward.percent}% (−${formatMoney(pricing.discountAmount)} BYN)`;
+                                : `🏷 Скидка -${pricing.reward.percent}% (−${formatMoney(pricing.rewardDiscountAmount)} BYN)`;
                             bonusButtonsHtml = `
                                 <div class="cart-bonus-row">
                                     <button class="cart-bonus-btn applied" data-cart-id="${item.id}" data-action="remove-reward">${labelText} · Снять ✕</button>
@@ -1302,6 +1586,11 @@
                                     <div style="font-size:15px; font-weight:700; text-transform:uppercase;">${item.name}</div>
                                     ${item.color ? `<div style="font-size:12px; color:var(--text-gray); margin-top:2px;">Вариант: ${item.color}</div>` : ''}
                                     ${item.desc ? `<div style="font-size:12px; color:var(--text-gray); margin-top:2px;">${item.desc}</div>` : ''}
+                                    ${pricing.podDiscountAmount > 0 ? `
+                                        <div style="margin-top:6px;">
+                                            <span class="pod-promo-badge">🔥 Акция к поду: −${formatMoney(pricing.podDiscountAmount)} BYN</span>
+                                        </div>
+                                    ` : ''}
                                 </div>
                                 <div style="text-align:right; white-space:nowrap;">
                                     ${pricing.discountAmount > 0 ? `<div class="old-price">${formatMoney(pricing.baseTotal)} BYN</div>` : ''}
@@ -1326,19 +1615,30 @@
                         <button class="pickup-btn ${selectedPickup === 'ВОКЗАЛ' ? 'selected' : ''}" id="pickupVokzal">📍 ВОКЗАЛ</button>
                         <button class="pickup-btn disabled" id="pickupDelivery">🚚 ДОСТАВКА СКОРО</button>
                     </div>
-                    ${totalDiscount > 0 ? `
+                    ${details.totalPodDiscount > 0 ? `
+                        <div style="display:flex; justify-content:space-between; font-size:13px; color:#ffb74d; font-weight:600;">
+                            <span>Скидка к под-системе</span>
+                            <span>−${formatMoney(details.totalPodDiscount)} BYN</span>
+                        </div>
+                    ` : ''}
+                    ${details.totalRouletteDiscount > 0 ? `
                         <div style="display:flex; justify-content:space-between; font-size:13px; color:#69f07a; font-weight:600;">
                             <span>Скидка по рулетке</span>
-                            <span>−${formatMoney(totalDiscount)} BYN</span>
+                            <span>−${formatMoney(details.totalRouletteDiscount)} BYN</span>
                         </div>
                     ` : ''}
                     <div style="display:flex; justify-content:space-between; font-size:16px; font-weight:700; margin-top:2px;">
                         <span>Итого</span>
-                        <span id="cartTotal">${formatMoney(Math.max(0, subtotal - totalDiscount))} BYN</span>
+                        <span id="cartTotal">${formatMoney(details.finalTotal)} BYN</span>
                     </div>
                     <button class="checkout-btn" id="checkoutBtn" ${selectedPickup === 'ВОКЗАЛ' ? '' : 'disabled'} style="width:100%; padding:15px 24px; border:none; border-radius:16px; background:var(--text-white); color:var(--bg-dark); font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:1px; cursor:pointer;">ОФОРМИТЬ ЗАКАЗ</button>
                 </div>
             `;
+
+            const upsellBtn = document.getElementById('cartUpsellLiquidBtn');
+            if (upsellBtn) {
+                upsellBtn.addEventListener('click', () => showLiquidUpsellModal());
+            }
 
             document.getElementById('pickupVokzal').addEventListener('click', () => {
                 selectedPickup = 'ВОКЗАЛ';
@@ -1870,25 +2170,30 @@
         }
 
         async function sendOrder(dayLabel, timeLabel) {
+            const details = calculateCartDetails();
             let orderText = 'Здравствуйте! Хочу оформить заказ:\n';
-            let total = 0;
             const usedRewardIds = [];
 
             cart.forEach((item, i) => {
-                const pricing = calcItemPricing(item);
-                total += pricing.finalTotal;
+                const pricing = details.itemsMap.get(item.id);
                 const colorStr = item.color ? ` (${item.color})` : '';
-                let bonusNote = '';
+                const notes = [];
+                if (pricing.podDiscountAmount > 0) {
+                    notes.push(`🔥 Акция к поду: −${formatMoney(pricing.podDiscountAmount)} BYN`);
+                }
                 if (pricing.reward) {
                     usedRewardIds.push(pricing.reward.id);
-                    bonusNote = pricing.reward.type === 'free_liquid'
-                        ? ' [🎁 Бесплатная жижа по рулетке]'
-                        : ` [🏷 Скидка -${pricing.reward.percent}% на 1 шт.]`;
+                    notes.push(
+                        pricing.reward.type === 'free_liquid'
+                            ? '🎁 Бесплатная жижа по рулетке'
+                            : `🏷 Скидка -${pricing.reward.percent}% на 1 шт.`
+                    );
                 }
+                const bonusNote = notes.length ? ` [${notes.join(' | ')}]` : '';
                 orderText += `${i + 1}. ${item.name}${colorStr} × ${item.qty} — ${formatMoney(pricing.finalTotal)} BYN${bonusNote}\n`;
             });
 
-            orderText += `\nИтого: ${formatMoney(total)} BYN\n📍 Способ получения: ${selectedPickup || 'ВОКЗАЛ'}\n📅 Дата: ${dayLabel}\n⏰ Время: ${timeLabel}`;
+            orderText += `\nИтого: ${formatMoney(details.finalTotal)} BYN\n📍 Способ получения: ${selectedPickup || 'ВОКЗАЛ'}\n📅 Дата: ${dayLabel}\n⏰ Время: ${timeLabel}`;
 
             if (usedRewardIds.length > 0) {
                 const usedSet = new Set(usedRewardIds);
@@ -1908,7 +2213,7 @@
                     userId: getUserDocId(),
                     username: getTgUsername() || getUserDocId(),
                     items: cart.map(i => ({ name: i.name, color: i.color || 'Стандарт', qty: i.qty, price: i.price })),
-                    total: formatMoney(total),
+                    total: formatMoney(details.finalTotal),
                     pickup: selectedPickup || 'ВОКЗАЛ',
                     date: dayLabel,
                     time: timeLabel,
