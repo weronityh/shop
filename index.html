@@ -95,7 +95,7 @@
 
         /* СТРАНИЦА БРЕНДА */
         .sub-header { display: flex; align-items: center; gap: 12px; padding: 16px; margin-bottom: 16px; background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-card); position: sticky; top: 0; z-index: 10; box-shadow: var(--shadow-card); }
-        .back-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-white); box-shadow: var(--shadow-card); }
+        .back-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-white); box-shadow: var(--shadow-card); flex-shrink: 0; }
         .sub-title { font-size: 18px; font-weight: 600; }
         .product-list { display: flex; flex-direction: column; gap: 12px; padding: 0 16px 100px; }
         .product-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 14px; display: flex; gap: 14px; align-items: center; cursor: pointer; transition: background 0.2s; position: relative; z-index: 1; box-shadow: var(--shadow-card); }
@@ -128,7 +128,7 @@
         /* БРЕНДЫ СПИСОК */
         .brand-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: background 0.2s, border-color 0.2s; box-shadow: var(--shadow-card); }
         .brand-card:active { background: var(--bg-card-hover); }
-        .brand-card-thumb { width: 56px; height: 56px; border-radius: 12px; background: var(--border-card); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; border: 1px solid var(--border-card); }
+        .brand-card-thumb { width: 56px; height: 56px; border-radius: 12px; background: var(--border-card); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; border: 1px solid var(--border-card); font-size: 24px; }
         .brand-card-thumb img { width: 100%; height: 100%; object-fit: cover; }
         .brand-card-info { flex: 1; min-width: 0; }
         .brand-card-name { font-size: 16px; font-weight: 700; text-transform: uppercase; }
@@ -139,7 +139,7 @@
         .product-detail-header { display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-card); position: sticky; top: 0; z-index: 10; box-shadow: var(--shadow-card); }
         .product-detail-title { font-size: 18px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .product-detail-content { padding: 20px 16px 190px; display: flex; flex-direction: column; align-items: center; }
-        .product-detail-image-wrap { width: 100%; max-width: 320px; aspect-ratio: 1; margin-bottom: 20px; border-radius: 24px; overflow: hidden; background: var(--bg-dark); position: relative; }
+        .product-detail-image-wrap { width: 100%; max-width: 320px; aspect-ratio: 1; margin-bottom: 20px; border-radius: 24px; overflow: hidden; background: var(--bg-dark); position: relative; display: flex; align-items: center; justify-content: center; }
         .product-detail-image { width: 100%; height: 100%; object-fit: contain; transition: opacity 0.2s ease; }
         .product-detail-category { font-size: 12px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
         .product-detail-name { font-size: 22px; font-weight: 900; text-transform: uppercase; text-align: center; margin-bottom: 6px; }
@@ -328,6 +328,33 @@
         .reward-item-card:last-child { margin-bottom: 0; }
         .reward-use-btn { padding: 7px 12px; border-radius: 10px; border: none; background: var(--text-white); color: var(--bg-dark); font-size: 11px; font-weight: 800; text-transform: uppercase; cursor: pointer; flex-shrink: 0; }
 
+        /* СТРАНИЦА ВСЕХ ОТЗЫВОВ */
+        .reviews-page-list { display: flex; flex-direction: column; gap: 12px; padding: 0 16px 100px; }
+        .reviews-summary-card {
+            background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 18px;
+            padding: 14px 16px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: var(--shadow-card);
+        }
+        .full-review-card {
+            background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-card); border-radius: 20px; padding: 14px;
+            display: flex; flex-direction: column; gap: 10px; box-shadow: var(--shadow-card);
+        }
+        .full-review-product { display: flex; align-items: center; gap: 12px; }
+        .full-review-thumb {
+            width: 56px; height: 56px; border-radius: 12px; background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border-card); overflow: hidden; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center; font-size: 24px;
+        }
+        .full-review-thumb img { width: 100%; height: 100%; object-fit: contain; }
+        .full-review-meta { flex: 1; min-width: 0; }
+        .full-review-prod-name { font-size: 14px; font-weight: 800; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .full-review-prod-var { font-size: 11px; color: var(--text-gray); margin-top: 2px; }
+        .full-review-stars { color: #ffb74d; font-size: 13px; letter-spacing: 1px; margin-top: 3px; }
+        .full-review-text { font-size: 13px; color: #ececec; line-height: 1.45; background: rgba(255,255,255,0.03); border-radius: 12px; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.06); }
+        .full-review-footer { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-gray); }
+        .full-review-author { color: #fff; font-weight: 600; }
+
         /* ГОРИЗОНТАЛЬНАЯ РУЛЕТКА */
         .roulette-modal {
             position: fixed; inset: 0; z-index: 1200;
@@ -376,6 +403,25 @@
             display: flex; align-items: center; justify-content: center; gap: 8px;
             padding: 12px 14px; border-radius: 14px; border: 1px dashed rgba(255,255,255,0.35);
             background: rgba(255,255,255,0.04); color: var(--text-white); font-size: 13px; font-weight: 600; cursor: pointer;
+        }
+        .admin-dept-tabs {
+            display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 10px;
+            scrollbar-width: none; margin-bottom: 6px;
+        }
+        .admin-dept-tabs::-webkit-scrollbar { display: none; }
+        .admin-dept-tab {
+            flex-shrink: 0; padding: 8px 14px; border-radius: 999px;
+            border: 1px solid var(--border-card); background: rgba(255,255,255,0.05);
+            color: var(--text-gray); font-size: 12px; font-weight: 700;
+            text-transform: uppercase; cursor: pointer; transition: all 0.15s ease;
+        }
+        .admin-dept-tab.active {
+            background: var(--text-white); color: var(--bg-dark); border-color: var(--text-white);
+        }
+        .admin-dept-group-title {
+            font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px;
+            color: #ffb74d; margin: 12px 0 6px; display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 4px;
         }
         .admin-item { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 18px; padding: 12px; display: flex; align-items: center; gap: 12px; }
         .admin-item-thumb { width: 52px; height: 52px; border-radius: 12px; background: rgba(255,255,255,0.06); overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
@@ -500,6 +546,19 @@
                 <div class="profile-cards" id="profileCard"></div>
             </div>
 
+            <!-- ОТДЕЛЬНАЯ СТРАНИЦА С ОТЗЫВАМИ -->
+            <div class="page" id="reviewsPage">
+                <div class="sub-header">
+                    <button class="back-btn" id="backToProfileFromReviews">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.4" stroke="currentColor" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                    </button>
+                    <div class="sub-title">ОТЗЫВЫ ПОКУПАТЕЛЕЙ</div>
+                </div>
+                <div class="reviews-page-list" id="allReviewsList">
+                    <div class="empty-state">Загрузка отзывов...</div>
+                </div>
+            </div>
+
             <!-- МЕНЮ СОЗДАТЕЛЯ -->
             <div class="page" id="adminPage">
                 <h1 class="section-title">МЕНЮ СОЗДАТЕЛЯ</h1>
@@ -530,21 +589,22 @@
                     <div class="admin-form">
                         <select class="admin-select" id="admCategory">
                             <option value="vapes">ПОД-СИСТЕМЫ</option>
-                            <option value="liquids">Жидкости</option>
-                            <option value="snus">Снюс</option>
-                            <option value="disposables">Одноразки</option>
-                            <option value="consumables">Расходники</option>
+                            <option value="liquids">ЖИДКОСТИ</option>
+                            <option value="snus">СНЮС</option>
+                            <option value="consumables">РАСХОДНИКИ</option>
+                            <option value="nicoboosters">НИКОБУСТЕРЫ</option>
+                            <option value="disposables">ОДНОРАЗКИ</option>
                         </select>
-                        <input class="admin-input" id="admBrand" placeholder="Бренд (например: SMOANT, BRUSKO)">
-                        <input class="admin-input" id="admName" placeholder="Название (например: DRYMOST 75MG)">
+                        <input class="admin-input" id="admBrand" placeholder="Бренд / Производитель (например: VAPORESSO, SMOANT, BRUSKO)">
+                        <input class="admin-input" id="admName" placeholder="Название (например: DRYMOST 75MG, КАРТРИДЖ 0.6)">
                         <input class="admin-input" id="admDesc" placeholder="Описание (например: Под-система, 20 мг)">
                         <div class="admin-row">
                             <input class="admin-input" id="admPrice" type="number" placeholder="Цена (BYN)">
                             <input class="admin-input" id="admStock" type="number" placeholder="Общий сток">
                         </div>
                         <div class="admin-row" id="admColorRow">
-                            <input class="admin-input" id="admColor" placeholder="Цвет или Вкус">
-                            <input class="admin-input" id="admColorStock" type="number" placeholder="Сток цвета/вкуса">
+                            <input class="admin-input" id="admColor" placeholder="Цвет / Вкус / Вариант">
+                            <input class="admin-input" id="admColorStock" type="number" placeholder="Сток варианта">
                         </div>
                         <label class="admin-upload-label">
                             <span>📷 Загрузить фото с телефона</span>
@@ -563,6 +623,8 @@
                 </div>
 
                 <div class="profile-card-title" style="margin-bottom: 10px;">Товары в базе (<span id="admTotalCount">0</span>)</div>
+                <input class="admin-input" id="admSearchInput" placeholder="🔍 Быстрый поиск по названию или бренду..." style="margin-bottom: 10px;">
+                <div class="admin-dept-tabs" id="adminDeptTabs"></div>
                 <div id="adminProductList" style="display:flex; flex-direction:column; gap:10px;"></div>
             </div>
         </main>
@@ -598,7 +660,7 @@
         const SUPER_ADMIN = 'seregablatnou';
         const IMGBB_API_KEY = 'aa100eea73f466598cc1886be9d7466f';
         const PURCHASES_PER_SPIN = 5;
-        const POD_LIQUID_DISCOUNT = 5;
+        const POD_LIQUID_TARGET_PRICE = 15;
 
         const firebaseConfig = {
             apiKey: "AIzaSyCjs05afH0dhwWRYs9cq15rG9mi8fdZHfM",
@@ -617,10 +679,21 @@
             { id: 'snus', name: 'СНЮС', sub: '0 шт.', icon: '📦', image: 'snus.png' },
             { id: 'liquids', name: 'ЖИДКОСТИ', sub: '0 брендов', icon: '💧', image: 'novayazhizha.png' },
             { id: 'disposables', name: 'ОДНОРАЗКИ', sub: '0 шт.', icon: '🚬', image: 'odnorazki.png' },
-            { id: 'consumables', name: 'РАСХОДНИКИ', sub: '0 шт.', icon: '🔧', image: 'rashodniki.png' }
+            { id: 'consumables', name: 'РАСХОДНИКИ', sub: '0 брендов', icon: '🔧', image: 'rashodniki.png' },
+            { id: 'nicoboosters', name: 'НИКОБУСТЕРЫ', sub: '0 шт.', icon: '🧪', image: 'nikobuster.png' }
         ];
 
-        const catalogData = { vapes: [], snus: [], liquids: [], disposables: [], consumables: [] };
+        const ADMIN_DEPARTMENTS = [
+            { id: 'all', label: 'Все' },
+            { id: 'vapes', label: '📱 Под-системы' },
+            { id: 'liquids', label: '💧 Жидкости' },
+            { id: 'snus', label: '📦 Снюс' },
+            { id: 'consumables', label: '🔧 Расходники' },
+            { id: 'nicoboosters', label: '🧪 Никобустеры' },
+            { id: 'disposables', label: '🚬 Одноразки' }
+        ];
+
+        const catalogData = { vapes: [], snus: [], liquids: [], disposables: [], consumables: [], nicoboosters: [] };
         let extraAdmins = [];
         let userPurchases = 0;
         let userRewards = [];
@@ -629,11 +702,15 @@
         let allRawProducts = [];
         let vapeBrands = [];
         let liquidBrands = [];
+        let consumableBrands = [];
         let cart = [];
         let selectedPickup = null;
         let currentCategoryId = null;
         let currentBrandIdx = null;
+        let currentBrandCategory = 'vapes';
         let detailBackPage = 'brand';
+        let adminSelectedDept = 'all';
+        let adminSearchQuery = '';
 
         const VAPE_COLOR_IMAGES = {
             'PASITO 3': {
@@ -662,6 +739,7 @@
             productDetail: document.getElementById('productDetailPage'),
             cart: document.getElementById('cartPage'),
             profile: document.getElementById('profilePage'),
+            reviews: document.getElementById('reviewsPage'),
             admin: document.getElementById('adminPage')
         };
 
@@ -709,10 +787,24 @@
             const num = Math.max(0, Number(val) || 0);
             return Number.isInteger(num) ? `${num}` : `${Number(num.toFixed(2))}`;
         }
+        function formatReviewDate(ts) {
+            if (!ts) return 'Недавно';
+            const d = typeof ts.toDate === 'function' ? ts.toDate() : (ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts));
+            if (isNaN(d.getTime())) return 'Недавно';
+            return d.toLocaleString('ru-RU', {
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+        }
 
-        // --- РАСЧЁТ АКЦИИ «ПОД-СИСТЕМА + ЖИДКОСТЬ −5 BYN» ---
+        // --- РАСЧЁТ АКЦИИ «ПОД-СИСТЕМА + ЛЮБАЯ ЖИДКОСТЬ ЗА 15 BYN» ---
         function getCartPodCount() {
             return cart.reduce((sum, item) => sum + (item.category === 'vapes' ? item.qty : 0), 0);
+        }
+
+        function getPodPromoLiquidPrice(price) {
+            const num = Number(price) || 0;
+            return Math.min(num, POD_LIQUID_TARGET_PRICE);
         }
 
         function calculateCartDetails() {
@@ -731,18 +823,21 @@
                     freeUnits = 1;
                 }
 
-                const eligibleForPodUnits = item.category === 'liquids' ? Math.max(0, item.qty - freeUnits) : 0;
+                const eligibleForPodUnits = (item.category === 'liquids' && item.price > POD_LIQUID_TARGET_PRICE)
+                    ? Math.max(0, item.qty - freeUnits)
+                    : 0;
                 const podDiscountUnits = Math.min(eligibleForPodUnits, podPromoSlotsLeft);
                 podPromoSlotsLeft -= podDiscountUnits;
 
-                const podDiscountAmount = +(Math.min(item.price, POD_LIQUID_DISCOUNT) * podDiscountUnits).toFixed(2);
+                const discountPerUnit = Math.max(0, +(item.price - POD_LIQUID_TARGET_PRICE).toFixed(2));
+                const podDiscountAmount = +(discountPerUnit * podDiscountUnits).toFixed(2);
 
                 let rewardDiscountAmount = 0;
                 if (freeUnits === 1) {
                     rewardDiscountAmount = +item.price.toFixed(2);
                 } else if (reward && reward.type === 'discount') {
                     const unitBaseForReward = (podDiscountUnits >= item.qty)
-                        ? Math.max(0, item.price - POD_LIQUID_DISCOUNT)
+                        ? getPodPromoLiquidPrice(item.price)
                         : item.price;
                     rewardDiscountAmount = +(unitBaseForReward * ((Number(reward.percent) || 0) / 100)).toFixed(2);
                 }
@@ -808,13 +903,13 @@
             document.body.classList.toggle('subtle-smoke', name === 'location');
             document.body.classList.toggle('catalog-bg', name === 'catalog');
 
-            if (name === 'catalog' || name === 'cart' || name === 'profile' || name === 'brand' || name === 'admin') {
+            if (name === 'catalog' || name === 'cart' || name === 'profile' || name === 'reviews' || name === 'brand' || name === 'admin') {
                 bottomNav.style.display = 'flex';
             } else {
                 bottomNav.style.display = 'none';
             }
 
-            const tabMap = { catalog: 'catalog', brand: 'catalog', brandModels: 'catalog', productDetail: 'catalog', cart: 'cart', profile: 'profile', admin: 'admin' };
+            const tabMap = { catalog: 'catalog', brand: 'catalog', brandModels: 'catalog', productDetail: 'catalog', cart: 'cart', profile: 'profile', reviews: 'profile', admin: 'admin' };
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.tab === (tabMap[name] || ''));
             });
@@ -959,13 +1054,28 @@
 
         function startFirestoreSync() {
             db.collection('products').onSnapshot((snapshot) => {
-                const defaultImages = { vapes: 'vape.png', snus: 'snus.png', liquids: 'novayazhizha.png', disposables: 'odnorazki.png', consumables: 'rashodniki.png' };
-                const iconMap = { vapes: '📱', snus: '📦', liquids: '💧', disposables: '🚬', consumables: '🔧' };
+                const defaultImages = {
+                    vapes: 'vape.png',
+                    snus: 'snus.png',
+                    liquids: 'novayazhizha.png',
+                    disposables: 'odnorazki.png',
+                    consumables: 'rashodniki.png',
+                    nicoboosters: 'nikobuster.png'
+                };
+                const iconMap = {
+                    vapes: '📱',
+                    snus: '📦',
+                    liquids: '💧',
+                    disposables: '🚬',
+                    consumables: '🔧',
+                    nicoboosters: '🧪'
+                };
 
                 allRawProducts = [];
                 const groupedVapes = new Map();
                 const groupedLiquids = new Map();
-                const groupedFlat = { snus: new Map(), disposables: new Map(), consumables: new Map() };
+                const groupedConsumables = new Map();
+                const groupedFlat = { snus: new Map(), disposables: new Map(), nicoboosters: new Map() };
 
                 snapshot.forEach((doc) => {
                     const d = doc.data();
@@ -1026,6 +1136,22 @@
                         m.colorImages[variantName] = resolvedImage;
                         m.colorStocks[variantName] = variantStock;
                         if (m.image === defaultImages.liquids && resolvedImage !== defaultImages.liquids) m.image = resolvedImage;
+                    } else if (siteCat === 'consumables') {
+                        const bName = brand || 'Разное';
+                        if (!groupedConsumables.has(bName)) groupedConsumables.set(bName, { brand: bName, modelsMap: new Map() });
+                        const modelsMap = groupedConsumables.get(bName).modelsMap;
+                        const mKey = name.toLowerCase();
+                        if (!modelsMap.has(mKey)) {
+                            modelsMap.set(mKey, {
+                                id: doc.id, category: 'consumables', brand: bName, name, desc: desc || 'Расходник', price, stock, image: resolvedImage,
+                                isCover: false, icon: '🔧', colors: [], colorImages: {}, colorStocks: {}
+                            });
+                        }
+                        const m = modelsMap.get(mKey);
+                        if (!m.colors.includes(variantName)) m.colors.push(variantName);
+                        m.colorImages[variantName] = resolvedImage;
+                        m.colorStocks[variantName] = variantStock;
+                        if (m.image === defaultImages.consumables && resolvedImage !== defaultImages.consumables) m.image = resolvedImage;
                     } else if (groupedFlat[siteCat]) {
                         const map = groupedFlat[siteCat];
                         const mKey = `${brand.toLowerCase()}||${name.toLowerCase()}`;
@@ -1047,16 +1173,19 @@
 
                 vapeBrands = Array.from(groupedVapes.values()).map(b => ({ brand: b.brand, models: Array.from(b.modelsMap.values()) })).filter(b => b.models.length > 0);
                 liquidBrands = Array.from(groupedLiquids.values()).map(b => ({ brand: b.brand, models: Array.from(b.modelsMap.values()) })).filter(b => b.models.length > 0);
+                consumableBrands = Array.from(groupedConsumables.values()).map(b => ({ brand: b.brand, models: Array.from(b.modelsMap.values()) })).filter(b => b.models.length > 0);
 
                 catalogData.snus = Array.from(groupedFlat.snus.values());
                 catalogData.disposables = Array.from(groupedFlat.disposables.values());
-                catalogData.consumables = Array.from(groupedFlat.consumables.values());
+                catalogData.nicoboosters = Array.from(groupedFlat.nicoboosters.values());
 
-                categories[0].sub = `${vapeBrands.length} бренд${vapeBrands.length === 1 ? '' : vapeBrands.length < 5 ? 'а' : 'ов'}`;
-                categories[2].sub = `${liquidBrands.length} бренд${liquidBrands.length === 1 ? '' : liquidBrands.length < 5 ? 'а' : 'ов'}`;
+                const formatBrandSub = (len) => `${len} бренд${len === 1 ? '' : len < 5 ? 'а' : 'ов'}`;
+                categories[0].sub = formatBrandSub(vapeBrands.length);
                 categories[1].sub = `${catalogData.snus.length} шт.`;
+                categories[2].sub = formatBrandSub(liquidBrands.length);
                 categories[3].sub = `${catalogData.disposables.length} шт.`;
-                categories[4].sub = `${catalogData.consumables.length} шт.`;
+                categories[4].sub = formatBrandSub(consumableBrands.length);
+                categories[5].sub = `${catalogData.nicoboosters.length} шт.`;
 
                 renderCategories();
                 if (currentCategoryId && pages.brand.classList.contains('active')) openCategory(currentCategoryId);
@@ -1067,14 +1196,22 @@
         function renderCategories() {
             categoryGrid.innerHTML = categories.map(cat => {
                 let count = 0;
+                const isBrandCat = (cat.id === 'vapes' || cat.id === 'liquids' || cat.id === 'consumables');
                 if (cat.id === 'vapes') count = vapeBrands.length;
                 else if (cat.id === 'liquids') count = liquidBrands.length;
+                else if (cat.id === 'consumables') count = consumableBrands.length;
                 else count = catalogData[cat.id]?.length || 0;
+
                 return `
                 <div class="category-card" data-category="${cat.id}">
-                    <div class="category-card-image">${cat.image ? `<img src="${cat.image}" alt="${cat.name}">` : `<span>${cat.icon}</span>`}</div>
+                    <div class="category-card-image">
+                        ${cat.image
+                            ? `<img src="${cat.image}" alt="${cat.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${cat.icon}</span>`
+                            : `<span>${cat.icon}</span>`
+                        }
+                    </div>
                     <div class="category-card-title">${cat.name}</div>
-                    <div class="category-card-sub">${(cat.id === 'vapes' || cat.id === 'liquids') ? `${count} бренд${count === 1 ? '' : count < 5 ? 'а' : 'ов'}` : `${count} шт.`}</div>
+                    <div class="category-card-sub">${isBrandCat ? `${count} бренд${count === 1 ? '' : count < 5 ? 'а' : 'ов'}` : `${count} шт.`}</div>
                 </div>`;
             }).join('');
 
@@ -1088,25 +1225,33 @@
             const category = categories.find(c => c.id === categoryId);
             brandPageTitle.textContent = category.name;
 
-            if (categoryId === 'vapes') {
-                if (vapeBrands.length === 0) {
+            if (categoryId === 'vapes' || categoryId === 'consumables') {
+                const brandsArr = categoryId === 'vapes' ? vapeBrands : consumableBrands;
+                const fallbackIcon = categoryId === 'vapes' ? '📱' : '🔧';
+
+                if (brandsArr.length === 0) {
                     brandList.innerHTML = `<div class="empty-state">В этой категории пока нет товаров в наличии</div>`;
                     showPage('brand'); return;
                 }
-                brandList.innerHTML = vapeBrands.map((b, bIdx) => {
+                brandList.innerHTML = brandsArr.map((b, bIdx) => {
                     const firstModel = b.models[0];
                     return `
                     <div class="brand-card" data-brand-idx="${bIdx}">
-                        <div class="brand-card-thumb">${firstModel.image ? `<img src="${firstModel.image}" alt="${firstModel.name}">` : `<span>📱</span>`}</div>
+                        <div class="brand-card-thumb">
+                            ${firstModel.image
+                                ? `<img src="${firstModel.image}" alt="${firstModel.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${fallbackIcon}</span>`
+                                : `<span>${fallbackIcon}</span>`
+                            }
+                        </div>
                         <div class="brand-card-info">
                             <div class="brand-card-name">${b.brand}</div>
-                            <div class="brand-card-count">${b.models.length} моделей</div>
+                            <div class="brand-card-count">${b.models.length} ${b.models.length === 1 ? 'позиция' : b.models.length < 5 ? 'позиции' : 'позиций'}</div>
                         </div>
                         <div class="brand-card-arrow">›</div>
                     </div>`;
                 }).join('');
                 brandList.querySelectorAll('.brand-card').forEach(card => {
-                    card.addEventListener('click', () => openBrandModels(card.dataset.brandIdx));
+                    card.addEventListener('click', () => openBrandModels(card.dataset.brandIdx, categoryId));
                 });
                 showPage('brand'); return;
             }
@@ -1122,7 +1267,7 @@
 
                 brandList.innerHTML = `
                     ${freeLiquid ? `<div class="free-hint-box">🎁 У вас есть приз «Бесплатная жидкость» — выберите любую и примените в корзине!</div>` : ''}
-                    ${hasPodPromo ? `<div class="pod-promo-hint-box">🔥 У вас в корзине под-система! Любая жидкость дешевле на <b>${POD_LIQUID_DISCOUNT} BYN</b> (доступно: ${podPromoSlots} шт.)</div>` : ''}
+                    ${hasPodPromo ? `<div class="pod-promo-hint-box">🔥 У вас в корзине под-система! Любая жидкость стоит <b>${POD_LIQUID_TARGET_PRICE} BYN</b> (доступно: ${podPromoSlots} шт.)</div>` : ''}
                     ${liquidBrands.map((b, bIdx) => {
                         const brandImage = (b.models.find(m => m.image && m.image !== 'novayazhizha.png')?.image) || b.models[0]?.image || 'novayazhizha.png';
                         return `
@@ -1137,7 +1282,8 @@
                             </div>
                             <div class="brand-models-list" id="liquidFlavors_${bIdx}">
                                 ${b.models.map((m, mIdx) => {
-                                    const promoPrice = Math.max(0, +(m.price - POD_LIQUID_DISCOUNT).toFixed(2));
+                                    const promoPrice = getPodPromoLiquidPrice(m.price);
+                                    const isDiscounted = hasPodPromo && m.price > POD_LIQUID_TARGET_PRICE;
                                     return `
                                     <div class="product-card" data-liq-brand="${bIdx}" data-liq-model="${mIdx}">
                                         <div class="product-thumb"><img src="${m.image}" alt="${m.name}"></div>
@@ -1147,8 +1293,8 @@
                                             <div class="product-price">
                                                 ${freeLiquid
                                                     ? `<span class="old-price">${m.price} BYN</span><span class="free-badge">БЕСПЛАТНО</span>`
-                                                    : hasPodPromo
-                                                        ? `<span class="old-price">${m.price} BYN</span><span style="color:#69f07a;">${formatMoney(promoPrice)} BYN</span><span class="pod-promo-badge">−${POD_LIQUID_DISCOUNT} BYN К ПОДУ</span>`
+                                                    : isDiscounted
+                                                        ? `<span class="old-price">${m.price} BYN</span><span style="color:#69f07a;">${formatMoney(promoPrice)} BYN</span><span class="pod-promo-badge">ЗА ${POD_LIQUID_TARGET_PRICE} BYN К ПОДУ</span>`
                                                         : `${m.price} BYN`
                                                 }
                                             </div>
@@ -1185,10 +1331,15 @@
             } else {
                 brandList.innerHTML = entries.map((entry, idx) => `
                     <div class="product-card" data-flat-idx="${idx}">
-                        <div class="product-thumb">${entry.image ? `<img src="${entry.image}" class="${entry.isCover ? 'full-cover' : ''}" alt="${entry.name}">` : `<span>${entry.icon}</span>`}</div>
+                        <div class="product-thumb">
+                            ${entry.image
+                                ? `<img src="${entry.image}" class="${entry.isCover ? 'full-cover' : ''}" alt="${entry.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${entry.icon}</span>`
+                                : `<span>${entry.icon}</span>`
+                            }
+                        </div>
                         <div class="product-info">
                             <div class="product-title">${entry.name}</div>
-                            <div class="product-desc">${entry.desc || ''} ${entry.colors.length > 1 || entry.colors[0] !== 'Стандарт' ? `· ${entry.colors.length} вкус.` : ''}</div>
+                            <div class="product-desc">${entry.desc || ''} ${entry.colors.length > 1 || entry.colors[0] !== 'Стандарт' ? `· ${entry.colors.length} вар.` : ''}</div>
                             <div class="product-price">${entry.price} BYN</div>
                         </div>
                         <div class="brand-card-arrow">›</div>
@@ -1199,20 +1350,28 @@
                     card.addEventListener('click', () => {
                         const idx = parseInt(card.dataset.flatIdx, 10);
                         detailBackPage = 'brand';
-                        openProductDetailObj(entries[idx], category.name, 'ВКУС');
+                        const varLabel = categoryId === 'nicoboosters' ? 'ВАРИАНТ' : 'ВКУС';
+                        openProductDetailObj(entries[idx], category.name, varLabel);
                     });
                 });
             }
             showPage('brand');
         }
 
-        function openBrandModels(brandIdx) {
+        function openBrandModels(brandIdx, catId = 'vapes') {
             currentBrandIdx = brandIdx;
-            const brand = vapeBrands[brandIdx];
+            currentBrandCategory = catId;
+            const isConsumables = catId === 'consumables';
+            const brand = isConsumables ? consumableBrands[brandIdx] : vapeBrands[brandIdx];
             if (!brand) return;
+
+            const categoryLabel = isConsumables ? 'РАСХОДНИКИ' : 'POD-СИСТЕМЫ';
+            const variantLabel = isConsumables ? 'ВАРИАНТ' : 'ЦВЕТ';
+            const fallbackIcon = isConsumables ? '🔧' : '📱';
+
             if (brand.models.length === 1) {
                 detailBackPage = 'brand';
-                openProductDetailObj(brand.models[0], 'POD-СИСТЕМЫ', 'ЦВЕТ');
+                openProductDetailObj(brand.models[0], categoryLabel, variantLabel);
                 return;
             }
 
@@ -1220,10 +1379,16 @@
             const modelsList = document.getElementById('brandModelsList');
             modelsList.innerHTML = brand.models.map((m, mIdx) => `
                 <div class="product-card" data-model-idx="${mIdx}">
-                    <div class="product-thumb"><img src="${m.image}" class="${m.isCover ? 'full-cover' : ''}" alt="${m.name}"></div>
+                    <div class="product-thumb">
+                        <img src="${m.image}" class="${m.isCover ? 'full-cover' : ''}" alt="${m.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
+                        <span style="display:none;">${fallbackIcon}</span>
+                    </div>
                     <div class="product-info">
-                        <div class="product-title">${m.name} <span class="promo-badge">🤑 −5 BYN на жидкость</span></div>
-                        <div class="product-desc">${m.desc}</div>
+                        <div class="product-title">
+                            ${m.name}
+                            ${!isConsumables ? `<span class="promo-badge">🤑 жижа за ${POD_LIQUID_TARGET_PRICE} BYN</span>` : ''}
+                        </div>
+                        <div class="product-desc">${m.desc || ''}${m.colors.length > 1 ? ` · ${m.colors.length} вар.` : ''}</div>
                         <div class="product-price">${m.price} BYN</div>
                     </div>
                 </div>
@@ -1232,7 +1397,7 @@
             modelsList.querySelectorAll('.product-card[data-model-idx]').forEach(card => {
                 card.addEventListener('click', () => {
                     detailBackPage = 'brandModels';
-                    openProductDetailObj(brand.models[parseInt(card.dataset.modelIdx, 10)], 'POD-СИСТЕМЫ', 'ЦВЕТ');
+                    openProductDetailObj(brand.models[parseInt(card.dataset.modelIdx, 10)], categoryLabel, variantLabel);
                 });
             });
             showPage('brandModels');
@@ -1248,8 +1413,9 @@
             const colors = model.colors && model.colors.length > 0 ? model.colors : ['Стандарт'];
             const isLiquid = model.category === 'liquids' || categoryLabel === 'ЖИДКОСТИ';
             const freeLiquid = isLiquid && hasFreeLiquidReward();
-            const hasPodPromo = isLiquid && !freeLiquid && getUnusedPodPromoSlots() > 0;
-            const promoPrice = Math.max(0, +(model.price - POD_LIQUID_DISCOUNT).toFixed(2));
+            const hasPodPromo = isLiquid && !freeLiquid && getUnusedPodPromoSlots() > 0 && model.price > POD_LIQUID_TARGET_PRICE;
+            const promoPrice = getPodPromoLiquidPrice(model.price);
+            const fallbackIcon = model.icon || (model.category === 'nicoboosters' ? '🧪' : model.category === 'consumables' ? '🔧' : '📦');
 
             function renderContent() {
                 const selectedColor = colors[selectedColorIdx];
@@ -1258,19 +1424,22 @@
                 const maxStock = (model.colorStocks && model.colorStocks[selectedColor] !== undefined) ? model.colorStocks[selectedColor] : (model.stock || 99);
 
                 content.innerHTML = `
-                    <div class="product-detail-image-wrap"><img class="product-detail-image" id="productMainImage" src="${imageSrc}" alt="${model.name}"></div>
+                    <div class="product-detail-image-wrap">
+                        <img class="product-detail-image" id="productMainImage" src="${imageSrc}" alt="${model.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
+                        <span style="display:none; font-size:72px;">${fallbackIcon}</span>
+                    </div>
                     <div class="product-detail-category">${categoryLabel}</div>
                     <div class="product-detail-name">${model.name}</div>
                     <div class="product-detail-price">
                         ${freeLiquid
                             ? `<span class="old-price">${model.price} BYN</span><span class="free-badge">БЕСПЛАТНО</span>`
                             : hasPodPromo
-                                ? `<span class="old-price">${model.price} BYN</span><span style="color:#69f07a;">${formatMoney(promoPrice)} BYN</span><span class="pod-promo-badge">−${POD_LIQUID_DISCOUNT} BYN К ПОДУ</span>`
+                                ? `<span class="old-price">${model.price} BYN</span><span style="color:#69f07a;">${formatMoney(promoPrice)} BYN</span><span class="pod-promo-badge">ЗА ${POD_LIQUID_TARGET_PRICE} BYN К ПОДУ</span>`
                                 : `${model.price} BYN`
                         }
                     </div>
                     ${freeLiquid ? `<div class="free-hint-box">🎁 После добавления в корзину нажмите кнопку «Сделать бесплатно»</div>` : ''}
-                    ${hasPodPromo ? `<div class="pod-promo-hint-box">🔥 У вас в корзине под-система — скидка −${POD_LIQUID_DISCOUNT} BYN применится автоматически!</div>` : ''}
+                    ${hasPodPromo ? `<div class="pod-promo-hint-box">🔥 У вас в корзине под-система — цена этой жидкости будет <b>${POD_LIQUID_TARGET_PRICE} BYN</b>!</div>` : ''}
                     <div class="product-detail-desc">${model.desc || ''}</div>
                     <div class="color-selector">
                         <div class="color-selector-label">
@@ -1280,7 +1449,7 @@
                         <div class="color-thumbs" id="colorThumbs">
                             ${colors.map((c, ci) => {
                                 const cImg = colorImages[c] || model.image;
-                                return `<div class="color-thumb ${ci === selectedColorIdx ? 'selected' : ''}" data-color-idx="${ci}"><img src="${cImg}" alt="${c}"><div class="color-thumb-name">${c}</div></div>`;
+                                return `<div class="color-thumb ${ci === selectedColorIdx ? 'selected' : ''}" data-color-idx="${ci}"><img src="${cImg}" alt="${c}" onerror="this.style.opacity='0.2'"><div class="color-thumb-name">${c}</div></div>`;
                             }).join('')}
                         </div>
                     </div>
@@ -1331,14 +1500,18 @@
                 reviewsWrap.className = 'reviews-box';
                 reviewsWrap.innerHTML = `<div style="font-size:12px; color:var(--text-gray);">Загрузка отзывов...</div>`;
                 content.appendChild(reviewsWrap);
-                loadAndRenderReviews(reviewsWrap, reviewKey);
+                loadAndRenderReviews(reviewsWrap, reviewKey, {
+                    name: model.name,
+                    variant: selectedColor,
+                    image: imageSrc
+                });
             }
 
             renderContent();
             showPage('productDetail');
         }
 
-        // --- МОДАЛЬНОЕ ОКНО ПРЕДЛОЖЕНИЯ ЖИДКОСТИ ПРИ ПОКУПКЕ ПОД-СИСТЕМЫ ---
+        // --- МОДАЛЬНОЕ ОКНО ПРЕДЛОЖЕНИЯ ЖИДКОСТИ ЗА 15 BYN ПРИ ПОКУПКЕ ПОД-СИСТЕМЫ ---
         function showLiquidUpsellModal(podName = '') {
             if (liquidBrands.length === 0) return;
 
@@ -1359,14 +1532,14 @@
             function renderUpsellContent() {
                 const slots = getUnusedPodPromoSlots();
                 const headerSub = podName
-                    ? `Вы добавили «${podName}». Возьмите любую жидкость к ней со скидкой <b>−${POD_LIQUID_DISCOUNT} BYN</b>!`
-                    : `У вас в корзине под-система! Заберите любую жидкость со скидкой <b>−${POD_LIQUID_DISCOUNT} BYN</b>.`;
+                    ? `Вы добавили «${podName}». Возьмите любую жидкость к ней всего за <b>${POD_LIQUID_TARGET_PRICE} BYN</b>!`
+                    : `У вас в корзине под-система! Заберите любую жидкость всего за <b>${POD_LIQUID_TARGET_PRICE} BYN</b>.`;
 
                 modal.innerHTML = `
                     <div class="upsell-box">
                         <div class="upsell-header">
                             <div class="upsell-pill">🔥 АКЦИЯ К ПОД-СИСТЕМЕ</div>
-                            <div class="upsell-title">Жидкость дешевле на ${POD_LIQUID_DISCOUNT} BYN</div>
+                            <div class="upsell-title">Любая жидкость за ${POD_LIQUID_TARGET_PRICE} BYN</div>
                             <div class="upsell-sub">${headerSub}${slots > 1 ? ` (доступно: ${slots} шт.)` : ''}</div>
                         </div>
 
@@ -1376,7 +1549,8 @@
                                 const colors = m.colors && m.colors.length > 0 ? m.colors : ['Стандарт'];
                                 const firstColor = colors[0];
                                 const thumbImg = (m.colorImages && m.colorImages[firstColor]) || m.image || 'novayazhizha.png';
-                                const newPrice = Math.max(0, +(m.price - POD_LIQUID_DISCOUNT).toFixed(2));
+                                const promoPrice = getPodPromoLiquidPrice(m.price);
+                                const hasDiscount = m.price > POD_LIQUID_TARGET_PRICE;
                                 return `
                                     <div class="upsell-item" data-upsell-idx="${idx}">
                                         <div class="upsell-thumb"><img src="${thumbImg}" alt="${m.name}" id="upsellImg_${idx}"></div>
@@ -1391,8 +1565,8 @@
                                         </div>
                                         <div class="upsell-price-action">
                                             <div class="upsell-prices">
-                                                <div class="old-price" style="font-size:11px;">${m.price} BYN</div>
-                                                <div class="upsell-new-price">${formatMoney(newPrice)} BYN</div>
+                                                ${hasDiscount ? `<div class="old-price" style="font-size:11px;">${m.price} BYN</div>` : ''}
+                                                <div class="upsell-new-price">${formatMoney(promoPrice)} BYN</div>
                                             </div>
                                             <button type="button" class="upsell-add-btn" data-upsell-add="${idx}">+ Взять</button>
                                         </div>
@@ -1442,7 +1616,7 @@
                         }, 1, { silentToast: true });
 
                         if (ok) {
-                            showToast(`Жидкость добавлена со скидкой −${POD_LIQUID_DISCOUNT} BYN!`);
+                            showToast(`Жидкость добавлена за ${formatMoney(getPodPromoLiquidPrice(m.price))} BYN!`);
                             if (pages.cart.classList.contains('active')) renderCart();
                             if (getUnusedPodPromoSlots() <= 0) {
                                 modal.remove();
@@ -1540,10 +1714,10 @@
                 ${details.unusedPodPromoSlots > 0 && liquidBrands.length > 0 ? `
                     <div class="cart-upsell-banner">
                         <div style="font-size:13px; font-weight:700; color:#ffd180; line-height:1.35;">
-                            🔥 Акция: к вашей под-системе любая жидкость со скидкой <b>−${POD_LIQUID_DISCOUNT} BYN</b>!
+                            🔥 Акция: к вашей под-системе любая жидкость всего за <b>${POD_LIQUID_TARGET_PRICE} BYN</b>!
                             ${details.unusedPodPromoSlots > 1 ? `<span style="color:#fff;">(доступно слотов: ${details.unusedPodPromoSlots})</span>` : ''}
                         </div>
-                        <button type="button" class="cart-upsell-btn" id="cartUpsellLiquidBtn">Выбрать жидкость со скидкой −${POD_LIQUID_DISCOUNT} BYN</button>
+                        <button type="button" class="cart-upsell-btn" id="cartUpsellLiquidBtn">Выбрать жидкость за ${POD_LIQUID_TARGET_PRICE} BYN</button>
                     </div>
                 ` : ''}
                 ${userRewards.length > 0 ? `
@@ -1588,7 +1762,7 @@
                                     ${item.desc ? `<div style="font-size:12px; color:var(--text-gray); margin-top:2px;">${item.desc}</div>` : ''}
                                     ${pricing.podDiscountAmount > 0 ? `
                                         <div style="margin-top:6px;">
-                                            <span class="pod-promo-badge">🔥 Акция к поду: −${formatMoney(pricing.podDiscountAmount)} BYN</span>
+                                            <span class="pod-promo-badge">🔥 Акция к поду: ${POD_LIQUID_TARGET_PRICE} BYN (−${formatMoney(pricing.podDiscountAmount)} BYN)</span>
                                         </div>
                                     ` : ''}
                                 </div>
@@ -1617,7 +1791,7 @@
                     </div>
                     ${details.totalPodDiscount > 0 ? `
                         <div style="display:flex; justify-content:space-between; font-size:13px; color:#ffb74d; font-weight:600;">
-                            <span>Скидка к под-системе</span>
+                            <span>Скидка к под-системе (жижа ${POD_LIQUID_TARGET_PRICE} BYN)</span>
                             <span>−${formatMoney(details.totalPodDiscount)} BYN</span>
                         </div>
                     ` : ''}
@@ -1932,7 +2106,10 @@
                 </div>
                 ${rewardsHtml}
                 <div class="profile-card"><div class="profile-card-title">Время работы</div><div style="font-size: 16px; font-weight: 700;">11:00 - 23:00</div></div>
-                <div class="profile-card"><div class="profile-card-title">Только честные отзывы</div><a href="https://t.me/Seregablatnou" target="_blank" class="profile-btn" id="reviewsBtn">Перейти к отзывам →</a></div>
+                <div class="profile-card">
+                    <div class="profile-card-title">Только честные отзывы</div>
+                    <button type="button" class="profile-btn primary" id="openReviewsPageBtn">Открыть отзывы покупателей →</button>
+                </div>
                 <div class="profile-card">
                     <div class="profile-card-title">Рулетка после 5 покупок</div>
                     <div style="font-size: 13px; color: #dcdcdc;">
@@ -1964,6 +2141,11 @@
                 });
             });
 
+            document.getElementById('openReviewsPageBtn').addEventListener('click', () => {
+                showPage('reviews');
+                renderAllReviewsPage();
+            });
+
             document.getElementById('feedbackBtn').addEventListener('click', () => {
                 const url = 'https://t.me/Seregablatnou';
                 if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
@@ -1973,40 +2155,203 @@
             document.getElementById('spinRouletteBtn').addEventListener('click', openRouletteModal);
         }
 
+        // --- ОТДЕЛЬНАЯ СТРАНИЦА ОТЗЫВОВ ---
+        function resolveReviewProductInfo(review) {
+            const [keyName = '', keyVariant = ''] = String(review.productKey || '').split('||');
+            const norm = (s) => String(s || '').trim().toLowerCase();
+
+            let matched = allRawProducts.find(p =>
+                norm(p.name) === norm(keyName) && norm(p.color || 'Стандарт') === norm(keyVariant || 'Стандарт')
+            );
+            if (!matched) {
+                matched = allRawProducts.find(p => norm(p.name) === norm(keyName));
+            }
+
+            const defaultImages = {
+                vapes: 'vape.png', snus: 'snus.png', liquids: 'novayazhizha.png',
+                disposables: 'odnorazki.png', consumables: 'rashodniki.png', nicoboosters: 'nikobuster.png'
+            };
+
+            const name = review.productName || matched?.name || keyName.toUpperCase() || 'Товар';
+            const variant = review.productVariant || matched?.color || (keyVariant && keyVariant !== 'стандарт' ? keyVariant : '');
+            const cat = matched?.category === 'devices' ? 'vapes' : (matched?.category || 'vapes');
+            const image = review.productImage
+                || matched?.image
+                || (variant ? getFallbackColorImage(name, variant) : null)
+                || defaultImages[cat]
+                || 'vape.png';
+
+            return { name, variant, image };
+        }
+
+        async function renderAllReviewsPage() {
+            const listBox = document.getElementById('allReviewsList');
+            if (!listBox) return;
+            listBox.innerHTML = `<div class="empty-state">Загрузка отзывов...</div>`;
+
+            let reviews = [];
+            try {
+                const snap = await db.collection('reviews').get();
+                snap.forEach(d => reviews.push({ id: d.id, ...d.data() }));
+                reviews.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+            } catch (e) {
+                listBox.innerHTML = `<div class="empty-state">Не удалось загрузить отзывы</div>`;
+                return;
+            }
+
+            if (reviews.length === 0) {
+                listBox.innerHTML = `<div class="empty-state">Отзывов пока нет. После покупки товара вы сможете оставить первый отзыв на его странице!</div>`;
+                return;
+            }
+
+            const avg = (reviews.reduce((s, r) => s + (Number(r.rating) || 5), 0) / reviews.length).toFixed(1);
+
+            listBox.innerHTML = `
+                <div class="reviews-summary-card">
+                    <div>
+                        <div style="font-size:13px; font-weight:700; text-transform:uppercase;">Всего отзывов: ${reviews.length}</div>
+                        <div style="font-size:11px; color:var(--text-gray); margin-top:2px;">Только от реальных покупателей</div>
+                    </div>
+                    <div style="font-size:18px; font-weight:800; color:#ffb74d;">⭐ ${avg}</div>
+                </div>
+                ${reviews.map(r => {
+                    const info = resolveReviewProductInfo(r);
+                    const ratingNum = Math.max(1, Math.min(5, Number(r.rating) || 5));
+                    const starsHtml = '★'.repeat(ratingNum) + '<span style="color:#444;">' + '★'.repeat(5 - ratingNum) + '</span>';
+                    const dateStr = formatReviewDate(r.createdAt);
+
+                    return `
+                    <div class="full-review-card">
+                        <div class="full-review-product">
+                            <div class="full-review-thumb">
+                                <img src="${info.image}" alt="${info.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
+                                <span style="display:none;">📦</span>
+                            </div>
+                            <div class="full-review-meta">
+                                <div class="full-review-prod-name">${info.name}</div>
+                                ${info.variant && info.variant.toLowerCase() !== 'стандарт'
+                                    ? `<div class="full-review-prod-var">Вариант: ${info.variant}</div>`
+                                    : ''
+                                }
+                                <div class="full-review-stars">${starsHtml} <span style="color:var(--text-gray); font-size:11px; margin-left:4px;">(${ratingNum}/5)</span></div>
+                            </div>
+                            ${isAdminUser() ? `<button class="admin-del-btn" data-allrev-del="${r.id}" style="flex-shrink:0;">🗑</button>` : ''}
+                        </div>
+                        <div class="full-review-text">${r.text || ''}</div>
+                        <div class="full-review-footer">
+                            <span class="full-review-author">${r.author || 'Покупатель'}</span>
+                            <span>🕒 ${dateStr}</span>
+                        </div>
+                    </div>`;
+                }).join('')}
+            `;
+
+            listBox.querySelectorAll('[data-allrev-del]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    await db.collection('reviews').doc(btn.dataset.allrevDel).delete();
+                    showToast('Отзыв удалён');
+                    renderAllReviewsPage();
+                });
+            });
+        }
+
+        // --- АДМИНКА С ОТДЕЛАМИ ---
+        function getAdminNormalizedCategory(cat) {
+            return cat === 'devices' ? 'vapes' : (cat || 'vapes');
+        }
+
+        function renderAdminDeptTabs() {
+            const tabsBox = document.getElementById('adminDeptTabs');
+            if (!tabsBox) return;
+
+            const counts = { all: allRawProducts.length };
+            ADMIN_DEPARTMENTS.forEach(d => {
+                if (d.id !== 'all') counts[d.id] = 0;
+            });
+            allRawProducts.forEach(p => {
+                const c = getAdminNormalizedCategory(p.category);
+                counts[c] = (counts[c] || 0) + 1;
+            });
+
+            tabsBox.innerHTML = ADMIN_DEPARTMENTS.map(d => `
+                <button type="button" class="admin-dept-tab ${adminSelectedDept === d.id ? 'active' : ''}" data-dept="${d.id}">
+                    ${d.label} (${counts[d.id] || 0})
+                </button>
+            `).join('');
+
+            tabsBox.querySelectorAll('.admin-dept-tab').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    adminSelectedDept = btn.dataset.dept;
+                    renderAdminList();
+                });
+            });
+        }
+
+        function renderAdminItemHtml(p) {
+            const hasVariantStock = Boolean(p.color);
+            const currentStock = hasVariantStock ? (p.color_stock ?? p.stock ?? 0) : (p.stock ?? 0);
+            return `
+            <div class="admin-item">
+                <div class="admin-item-thumb">${p.image ? `<img src="${p.image}" alt="" onerror="this.style.opacity='0.25'">` : `<span>📦</span>`}</div>
+                <div class="admin-item-info">
+                    <div class="admin-item-title">${p.name || 'Без названия'}</div>
+                    <div class="admin-item-sub">${p.brand || ''} ${p.color ? '· ' + p.color : ''}</div>
+                    <div class="admin-price-edit">
+                        <input type="number" class="admin-price-input" id="priceInput_${p.docId}" value="${p.price || 0}" placeholder="BYN">
+                        <span style="font-size:11px; color:var(--text-gray);">BYN</span>
+                        <button class="admin-price-save" data-id="${p.docId}">OK</button>
+                    </div>
+                </div>
+                <div class="admin-stock-ctrl">
+                    <button class="admin-mini-btn" data-id="${p.docId}" data-has-var="${hasVariantStock ? '1' : '0'}" data-val="${currentStock}" data-act="dec">−</button>
+                    <span style="min-width: 22px; text-align:center; font-size:13px; font-weight:700;">${currentStock}</span>
+                    <button class="admin-mini-btn" data-id="${p.docId}" data-has-var="${hasVariantStock ? '1' : '0'}" data-val="${currentStock}" data-act="inc">+</button>
+                    <button class="admin-del-btn" data-id="${p.docId}" data-act="del">🗑</button>
+                </div>
+            </div>`;
+        }
+
         function renderAdminList() {
             const listEl = document.getElementById('adminProductList');
             const countEl = document.getElementById('admTotalCount');
             if (!listEl) return;
             countEl.textContent = allRawProducts.length;
+            renderAdminDeptTabs();
 
-            if (allRawProducts.length === 0) {
-                listEl.innerHTML = `<div class="empty-state" style="padding: 30px 10px;">База пока пуста. Добавьте первый товар выше!</div>`;
+            const q = adminSearchQuery.trim().toLowerCase();
+            let filtered = allRawProducts.filter(p => {
+                const cat = getAdminNormalizedCategory(p.category);
+                if (adminSelectedDept !== 'all' && cat !== adminSelectedDept) return false;
+                if (q) {
+                    const hay = `${p.name || ''} ${p.brand || ''} ${p.color || ''}`.toLowerCase();
+                    if (!hay.includes(q)) return false;
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `<div class="empty-state" style="padding: 30px 10px;">В этом отделе пока ничего не найдено</div>`;
                 return;
             }
 
-            listEl.innerHTML = allRawProducts.map(p => {
-                const hasVariantStock = Boolean(p.color);
-                const currentStock = hasVariantStock ? (p.color_stock ?? p.stock ?? 0) : (p.stock ?? 0);
-                return `
-                <div class="admin-item">
-                    <div class="admin-item-thumb">${p.image ? `<img src="${p.image}" alt="">` : `<span>📦</span>`}</div>
-                    <div class="admin-item-info">
-                        <div class="admin-item-title">${p.name || 'Без названия'}</div>
-                        <div class="admin-item-sub">${p.brand || ''} ${p.color ? '· ' + p.color : ''}</div>
-                        <div class="admin-price-edit">
-                            <input type="number" class="admin-price-input" id="priceInput_${p.docId}" value="${p.price || 0}" placeholder="BYN">
-                            <span style="font-size:11px; color:var(--text-gray);">BYN</span>
-                            <button class="admin-price-save" data-id="${p.docId}">OK</button>
-                        </div>
-                    </div>
-                    <div class="admin-stock-ctrl">
-                        <button class="admin-mini-btn" data-id="${p.docId}" data-has-var="${hasVariantStock ? '1' : '0'}" data-val="${currentStock}" data-act="dec">−</button>
-                        <span style="min-width: 22px; text-align:center; font-size:13px; font-weight:700;">${currentStock}</span>
-                        <button class="admin-mini-btn" data-id="${p.docId}" data-has-var="${hasVariantStock ? '1' : '0'}" data-val="${currentStock}" data-act="inc">+</button>
-                        <button class="admin-del-btn" data-id="${p.docId}" data-act="del">🗑</button>
-                    </div>
-                </div>`;
-            }).join('');
+            if (adminSelectedDept === 'all') {
+                const sectionsHtml = ADMIN_DEPARTMENTS
+                    .filter(d => d.id !== 'all')
+                    .map(dept => {
+                        const items = filtered.filter(p => getAdminNormalizedCategory(p.category) === dept.id);
+                        if (items.length === 0) return '';
+                        return `
+                            <div class="admin-dept-group-title">
+                                <span>${dept.label}</span>
+                                <span>${items.length} поз.</span>
+                            </div>
+                            ${items.map(renderAdminItemHtml).join('')}
+                        `;
+                    }).join('');
+                listEl.innerHTML = sectionsHtml;
+            } else {
+                listEl.innerHTML = filtered.map(renderAdminItemHtml).join('');
+            }
 
             listEl.querySelectorAll('.admin-price-save').forEach(btn => {
                 btn.addEventListener('click', async () => {
@@ -2040,6 +2385,11 @@
                 });
             });
         }
+
+        document.getElementById('admSearchInput').addEventListener('input', (e) => {
+            adminSearchQuery = e.target.value;
+            renderAdminList();
+        });
 
         document.getElementById('admPhotoFile').addEventListener('change', async (e) => {
             const file = e.target.files?.[0];
@@ -2179,7 +2529,7 @@
                 const colorStr = item.color ? ` (${item.color})` : '';
                 const notes = [];
                 if (pricing.podDiscountAmount > 0) {
-                    notes.push(`🔥 Акция к поду: −${formatMoney(pricing.podDiscountAmount)} BYN`);
+                    notes.push(`🔥 Акция к поду: ${POD_LIQUID_TARGET_PRICE} BYN (−${formatMoney(pricing.podDiscountAmount)} BYN)`);
                 }
                 if (pricing.reward) {
                     usedRewardIds.push(pricing.reward.id);
@@ -2235,6 +2585,7 @@
         document.getElementById('backToCatalog').addEventListener('click', () => showPage('catalog'));
         document.getElementById('backToBrands').addEventListener('click', () => showPage('brand'));
         document.getElementById('backToModels').addEventListener('click', () => showPage(detailBackPage));
+        document.getElementById('backToProfileFromReviews').addEventListener('click', () => { showPage('profile'); renderProfile(); });
 
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -2267,7 +2618,7 @@
             initialCat.addEventListener('error', () => initialCat.classList.add('loaded'), { once: true });
         }
 
-        async function loadAndRenderReviews(container, productKey) {
+        async function loadAndRenderReviews(container, productKey, productMeta = {}) {
             let list = [];
             try {
                 const snap = await db.collection('reviews').where('productKey', '==', productKey).get();
@@ -2323,6 +2674,9 @@
                     const tgU = getTgUsername();
                     await db.collection('reviews').add({
                         productKey,
+                        productName: productMeta.name || '',
+                        productVariant: productMeta.variant || 'Стандарт',
+                        productImage: productMeta.image || '',
                         rating: chosenRating,
                         text: txt,
                         author: tgU ? `@${tgU}` : (window.Telegram?.WebApp?.initDataUnsafe?.user?.first_name || 'Покупатель'),
@@ -2330,7 +2684,7 @@
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                     showToast('Отзыв опубликован!');
-                    loadAndRenderReviews(container, productKey);
+                    loadAndRenderReviews(container, productKey, productMeta);
                 });
             }
 
@@ -2338,7 +2692,7 @@
                 btn.addEventListener('click', async () => {
                     await db.collection('reviews').doc(btn.dataset.revId).delete();
                     showToast('Отзыв удалён');
-                    loadAndRenderReviews(container, productKey);
+                    loadAndRenderReviews(container, productKey, productMeta);
                 });
             });
         }
