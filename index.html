@@ -1,3 +1,6 @@
+Вот полностью обновлённый файл `index.html` — просто скопируйте и вставьте в GitHub:
+
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -329,7 +332,8 @@
         .profile-cards { display: flex; flex-direction: column; gap: 12px; }
         .profile-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 18px; box-shadow: var(--shadow-card); }
         .profile-user { display: flex; align-items: center; gap: 14px; }
-        .profile-avatar { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; flex-shrink: 0; }
+        .profile-avatar { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; flex-shrink: 0; overflow: hidden; }
+        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .profile-username { font-size: 17px; font-weight: 700; }
         .profile-sub { font-size: 12px; color: var(--text-gray); margin-top: 2px; }
         .profile-card-title { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
@@ -345,6 +349,17 @@
         .reward-item-card { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); margin-bottom: 8px; }
         .reward-item-card:last-child { margin-bottom: 0; }
         .reward-use-btn { padding: 7px 12px; border-radius: 10px; border: none; background: var(--text-white); color: var(--bg-dark); font-size: 11px; font-weight: 800; text-transform: uppercase; cursor: pointer; flex-shrink: 0; }
+
+        /* АВАТАР + ЮЗ ПОЛЬЗОВАТЕЛЯ В ОТЗЫВАХ */
+        .review-author-wrap { display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .review-user-avatar {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 800; color: #fff;
+            overflow: hidden; flex-shrink: 0;
+        }
+        .review-user-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
         /* СТРАНИЦА ВСЕХ ОТЗЫВОВ */
         .reviews-page-list { display: flex; flex-direction: column; gap: 12px; padding: 0 16px 100px; }
@@ -370,8 +385,8 @@
         .full-review-prod-var { font-size: 11px; color: var(--text-gray); margin-top: 2px; }
         .full-review-stars { color: #ffb74d; font-size: 13px; letter-spacing: 1px; margin-top: 3px; }
         .full-review-text { font-size: 13px; color: #ececec; line-height: 1.45; background: rgba(255,255,255,0.03); border-radius: 12px; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.06); }
-        .full-review-footer { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-gray); }
-        .full-review-author { color: #fff; font-weight: 600; }
+        .full-review-footer { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-gray); gap: 8px; }
+        .full-review-author { color: #fff; font-weight: 700; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* ГОРИЗОНТАЛЬНАЯ РУЛЕТКА */
         .roulette-modal {
@@ -441,6 +456,14 @@
             color: #ffb74d; margin: 12px 0 6px; display: flex; align-items: center; justify-content: space-between;
             border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 4px;
         }
+        .admin-model-subhead {
+            font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;
+            color: #bdbdbd; margin: 8px 0 2px; padding-left: 4px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .admin-model-subhead::before {
+            content: ""; width: 6px; height: 6px; border-radius: 50%; background: #ffffff; opacity: 0.55;
+        }
         .admin-item { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 18px; padding: 12px; display: flex; align-items: center; gap: 12px; }
         .admin-item-thumb { width: 52px; height: 52px; border-radius: 12px; background: rgba(255,255,255,0.06); overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
         .admin-item-thumb img { width: 100%; height: 100%; object-fit: cover; }
@@ -466,8 +489,8 @@
         .star-btn { background: none; border: none; color: #444; font-size: 22px; cursor: pointer; padding: 0; }
         .star-btn.active { color: #ffb74d; }
         .review-card { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 14px; padding: 12px; margin-bottom: 8px; }
-        .review-top { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-bottom: 4px; }
-        .review-author { font-weight: 700; color: #fff; }
+        .review-top { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-bottom: 6px; gap: 8px; }
+        .review-author { font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .review-stars { color: #ffb74d; font-size: 12px; }
         .review-text { font-size: 13px; color: #dcdcdc; line-height: 1.35; }
         .order-card { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
@@ -744,6 +767,13 @@
             }
         };
 
+        function naturalCompare(a, b) {
+            return String(a || '').trim().localeCompare(String(b || '').trim(), 'ru', {
+                numeric: true,
+                sensitivity: 'base'
+            });
+        }
+
         function getFallbackColorImage(modelName, colorName) {
             const norm = (value) => String(value || '').toUpperCase().replace(/\s+/g, ' ').trim();
             const found = Object.entries(VAPE_COLOR_IMAGES).find(([name]) => norm(name) === norm(modelName));
@@ -773,6 +803,15 @@
 
         function getTgUsername() {
             return (window.Telegram?.WebApp?.initDataUnsafe?.user?.username || '').toLowerCase().trim();
+        }
+        function getTgPhotoUrl() {
+            return window.Telegram?.WebApp?.initDataUnsafe?.user?.photo_url || '';
+        }
+        function getTgAuthorLabel() {
+            const u = getTgUsername();
+            if (u) return `@${u}`;
+            const first = (window.Telegram?.WebApp?.initDataUnsafe?.user?.first_name || '').trim();
+            return first || 'Покупатель';
         }
         function getUserDocId() {
             const uname = getTgUsername();
@@ -815,6 +854,22 @@
                 day: '2-digit', month: '2-digit', year: 'numeric',
                 hour: '2-digit', minute: '2-digit'
             });
+        }
+        function renderAuthorBadgeHtml(author, authorPhoto) {
+            const displayAuthor = author || 'Покупатель';
+            const cleanForLetter = displayAuthor.replace(/^@+/, '').trim();
+            const letter = (cleanForLetter[0] || 'W').toUpperCase();
+            return `
+                <div class="review-author-wrap">
+                    <div class="review-user-avatar">
+                        ${authorPhoto
+                            ? `<img src="${authorPhoto}" alt="${displayAuthor}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${letter}</span>`
+                            : `<span>${letter}</span>`
+                        }
+                    </div>
+                    <span class="full-review-author">${displayAuthor}</span>
+                </div>
+            `;
         }
         function resolveOrderItemImage(name, color) {
             const norm = (s) => String(s || '').trim().toLowerCase();
@@ -987,6 +1042,16 @@
         function startUserPurchasesSync() {
             const docId = getUserDocId();
             if (!docId) return;
+
+            const tgU = getTgUsername();
+            const tgPhoto = getTgPhotoUrl();
+            if (tgU || tgPhoto) {
+                const profilePatch = {};
+                if (tgU) profilePatch.username = tgU;
+                if (tgPhoto) profilePatch.photoUrl = tgPhoto;
+                db.collection('users').doc(docId).set(profilePatch, { merge: true }).catch(() => {});
+            }
+
             db.collection('users').doc(docId).onSnapshot((doc) => {
                 const data = doc.exists ? doc.data() : {};
                 userPurchases = Number(data.purchases) || 0;
@@ -1115,7 +1180,6 @@
                         }
 
                         btn.disabled = true;
-                        const tgU = getTgUsername();
                         const img = it.productImage || resolveOrderItemImage(it.productName, it.productVariant);
 
                         try {
@@ -1126,7 +1190,8 @@
                                 productImage: img || '',
                                 rating: it.rating,
                                 text: txt,
-                                author: tgU ? `@${tgU}` : (window.Telegram?.WebApp?.initDataUnsafe?.user?.first_name || 'Покупатель'),
+                                author: getTgAuthorLabel(),
+                                authorPhoto: getTgPhotoUrl(),
                                 userId: getUserDocId(),
                                 orderId: it.orderId || '',
                                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -1262,6 +1327,33 @@
         document.getElementById('admAddPurchaseBtn').addEventListener('click', () => updateClientPurchases(1));
         document.getElementById('admSubPurchaseBtn').addEventListener('click', () => updateClientPurchases(-1));
 
+        function sortBrandList(brandsArr) {
+            return Array.from(brandsArr.values())
+                .map(b => {
+                    const sortedModels = Array.from(b.modelsMap.values()).sort((m1, m2) => naturalCompare(m1.name, m2.name));
+                    sortedModels.forEach(m => {
+                        if (Array.isArray(m.colors)) {
+                            m.colors.sort((c1, c2) => naturalCompare(c1, c2));
+                        }
+                    });
+                    return { brand: b.brand, models: sortedModels };
+                })
+                .filter(b => b.models.length > 0)
+                .sort((b1, b2) => naturalCompare(b1.brand, b2.brand));
+        }
+
+        function sortFlatList(map) {
+            const arr = Array.from(map.values()).sort((a, b) => {
+                const byBrand = naturalCompare(a.brand, b.brand);
+                if (byBrand !== 0) return byBrand;
+                return naturalCompare(a.name, b.name);
+            });
+            arr.forEach(m => {
+                if (Array.isArray(m.colors)) m.colors.sort((c1, c2) => naturalCompare(c1, c2));
+            });
+            return arr;
+        }
+
         function startFirestoreSync() {
             db.collection('products').onSnapshot((snapshot) => {
                 const defaultImages = {
@@ -1315,8 +1407,9 @@
 
                     if (siteCat === 'vapes') {
                         const bName = brand || 'Разное';
-                        if (!groupedVapes.has(bName)) groupedVapes.set(bName, { brand: bName, modelsMap: new Map() });
-                        const modelsMap = groupedVapes.get(bName).modelsMap;
+                        const bKey = bName.toLowerCase();
+                        if (!groupedVapes.has(bKey)) groupedVapes.set(bKey, { brand: bName, modelsMap: new Map() });
+                        const modelsMap = groupedVapes.get(bKey).modelsMap;
                         const mKey = name.toLowerCase();
                         if (!modelsMap.has(mKey)) {
                             modelsMap.set(mKey, {
@@ -1332,8 +1425,9 @@
                         if (m.image === defaultImages.vapes && resolvedImage !== defaultImages.vapes) m.image = resolvedImage;
                     } else if (siteCat === 'liquids') {
                         const bName = brand || 'Разное';
-                        if (!groupedLiquids.has(bName)) groupedLiquids.set(bName, { brand: bName, modelsMap: new Map() });
-                        const modelsMap = groupedLiquids.get(bName).modelsMap;
+                        const bKey = bName.toLowerCase();
+                        if (!groupedLiquids.has(bKey)) groupedLiquids.set(bKey, { brand: bName, modelsMap: new Map() });
+                        const modelsMap = groupedLiquids.get(bKey).modelsMap;
                         const mKey = name.toLowerCase();
                         if (!modelsMap.has(mKey)) {
                             modelsMap.set(mKey, {
@@ -1348,8 +1442,9 @@
                         if (m.image === defaultImages.liquids && resolvedImage !== defaultImages.liquids) m.image = resolvedImage;
                     } else if (siteCat === 'consumables') {
                         const bName = brand || 'Разное';
-                        if (!groupedConsumables.has(bName)) groupedConsumables.set(bName, { brand: bName, modelsMap: new Map() });
-                        const modelsMap = groupedConsumables.get(bName).modelsMap;
+                        const bKey = bName.toLowerCase();
+                        if (!groupedConsumables.has(bKey)) groupedConsumables.set(bKey, { brand: bName, modelsMap: new Map() });
+                        const modelsMap = groupedConsumables.get(bKey).modelsMap;
                         const mKey = name.toLowerCase();
                         if (!modelsMap.has(mKey)) {
                             modelsMap.set(mKey, {
@@ -1381,13 +1476,13 @@
                     }
                 });
 
-                vapeBrands = Array.from(groupedVapes.values()).map(b => ({ brand: b.brand, models: Array.from(b.modelsMap.values()) })).filter(b => b.models.length > 0);
-                liquidBrands = Array.from(groupedLiquids.values()).map(b => ({ brand: b.brand, models: Array.from(b.modelsMap.values()) })).filter(b => b.models.length > 0);
-                consumableBrands = Array.from(groupedConsumables.values()).map(b => ({ brand: b.brand, models: Array.from(b.modelsMap.values()) })).filter(b => b.models.length > 0);
+                vapeBrands = sortBrandList(groupedVapes);
+                liquidBrands = sortBrandList(groupedLiquids);
+                consumableBrands = sortBrandList(groupedConsumables);
 
-                catalogData.snus = Array.from(groupedFlat.snus.values());
-                catalogData.disposables = Array.from(groupedFlat.disposables.values());
-                catalogData.nicoboosters = Array.from(groupedFlat.nicoboosters.values());
+                catalogData.snus = sortFlatList(groupedFlat.snus);
+                catalogData.disposables = sortFlatList(groupedFlat.disposables);
+                catalogData.nicoboosters = sortFlatList(groupedFlat.nicoboosters);
 
                 const formatBrandSub = (len) => `${len} бренд${len === 1 ? '' : len < 5 ? 'а' : 'ов'}`;
                 categories[0].sub = formatBrandSub(vapeBrands.length);
@@ -2280,6 +2375,7 @@
             const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
             const username = tgUser?.username ? `@${tgUser.username}` : (tgUser?.first_name || 'Гость');
             const avatarLetter = (tgUser?.first_name || tgUser?.username || 'W')[0].toUpperCase();
+            const tgPhoto = getTgPhotoUrl();
 
             const spinsAvailable = Math.floor(userPurchases / PURCHASES_PER_SPIN);
             const progressCount = spinsAvailable > 0 ? PURCHASES_PER_SPIN : (userPurchases % PURCHASES_PER_SPIN);
@@ -2309,7 +2405,12 @@
             container.innerHTML = `
                 <div class="profile-card">
                     <div class="profile-user">
-                        <div class="profile-avatar">${avatarLetter}</div>
+                        <div class="profile-avatar">
+                            ${tgPhoto
+                                ? `<img src="${tgPhoto}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${avatarLetter}</span>`
+                                : `<span>${avatarLetter}</span>`
+                            }
+                        </div>
                         <div>
                             <div class="profile-username">${username}</div>
                             <div class="profile-sub">Подтверждённых покупок: ${userPurchases}</div>
@@ -2412,7 +2513,7 @@
             }
 
             if (reviews.length === 0) {
-                listBox.innerHTML = `<div class="empty-state">Отзывов пока нет. После покупки товара вы сможете оставить первый отзыв на его странице!</div>`;
+                listBox.innerHTML = `<div class="empty-state">Отзывов пока нет. После покупки товара вы сможете оставить первый отзыв!</div>`;
                 return;
             }
 
@@ -2451,8 +2552,8 @@
                         </div>
                         <div class="full-review-text">${r.text || ''}</div>
                         <div class="full-review-footer">
-                            <span class="full-review-author">${r.author || 'Покупатель'}</span>
-                            <span>🕒 ${dateStr}</span>
+                            ${renderAuthorBadgeHtml(r.author, r.authorPhoto)}
+                            <span style="flex-shrink:0;">🕒 ${dateStr}</span>
                         </div>
                     </div>`;
                 }).join('')}
@@ -2467,9 +2568,19 @@
             });
         }
 
-        // --- АДМИНКА С ОТДЕЛАМИ ---
+        // --- АДМИНКА С ОТДЕЛАМИ И СОРТИРОВКОЙ ПО МОДЕЛЯМ И НАЗВАНИЯМ ---
         function getAdminNormalizedCategory(cat) {
             return cat === 'devices' ? 'vapes' : (cat || 'vapes');
+        }
+
+        function sortAdminItems(items) {
+            return [...items].sort((a, b) => {
+                const byBrand = naturalCompare(a.brand || 'zzz', b.brand || 'zzz');
+                if (byBrand !== 0) return byBrand;
+                const byName = naturalCompare(a.name, b.name);
+                if (byName !== 0) return byName;
+                return naturalCompare(a.color, b.color);
+            });
         }
 
         function renderAdminDeptTabs() {
@@ -2523,6 +2634,22 @@
             </div>`;
         }
 
+        function renderAdminItemsGroupedByModel(items) {
+            const sorted = sortAdminItems(items);
+            let lastGroupKey = '';
+            return sorted.map(p => {
+                const brandPart = (p.brand || '').trim().toUpperCase();
+                const namePart = (p.name || 'Без названия').trim().toUpperCase();
+                const groupKey = `${brandPart}||${namePart}`;
+                let subhead = '';
+                if (groupKey !== lastGroupKey) {
+                    lastGroupKey = groupKey;
+                    subhead = `<div class="admin-model-subhead">${brandPart ? `${brandPart} · ` : ''}${namePart}</div>`;
+                }
+                return subhead + renderAdminItemHtml(p);
+            }).join('');
+        }
+
         function renderAdminList() {
             const listEl = document.getElementById('adminProductList');
             const countEl = document.getElementById('admTotalCount');
@@ -2557,12 +2684,12 @@
                                 <span>${dept.label}</span>
                                 <span>${items.length} поз.</span>
                             </div>
-                            ${items.map(renderAdminItemHtml).join('')}
+                            ${renderAdminItemsGroupedByModel(items)}
                         `;
                     }).join('');
                 listEl.innerHTML = sectionsHtml;
             } else {
-                listEl.innerHTML = filtered.map(renderAdminItemHtml).join('');
+                listEl.innerHTML = renderAdminItemsGroupedByModel(filtered);
             }
 
             listEl.querySelectorAll('.admin-price-save').forEach(btn => {
@@ -2867,8 +2994,8 @@
                     ${list.length === 0 ? `<div style="font-size:12px; color:var(--text-gray);">Отзывов пока нет</div>` : list.map(r => `
                         <div class="review-card">
                             <div class="review-top">
-                                <span class="review-author">${r.author || 'Покупатель'}</span>
-                                <div style="display:flex; align-items:center; gap:8px;">
+                                ${renderAuthorBadgeHtml(r.author, r.authorPhoto)}
+                                <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
                                     <span class="review-stars">${'★'.repeat(r.rating || 5)}</span>
                                     ${isAdminUser() ? `<button class="admin-del-btn" data-rev-id="${r.id}" style="width:24px;height:24px;font-size:11px;">🗑</button>` : ''}
                                 </div>
@@ -2893,7 +3020,6 @@
                     }
                     const txt = container.querySelector('#reviewTextInput').value.trim();
                     if (!txt) { showToast('Напишите текст отзыва'); return; }
-                    const tgU = getTgUsername();
                     await db.collection('reviews').add({
                         productKey,
                         productName: productMeta.name || '',
@@ -2901,7 +3027,8 @@
                         productImage: productMeta.image || '',
                         rating: chosenRating,
                         text: txt,
-                        author: tgU ? `@${tgU}` : (window.Telegram?.WebApp?.initDataUnsafe?.user?.first_name || 'Покупатель'),
+                        author: getTgAuthorLabel(),
+                        authorPhoto: getTgPhotoUrl(),
                         userId: getUserDocId(),
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
