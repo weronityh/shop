@@ -500,6 +500,70 @@
         .review-stars { color: #ffb74d; font-size: 12px; }
         .review-text { font-size: 13px; color: #dcdcdc; line-height: 1.35; }
         .order-card { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+
+        /* ===== АДМИНКА v2 ===== */
+        .adm-tabs { position: sticky; top: 0; z-index: 20; display: flex; gap: 6px; padding: 6px; margin-bottom: 14px; background: var(--bg-card); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border-card); border-radius: 18px; box-shadow: var(--shadow-card); }
+        .adm-tab { flex: 1; min-width: 0; padding: 12px 4px; border: none; border-radius: 13px; background: transparent; color: var(--text-gray); font-family: inherit; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; transition: background 0.15s, color 0.15s; }
+        .adm-tab.active { background: var(--text-white); color: var(--bg-dark); }
+        .adm-badge { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: #ff3b30; color: #fff; font-size: 10px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; letter-spacing: 0; line-height: 1; }
+        .adm-nav-badge { position: absolute; top: 2px; right: 4px; }
+        .adm-pane { display: none; flex-direction: column; gap: 12px; }
+        .adm-pane.active { display: flex; }
+        .adm-pane .admin-dept-tabs { margin: 0; padding: 2px 2px 4px; }
+        .adm-section-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-gray); padding: 0 2px; }
+        .adm-toolbar { display: flex; gap: 8px; }
+        .adm-toolbar .admin-input { flex: 1; min-width: 0; }
+        .adm-add-btn { flex-shrink: 0; padding: 0 16px; border-radius: 14px; border: none; background: var(--text-white); color: var(--bg-dark); font-family: inherit; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; cursor: pointer; }
+        .adm-add-btn:active { transform: scale(0.97); }
+        .adm-filter-out.active { background: #ff453a; border-color: #ff453a; color: #fff; }
+        .adm-filter-low.active { background: #ff9f0a; border-color: #ff9f0a; color: #000; }
+
+        .adm-card { --adm-c: #30d158; background: var(--bg-card); border: 1px solid var(--border-card); border-left: 3px solid var(--adm-c); border-radius: 18px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+        .adm-card.st-low { --adm-c: #ff9f0a; }
+        .adm-card.st-out { --adm-c: #ff453a; }
+        .adm-card-top { display: flex; align-items: center; gap: 12px; }
+        .adm-thumb { width: 56px; height: 56px; border-radius: 14px; background: rgba(255,255,255,0.06); border: 1px solid var(--border-card); overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .adm-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .adm-info { flex: 1; min-width: 0; }
+        .adm-title { font-size: 14px; font-weight: 700; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .adm-variant { font-size: 12px; color: #d6d6d6; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .adm-meta { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
+        .adm-price { padding: 3px 9px; border-radius: 8px; border: 1px solid var(--border-card); background: rgba(255,255,255,0.08); color: #fff; font-family: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
+        .adm-state { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; color: var(--adm-c); }
+        .adm-del { width: 36px; height: 36px; flex-shrink: 0; align-self: flex-start; border-radius: 10px; border: 1px solid rgba(255,59,48,0.35); background: rgba(255,59,48,0.12); color: #ff453a; font-size: 14px; cursor: pointer; }
+        .adm-card-bottom { display: flex; align-items: center; gap: 8px; }
+        .adm-stock { display: flex; align-items: center; background: rgba(255,255,255,0.05); border: 1px solid var(--border-card); border-radius: 14px; overflow: hidden; flex-shrink: 0; }
+        .adm-stock-btn { width: 46px; height: 44px; border: none; background: transparent; color: #fff; font-family: inherit; font-size: 22px; font-weight: 700; cursor: pointer; }
+        .adm-stock-btn:active { background: rgba(255,255,255,0.12); }
+        .adm-stock-val { min-width: 40px; text-align: center; font-size: 18px; font-weight: 800; color: var(--adm-c); }
+        .adm-actions { flex: 1; display: flex; justify-content: flex-end; gap: 6px; }
+        .adm-act { height: 44px; min-width: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--border-card); background: rgba(255,255,255,0.08); color: #fff; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+        .adm-act:active { background: rgba(255,255,255,0.16); }
+
+        .adm-order-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; }
+        .adm-order-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+        .adm-order-chip { font-size: 11px; font-weight: 600; color: #ffb74d; background: rgba(255,183,77,0.1); border-radius: 8px; padding: 3px 8px; }
+        .adm-order-items { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: #d0d0d0; }
+        .adm-order-btns { display: flex; gap: 8px; margin-top: 2px; }
+        .adm-order-btns .profile-btn { padding: 13px 8px; font-size: 12px; }
+        .adm-order-btns .adm-cancel { width: 56px; flex-shrink: 0; border-color: rgba(255,59,48,0.4); color: #ff6961; }
+        .adm-empty { text-align: center; padding: 28px 10px; color: var(--text-gray); font-size: 13px; }
+
+        .adm-modal-overlay { position: fixed; inset: 0; z-index: 1100; background: rgba(0,0,0,0.82); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: flex; align-items: flex-end; justify-content: center; animation: fadeIn 0.2s ease; }
+        .adm-sheet { width: 100%; max-width: 640px; max-height: 92vh; overflow-y: auto; -webkit-overflow-scrolling: touch; background: rgba(12,12,12,0.98); border: 1px solid var(--border-card); border-bottom: none; border-radius: 24px 24px 0 0; padding: 16px 16px calc(18px + env(safe-area-inset-bottom)); animation: slideUp 0.25s cubic-bezier(0.22, 1, 0.36, 1); }
+        .adm-sheet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .adm-sheet-title { font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .adm-sheet-close { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-card); background: rgba(255,255,255,0.08); color: #fff; font-size: 14px; cursor: pointer; }
+        .adm-label { font-size: 11px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; margin: 4px 2px -4px; }
+        .adm-photo-row { display: flex; gap: 10px; align-items: stretch; }
+        .adm-photo-prev { width: 52px; border-radius: 12px; background: rgba(255,255,255,0.06); border: 1px solid var(--border-card); overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .adm-photo-prev img { width: 100%; height: 100%; object-fit: cover; }
+        .adm-photo-row .admin-upload-label { flex: 1; }
+        .adm-confirm { width: 100%; max-width: 340px; background: rgba(14,14,14,0.99); border: 1px solid var(--border-card); border-radius: 22px; padding: 20px; box-shadow: var(--shadow-card); animation: slideUp 0.2s ease; }
+        .adm-confirm-title { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
+        .adm-confirm-text { font-size: 13px; color: #cfcfcf; line-height: 1.5; margin-bottom: 16px; word-break: break-word; }
+        .adm-confirm-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .profile-btn.adm-danger { background: #ff3b30; border-color: #ff3b30; color: #fff; }
     </style>
 </head>
 <body>
@@ -612,69 +676,55 @@
             <div class="page" id="adminPage">
                 <h1 class="section-title">МЕНЮ СОЗДАТЕЛЯ</h1>
 
-                <div class="profile-card" style="margin-bottom: 16px;">
-                    <div class="profile-card-title">📦 Заказы на подтверждение</div>
-                    <div id="adminOrdersList" style="display:flex; flex-direction:column; gap:8px;">
-                        <div style="font-size:12px; color:var(--text-gray);">Загрузка...</div>
+                <div class="adm-tabs" id="admTabs">
+                    <button type="button" class="adm-tab active" data-adm-tab="orders">📦 Заказы <span class="adm-badge" id="admOrdersBadge" style="display:none;">0</span></button>
+                    <button type="button" class="adm-tab" data-adm-tab="stock">🛍 Склад</button>
+                    <button type="button" class="adm-tab" data-adm-tab="access">👥 Доступ</button>
+                </div>
+
+                <!-- ЗАКАЗЫ -->
+                <div class="adm-pane active" data-adm-pane="orders">
+                    <div class="adm-section-title">Заказы на подтверждение</div>
+                    <div id="adminOrdersList" style="display:flex; flex-direction:column; gap:10px;">
+                        <div class="adm-empty">Загрузка...</div>
                     </div>
                 </div>
 
-                <div class="profile-card" id="superAdminBlock" style="display:none; margin-bottom: 16px;">
-                    <div class="profile-card-title">👑 Управление админами</div>
-                    <div style="display:flex; gap:8px; margin-bottom:10px;">
-                        <input class="admin-input" id="admNewAdmin" placeholder="@username (например: ivan_shop)">
-                        <button class="profile-btn primary" id="admAddAdminBtn" style="width:auto; padding:0 18px; flex-shrink:0;">Выдать</button>
+                <!-- СКЛАД -->
+                <div class="adm-pane" data-adm-pane="stock">
+                    <div class="adm-toolbar">
+                        <input class="admin-input" id="admSearchInput" placeholder="🔍 Название или бренд...">
+                        <button type="button" class="adm-add-btn" id="admOpenAddBtn">＋ Товар</button>
                     </div>
-                    <div id="admAdminsList" style="display:flex; flex-direction:column; gap:8px;"></div>
+                    <div class="admin-dept-tabs" id="adminDeptTabs"></div>
+                    <div class="admin-dept-tabs" id="admStockFilters"></div>
+                    <div class="adm-section-title">Товары в базе (<span id="admTotalCount">0</span>)</div>
+                    <div id="adminProductList" style="display:flex; flex-direction:column; gap:10px;"></div>
                 </div>
 
-                <div class="profile-card" style="margin-bottom: 16px;">
-                    <div class="profile-card-title">⭐ Засчитать товары клиенту</div>
-                    <div style="display:flex; gap:8px;">
-                        <input class="admin-input" id="admClientUsername" placeholder="@username покупателя">
-                        <button class="profile-btn" id="admSubPurchaseBtn" style="width:auto; padding:0 14px; flex-shrink:0; border-color:rgba(255,59,48,0.45); color:#ff6961;">−1</button>
-                        <button class="profile-btn primary" id="admAddPurchaseBtn" style="width:auto; padding:0 16px; flex-shrink:0;">+1</button>
-                    </div>
-                    <div style="font-size:11px; color:var(--text-gray); margin-top:8px;">
-                        5 товаров = 1 прокрут рулетки. Товары сверх 5 сохраняются.
-                    </div>
-                </div>
-
-                <div class="profile-card" style="margin-bottom: 16px;">
-                    <div class="profile-card-title">+ Добавить товар</div>
-                    <div class="admin-form">
-                        <select class="admin-select" id="admCategory">
-                            <option value="vapes">ПОД-СИСТЕМЫ</option>
-                            <option value="liquids">ЖИДКОСТИ</option>
-                            <option value="snus">СНЮС</option>
-                            <option value="consumables">РАСХОДНИКИ</option>
-                            <option value="nicoboosters">НИКОБУСТЕРЫ</option>
-                            <option value="disposables">ОДНОРАЗКИ</option>
-                        </select>
-                        <input class="admin-input" id="admBrand" placeholder="Бренд / Производитель (например: VAPORESSO, SMOANT, BRUSKO)">
-                        <input class="admin-input" id="admName" placeholder="Название (например: DRYMOST 75MG, КАРТРИДЖ 0.6)">
-                        <input class="admin-input" id="admDesc" placeholder="Описание (например: Под-система, 20 мг)">
-                        <div class="admin-row">
-                            <input class="admin-input" id="admPrice" type="number" placeholder="Цена (BYN)">
-                            <input class="admin-input" id="admStock" type="number" placeholder="Общий сток">
+                <!-- ДОСТУП И БАЛЛЫ -->
+                <div class="adm-pane" data-adm-pane="access">
+                    <div class="profile-card">
+                        <div class="profile-card-title">⭐ Засчитать товары клиенту</div>
+                        <div style="display:flex; gap:8px;">
+                            <input class="admin-input" id="admClientUsername" placeholder="@username покупателя">
+                            <button class="profile-btn" id="admSubPurchaseBtn" style="width:auto; padding:0 14px; flex-shrink:0; border-color:rgba(255,59,48,0.45); color:#ff6961;">−1</button>
+                            <button class="profile-btn primary" id="admAddPurchaseBtn" style="width:auto; padding:0 16px; flex-shrink:0;">+1</button>
                         </div>
-                        <div class="admin-row" id="admColorRow">
-                            <input class="admin-input" id="admColor" placeholder="Цвет / Вкус / Вариант">
-                            <input class="admin-input" id="admColorStock" type="number" placeholder="Сток варианта">
+                        <div style="font-size:11px; color:var(--text-gray); margin-top:8px;">
+                            5 товаров = 1 прокрут рулетки. Товары сверх 5 сохраняются.
                         </div>
-                        <label class="admin-upload-label">
-                            <span>📷 Загрузить фото с телефона</span>
-                            <input type="file" accept="image/*" id="admPhotoFile" style="display:none;">
-                        </label>
-                        <input class="admin-input" id="admImage" placeholder="Ссылка на фото или имя файла (необязательно)">
-                        <button class="profile-btn primary" id="admSaveBtn">Сохранить товар</button>
+                    </div>
+
+                    <div class="profile-card" id="superAdminBlock" style="display:none;">
+                        <div class="profile-card-title">👑 Управление админами</div>
+                        <div style="display:flex; gap:8px; margin-bottom:10px;">
+                            <input class="admin-input" id="admNewAdmin" placeholder="@username (например: ivan_shop)">
+                            <button class="profile-btn primary" id="admAddAdminBtn" style="width:auto; padding:0 18px; flex-shrink:0;">Выдать</button>
+                        </div>
+                        <div id="admAdminsList" style="display:flex; flex-direction:column; gap:8px;"></div>
                     </div>
                 </div>
-
-                <div class="profile-card-title" style="margin-bottom: 10px;">Товары в базе (<span id="admTotalCount">0</span>)</div>
-                <input class="admin-input" id="admSearchInput" placeholder="🔍 Быстрый поиск по названию или бренду..." style="margin-bottom: 10px;">
-                <div class="admin-dept-tabs" id="adminDeptTabs"></div>
-                <div id="adminProductList" style="display:flex; flex-direction:column; gap:10px;"></div>
             </div>
         </main>
 
@@ -699,8 +749,54 @@
             <button class="nav-btn" data-tab="admin" id="adminNavBtn" style="display:none;" aria-label="Админ">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                 <span>Админ</span>
+                <span class="adm-badge adm-nav-badge" id="adminNavBadge" style="display:none;">0</span>
             </button>
         </nav>
+    </div>
+
+    <div class="adm-modal-overlay" id="admProductModal" style="display:none;">
+        <div class="adm-sheet">
+            <div class="adm-sheet-head">
+                <div class="adm-sheet-title" id="admModalTitle">＋ Новый товар</div>
+                <button type="button" class="adm-sheet-close" id="admModalClose" aria-label="Закрыть">✕</button>
+            </div>
+            <div class="admin-form">
+                <div class="adm-label">Категория</div>
+                <select class="admin-select" id="admCategory">
+                    <option value="vapes">ПОД-СИСТЕМЫ</option>
+                    <option value="liquids">ЖИДКОСТИ</option>
+                    <option value="snus">СНЮС</option>
+                    <option value="consumables">РАСХОДНИКИ</option>
+                    <option value="nicoboosters">НИКОБУСТЕРЫ</option>
+                    <option value="disposables">ОДНОРАЗКИ</option>
+                </select>
+                <div class="adm-label">Бренд и название</div>
+                <input class="admin-input" id="admBrand" placeholder="Бренд / Производитель (например: VAPORESSO, SMOANT, BRUSKO)">
+                <input class="admin-input" id="admName" placeholder="Название (например: DRYMOST 75MG, КАРТРИДЖ 0.6)">
+                <input class="admin-input" id="admDesc" placeholder="Описание (например: Под-система, 20 мг)">
+                <div class="adm-label">Цена (BYN) и общий сток</div>
+                <div class="admin-row">
+                    <input class="admin-input" id="admPrice" type="number" inputmode="decimal" placeholder="Цена (BYN)">
+                    <input class="admin-input" id="admStock" type="number" inputmode="numeric" placeholder="Общий сток">
+                </div>
+                <div class="adm-label">Вариант (цвет / вкус) и его сток</div>
+                <div class="admin-row" id="admColorRow">
+                    <input class="admin-input" id="admColor" placeholder="Цвет / Вкус / Вариант">
+                    <input class="admin-input" id="admColorStock" type="number" inputmode="numeric" placeholder="Сток варианта">
+                </div>
+                <div class="adm-label">Фото</div>
+                <div class="adm-photo-row">
+                    <div class="adm-photo-prev" id="admImagePreview"><span>📦</span></div>
+                    <label class="admin-upload-label">
+                        <span>📷 Загрузить фото</span>
+                        <input type="file" accept="image/*" id="admPhotoFile" style="display:none;">
+                    </label>
+                </div>
+                <input class="admin-input" id="admImage" placeholder="Ссылка на фото или имя файла (необязательно)">
+                <button type="button" class="profile-btn primary" id="admSaveBtn" style="margin-top:6px;">Сохранить товар</button>
+                <button type="button" class="profile-btn" id="admSaveAgainBtn">Сохранить и добавить ещё вариант</button>
+            </div>
+        </div>
     </div>
 
     <div class="toast" id="toast">Добавлено</div>
@@ -773,6 +869,12 @@
         let detailBackPage = 'brand';
         let adminSelectedDept = 'all';
         let adminSearchQuery = '';
+        let adminStockFilter = 'all';
+        let adminEditingId = null;
+        let adminActiveTab = 'orders';
+        let adminPendingOrders = [];
+        let adminOrdersUnsub = null;
+        let adminPhotoUploading = false;
         let catalogSearchQuery = '';
         let activePageName = 'welcome';
 
@@ -1179,6 +1281,7 @@
             const superBlock = document.getElementById('superAdminBlock');
             if (adminBtn) adminBtn.style.display = isAdminUser() ? 'flex' : 'none';
             if (superBlock) superBlock.style.display = isSuperAdmin() ? 'block' : 'none';
+            syncAdminOrdersListener();
             if (pages.admin.classList.contains('active') && !isAdminUser()) {
                 showPage('catalog');
                 showToast('Доступ к админ-панели закрыт');
@@ -3102,6 +3205,45 @@
             });
         }
 
+        function getAdminStock(p) {
+            const raw = p.color ? (p.color_stock ?? p.stock ?? 0) : (p.stock ?? 0);
+            return Number(raw) || 0;
+        }
+        function adminStockClass(n) { return n <= 0 ? 'st-out' : (n <= 2 ? 'st-low' : 'st-ok'); }
+        function adminStockLabel(n) { return n <= 0 ? 'Закончился' : (n <= 2 ? 'Мало' : 'В наличии'); }
+
+        function admConfirm({ title, text = '', okText = 'Подтвердить', danger = true }) {
+            return new Promise((resolve) => {
+                const ov = document.createElement('div');
+                ov.className = 'adm-modal-overlay';
+                ov.style.cssText = 'z-index:1300; align-items:center; padding:16px;';
+                ov.innerHTML = `
+                    <div class="adm-confirm">
+                        <div class="adm-confirm-title">${escHtml(title)}</div>
+                        <div class="adm-confirm-text">${escHtml(text).replace(/\n/g, '<br>')}</div>
+                        <div class="adm-confirm-btns">
+                            <button type="button" class="profile-btn" data-r="0">Отмена</button>
+                            <button type="button" class="profile-btn ${danger ? 'adm-danger' : 'primary'}" data-r="1">${escHtml(okText)}</button>
+                        </div>
+                    </div>`;
+                const done = (v) => { ov.remove(); resolve(v); };
+                ov.addEventListener('click', (e) => { if (e.target === ov) done(false); });
+                ov.querySelectorAll('button[data-r]').forEach(b => b.addEventListener('click', () => done(b.dataset.r === '1')));
+                document.body.appendChild(ov);
+            });
+        }
+
+        function admSetTab(name) {
+            adminActiveTab = name;
+            document.querySelectorAll('.adm-tab').forEach(b => b.classList.toggle('active', b.dataset.admTab === name));
+            document.querySelectorAll('.adm-pane').forEach(p => p.classList.toggle('active', p.dataset.admPane === name));
+            if (name === 'orders') renderAdminOrders();
+            if (name === 'stock') renderAdminList();
+            if (name === 'access') renderAdminsList();
+            mainScroll.scrollTop = 0;
+        }
+        document.querySelectorAll('.adm-tab').forEach(b => b.addEventListener('click', () => admSetTab(b.dataset.admTab)));
+
         function renderAdminDeptTabs() {
             const tabsBox = document.getElementById('adminDeptTabs');
             if (!tabsBox) return;
@@ -3127,28 +3269,54 @@
                     renderAdminList();
                 });
             });
+
+            const filtersBox = document.getElementById('admStockFilters');
+            if (!filtersBox) return;
+            const outN = allRawProducts.filter(p => getAdminStock(p) <= 0).length;
+            const lowN = allRawProducts.filter(p => { const s = getAdminStock(p); return s > 0 && s <= 2; }).length;
+            const filters = [
+                { id: 'all', label: 'Весь склад', cls: '' },
+                { id: 'out', label: `🔴 Закончились (${outN})`, cls: 'adm-filter-out' },
+                { id: 'low', label: `🟠 Мало ≤2 (${lowN})`, cls: 'adm-filter-low' }
+            ];
+            filtersBox.innerHTML = filters.map(f => `
+                <button type="button" class="admin-dept-tab ${f.cls} ${adminStockFilter === f.id ? 'active' : ''}" data-sf="${f.id}">${f.label}</button>
+            `).join('');
+            filtersBox.querySelectorAll('[data-sf]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    adminStockFilter = btn.dataset.sf;
+                    renderAdminList();
+                });
+            });
         }
 
         function renderAdminItemHtml(p) {
-            const hasVariantStock = Boolean(p.color);
-            const currentStock = hasVariantStock ? (p.color_stock ?? p.stock ?? 0) : (p.stock ?? 0);
+            const stock = getAdminStock(p);
+            const price = Number(p.price) || 0;
             return `
-            <div class="admin-item">
-                <div class="admin-item-thumb">${p.image ? `<img src="${p.image}" loading="lazy" decoding="async" alt="" onerror="this.style.opacity='0.25'">` : `<span>📦</span>`}</div>
-                <div class="admin-item-info">
-                    <div class="admin-item-title">${escHtml(p.name || 'Без названия')}</div>
-                    <div class="admin-item-sub">${escHtml(p.brand || '')} ${p.color ? '· ' + escHtml(p.color) : ''}</div>
-                    <div class="admin-price-edit">
-                        <input type="number" class="admin-price-input" id="priceInput_${p.docId}" value="${p.price || 0}" placeholder="BYN">
-                        <span style="font-size:11px; color:var(--text-gray);">BYN</span>
-                        <button class="admin-price-save" data-id="${p.docId}">OK</button>
+            <div class="adm-card ${adminStockClass(stock)}" data-card="${escHtml(p.docId)}">
+                <div class="adm-card-top">
+                    <div class="adm-thumb">${p.image ? `<img src="${escHtml(p.image)}" loading="lazy" decoding="async" alt="" onerror="this.style.opacity='0.25'">` : `<span>📦</span>`}</div>
+                    <div class="adm-info">
+                        <div class="adm-title">${escHtml(p.name || 'Без названия')}</div>
+                        <div class="adm-variant">${p.color ? escHtml(p.color) : '<span style="color:var(--text-gray);">Без варианта</span>'}${p.brand ? ` <span style="color:var(--text-gray);">· ${escHtml(p.brand)}</span>` : ''}</div>
+                        <div class="adm-meta">
+                            <button type="button" class="adm-price" data-adm-act="price" data-id="${escHtml(p.docId)}">${price} BYN ✎</button>
+                            <span class="adm-state">${adminStockLabel(stock)}</span>
+                        </div>
                     </div>
+                    <button type="button" class="adm-del" data-adm-act="del" data-id="${escHtml(p.docId)}" aria-label="Удалить">🗑</button>
                 </div>
-                <div class="admin-stock-ctrl">
-                    <button class="admin-mini-btn" data-id="${p.docId}" data-has-var="${hasVariantStock ? '1' : '0'}" data-val="${currentStock}" data-act="dec">−</button>
-                    <span style="min-width: 22px; text-align:center; font-size:13px; font-weight:700;">${currentStock}</span>
-                    <button class="admin-mini-btn" data-id="${p.docId}" data-has-var="${hasVariantStock ? '1' : '0'}" data-val="${currentStock}" data-act="inc">+</button>
-                    <button class="admin-del-btn" data-id="${p.docId}" data-act="del">🗑</button>
+                <div class="adm-card-bottom">
+                    <div class="adm-stock">
+                        <button type="button" class="adm-stock-btn" data-adm-act="dec" data-id="${escHtml(p.docId)}" data-val="${stock}">−</button>
+                        <span class="adm-stock-val">${stock}</span>
+                        <button type="button" class="adm-stock-btn" data-adm-act="inc" data-id="${escHtml(p.docId)}" data-val="${stock}">+</button>
+                    </div>
+                    <div class="adm-actions">
+                        <button type="button" class="adm-act" data-adm-act="edit" data-id="${escHtml(p.docId)}" aria-label="Редактировать">✏️</button>
+                        <button type="button" class="adm-act" data-adm-act="variant" data-id="${escHtml(p.docId)}">+ Вариант</button>
+                    </div>
                 </div>
             </div>`;
         }
@@ -3177,9 +3345,12 @@
             renderAdminDeptTabs();
 
             const q = adminSearchQuery.trim().toLowerCase();
-            let filtered = allRawProducts.filter(p => {
+            const filtered = allRawProducts.filter(p => {
                 const cat = getAdminNormalizedCategory(p.category);
                 if (adminSelectedDept !== 'all' && cat !== adminSelectedDept) return false;
+                const s = getAdminStock(p);
+                if (adminStockFilter === 'out' && s > 0) return false;
+                if (adminStockFilter === 'low' && !(s > 0 && s <= 2)) return false;
                 if (q) {
                     const hay = `${p.name || ''} ${p.brand || ''} ${p.color || ''}`.toLowerCase();
                     if (!hay.includes(q)) return false;
@@ -3188,12 +3359,12 @@
             });
 
             if (filtered.length === 0) {
-                listEl.innerHTML = `<div class="empty-state" style="padding: 30px 10px;">В этом отделе пока ничего не найдено</div>`;
+                listEl.innerHTML = `<div class="adm-empty">${adminStockFilter === 'out' ? 'Закончившихся товаров нет 👍' : adminStockFilter === 'low' ? 'Товаров с малым остатком нет 👍' : 'Ничего не найдено'}</div>`;
                 return;
             }
 
             if (adminSelectedDept === 'all') {
-                const sectionsHtml = ADMIN_DEPARTMENTS
+                listEl.innerHTML = ADMIN_DEPARTMENTS
                     .filter(d => d.id !== 'all')
                     .map(dept => {
                         const items = filtered.filter(p => getAdminNormalizedCategory(p.category) === dept.id);
@@ -3206,98 +3377,201 @@
                             ${renderAdminItemsGroupedByModel(items)}
                         `;
                     }).join('');
-                listEl.innerHTML = sectionsHtml;
             } else {
                 listEl.innerHTML = renderAdminItemsGroupedByModel(filtered);
             }
-
-            listEl.querySelectorAll('.admin-price-save').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const id = btn.dataset.id;
-                    const input = document.getElementById(`priceInput_${id}`);
-                    const newPrice = Number(input.value);
-                    if (isNaN(newPrice) || newPrice < 0) {
-                        showToast('Введите корректную цену');
-                        return;
-                    }
-                    await db.collection('products').doc(id).update({ price: newPrice });
-                    showToast(`Цена обновлена: ${newPrice} BYN`);
-                });
-            });
-
-            listEl.querySelectorAll('.admin-mini-btn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const id = btn.dataset.id;
-                    const hasVar = btn.dataset.hasVar === '1';
-                    const cur = Number(btn.dataset.val) || 0;
-                    const next = btn.dataset.act === 'inc' ? cur + 1 : Math.max(0, cur - 1);
-                    await db.collection('products').doc(id).update(hasVar ? { color_stock: next } : { stock: next });
-                    showToast(`Сток обновлён: ${next}`);
-                });
-            });
-
-            listEl.querySelectorAll('.admin-del-btn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    await db.collection('products').doc(btn.dataset.id).delete();
-                    showToast('Удалено');
-                });
-            });
         }
+
+        // Один делегированный обработчик на весь список (не пересоздаётся при каждом рендере)
+        document.getElementById('adminProductList').addEventListener('click', async (e) => {
+            const btn = e.target.closest('[data-adm-act]');
+            if (!btn || !isAdminUser()) return;
+            const id = btn.dataset.id;
+            const act = btn.dataset.admAct;
+            const p = allRawProducts.find(x => x.docId === id);
+            if (!p) return;
+
+            if (act === 'inc' || act === 'dec') {
+                const card = btn.closest('.adm-card');
+                const cur = Number(btn.dataset.val) || 0;
+                const next = act === 'inc' ? cur + 1 : Math.max(0, cur - 1);
+                if (next === cur) return;
+                // мгновенно обновляем экран (защита от быстрых двойных нажатий)
+                if (card) {
+                    card.querySelectorAll('.adm-stock-btn').forEach(b => { b.dataset.val = String(next); });
+                    card.querySelector('.adm-stock-val').textContent = next;
+                    card.classList.remove('st-ok', 'st-low', 'st-out');
+                    card.classList.add(adminStockClass(next));
+                    const st = card.querySelector('.adm-state');
+                    if (st) st.textContent = adminStockLabel(next);
+                }
+                try {
+                    await db.collection('products').doc(id).update(p.color ? { color_stock: next } : { stock: next });
+                } catch (err) {
+                    console.error(err);
+                    showToast('Ошибка обновления стока');
+                    renderAdminList();
+                }
+            } else if (act === 'price') {
+                openAdminProductModal({ mode: 'edit', product: p, focus: 'admPrice' });
+            } else if (act === 'edit') {
+                openAdminProductModal({ mode: 'edit', product: p });
+            } else if (act === 'variant') {
+                openAdminProductModal({ mode: 'variant', product: p });
+            } else if (act === 'del') {
+                const label = `${p.name || 'Без названия'}${p.color ? ' (' + p.color + ')' : ''}`;
+                const ok = await admConfirm({ title: 'Удалить товар?', text: `«${label}» будет удалён из базы навсегда.`, okText: 'Удалить' });
+                if (!ok) return;
+                try {
+                    await db.collection('products').doc(id).delete();
+                    showToast('Удалено');
+                } catch (err) {
+                    console.error(err);
+                    showToast('Ошибка удаления');
+                }
+            }
+        });
 
         document.getElementById('admSearchInput').addEventListener('input', (e) => {
             adminSearchQuery = e.target.value;
             renderAdminList();
         });
 
+        // ---------- Модалка: добавить / редактировать / новый вариант ----------
+        function updateAdminImagePreview() {
+            const box = document.getElementById('admImagePreview');
+            const url = document.getElementById('admImage').value.trim();
+            box.innerHTML = url ? `<img src="${escHtml(url)}" alt="" onerror="this.style.opacity='0.25'">` : '<span>📦</span>';
+        }
+        document.getElementById('admImage').addEventListener('input', updateAdminImagePreview);
+
+        function openAdminProductModal({ mode = 'add', product = null, focus = null } = {}) {
+            const $ = (id) => document.getElementById(id);
+            const isEdit = mode === 'edit' && !!product;
+            const p = product || {};
+            adminEditingId = isEdit ? product.docId : null;
+
+            $('admModalTitle').textContent = isEdit ? '✏️ Редактировать товар' : (mode === 'variant' ? '＋ Новый вариант' : '＋ Новый товар');
+            $('admSaveBtn').textContent = isEdit ? 'Сохранить изменения' : 'Сохранить товар';
+            $('admSaveAgainBtn').style.display = isEdit ? 'none' : 'block';
+
+            const defCat = adminSelectedDept !== 'all' ? adminSelectedDept : 'vapes';
+            $('admCategory').value = getAdminNormalizedCategory(product ? p.category : defCat);
+            $('admBrand').value = p.brand || '';
+            $('admName').value = p.name || '';
+            $('admDesc').value = p.desc || '';
+            $('admPrice').value = product ? (p.price ?? '') : '';
+
+            if (isEdit) {
+                $('admStock').value = (p.stock !== undefined && p.stock !== '') ? p.stock : 99;
+                $('admColor').value = p.color || '';
+                $('admColorStock').value = p.color ? (p.color_stock ?? p.stock ?? '') : '';
+                $('admImage').value = p.image || '';
+            } else {
+                // новый вариант: бренд, модель, описание, цена и категория скопированы; остальное — пустое
+                $('admStock').value = '';
+                $('admColor').value = '';
+                $('admColorStock').value = '';
+                $('admImage').value = '';
+            }
+            $('admPhotoFile').value = '';
+            updateAdminImagePreview();
+
+            $('admProductModal').style.display = 'flex';
+            const focusId = focus || (mode === 'variant' ? 'admColor' : (mode === 'add' ? 'admName' : null));
+            if (focusId) setTimeout(() => { const el = $(focusId); if (el) el.focus(); }, 80);
+        }
+
+        function closeAdminProductModal() {
+            document.getElementById('admProductModal').style.display = 'none';
+            adminEditingId = null;
+        }
+        document.getElementById('admModalClose').addEventListener('click', closeAdminProductModal);
+        document.getElementById('admProductModal').addEventListener('click', (e) => {
+            if (e.target.id === 'admProductModal') closeAdminProductModal();
+        });
+        document.getElementById('admOpenAddBtn').addEventListener('click', () => openAdminProductModal({ mode: 'add' }));
+
         document.getElementById('admPhotoFile').addEventListener('change', async (e) => {
             const rawFile = e.target.files?.[0];
             if (!rawFile) return;
+            adminPhotoUploading = true;
             showToast('Сжатие и загрузка фото...');
-            const optimizedFile = await compressImageForUpload(rawFile, 900, 0.82);
-            const formData = new FormData();
-            formData.append('image', optimizedFile);
             try {
+                const optimizedFile = await compressImageForUpload(rawFile, 900, 0.82);
+                const formData = new FormData();
+                formData.append('image', optimizedFile);
                 const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
                 const json = await res.json();
                 if (json.success) {
                     document.getElementById('admImage').value = json.data.url;
+                    updateAdminImagePreview();
                     showToast('Фото загружено!');
                 } else showToast('Ошибка загрузки фото');
             } catch (err) {
                 console.error(err);
                 showToast('Ошибка сети при загрузке');
+            } finally {
+                adminPhotoUploading = false;
+                e.target.value = '';
             }
         });
 
-        document.getElementById('admSaveBtn').addEventListener('click', async () => {
-            const category = document.getElementById('admCategory').value;
-            const brand = document.getElementById('admBrand').value.trim();
-            const name = document.getElementById('admName').value.trim();
-            const desc = document.getElementById('admDesc').value.trim();
-            const price = Number(document.getElementById('admPrice').value) || 0;
-            const stock = Number(document.getElementById('admStock').value) || 0;
-            const color = document.getElementById('admColor').value.trim();
-            const colorStockRaw = document.getElementById('admColorStock').value.trim();
+        async function saveAdminProduct(keepOpen) {
+            if (!isAdminUser()) return;
+            if (adminPhotoUploading) { showToast('Подождите, фото ещё загружается'); return; }
+            const $ = (id) => document.getElementById(id);
+            const category = $('admCategory').value;
+            const brand = $('admBrand').value.trim();
+            const name = $('admName').value.trim();
+            const desc = $('admDesc').value.trim();
+            const price = Number($('admPrice').value) || 0;
+            const stock = Number($('admStock').value) || 0;
+            const color = $('admColor').value.trim();
+            const colorStockRaw = $('admColorStock').value.trim();
             const color_stock = colorStockRaw !== '' ? (Number(colorStockRaw) || 0) : stock;
-            const image = document.getElementById('admImage').value.trim();
+            const image = $('admImage').value.trim();
 
-            if (!name || !price) { showToast('Укажите название и цену'); return; }
+            if (!name || !price || price < 0) { showToast('Укажите название и цену'); return; }
 
+            const saveBtn = $('admSaveBtn');
+            const againBtn = $('admSaveAgainBtn');
+            saveBtn.disabled = true;
+            againBtn.disabled = true;
+            const data = { category, brand, name, desc, price, stock, color, color_stock, image };
             try {
-                await db.collection('products').add({
-                    category, brand, name, desc, price, stock, color, color_stock, image,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                document.getElementById('admColor').value = '';
-                document.getElementById('admColorStock').value = '';
-                document.getElementById('admImage').value = '';
-                document.getElementById('admPhotoFile').value = '';
-                showToast('Товар добавлен в базу!');
+                if (adminEditingId) {
+                    await db.collection('products').doc(adminEditingId).update(data);
+                    showToast('Товар обновлён');
+                    closeAdminProductModal();
+                } else {
+                    await db.collection('products').add({
+                        ...data,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    showToast('Товар добавлен в базу!');
+                    if (keepOpen) {
+                        $('admColor').value = '';
+                        $('admColorStock').value = '';
+                        $('admStock').value = '';
+                        $('admImage').value = '';
+                        $('admPhotoFile').value = '';
+                        updateAdminImagePreview();
+                        $('admColor').focus();
+                    } else {
+                        closeAdminProductModal();
+                    }
+                }
             } catch (err) {
                 console.error(err);
                 showToast('Ошибка сохранения в Firebase');
+            } finally {
+                saveBtn.disabled = false;
+                againBtn.disabled = false;
             }
-        });
+        }
+        document.getElementById('admSaveBtn').addEventListener('click', () => saveAdminProduct(false));
+        document.getElementById('admSaveAgainBtn').addEventListener('click', () => saveAdminProduct(true));
 
         function showDeliveryModal() {
             if (document.querySelector('.delivery-modal')) return;
@@ -3731,16 +4005,50 @@
             }
         }
 
-        async function renderAdminOrders() {
+        function updateAdminOrdersBadge() {
+            const n = adminPendingOrders.length;
+            ['admOrdersBadge', 'adminNavBadge'].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.textContent = n > 99 ? '99+' : String(n);
+                el.style.display = n > 0 ? 'inline-flex' : 'none';
+            });
+        }
+
+        // Живая подписка на pending-заказы (только для админов)
+        function syncAdminOrdersListener() {
+            if (isAdminUser()) {
+                if (adminOrdersUnsub) return;
+                let firstLoad = true;
+                adminOrdersUnsub = db.collection('orders').where('status', '==', 'pending').onSnapshot((snap) => {
+                    adminPendingOrders = [];
+                    snap.forEach(d => adminPendingOrders.push({ id: d.id, ...d.data() }));
+                    adminPendingOrders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+                    if (!firstLoad && snap.docChanges().some(c => c.type === 'added' && !c.doc.metadata.hasPendingWrites)) {
+                        showToast('📦 Новый заказ!');
+                    }
+                    firstLoad = false;
+                    updateAdminOrdersBadge();
+                    renderAdminOrders();
+                }, (err) => {
+                    console.error('Ошибка подписки на заказы:', err);
+                    adminOrdersUnsub = null;
+                });
+            } else if (adminOrdersUnsub) {
+                adminOrdersUnsub();
+                adminOrdersUnsub = null;
+                adminPendingOrders = [];
+                updateAdminOrdersBadge();
+            }
+        }
+
+        function renderAdminOrders() {
             const box = document.getElementById('adminOrdersList');
             if (!box || !isAdminUser()) return;
-            const snap = await db.collection('orders').where('status', '==', 'pending').get();
-            const orders = [];
-            snap.forEach(d => orders.push({ id: d.id, ...d.data() }));
-            orders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+            const orders = adminPendingOrders;
 
             if (orders.length === 0) {
-                box.innerHTML = `<div style="font-size:12px; color:var(--text-gray);">Новых заказов нет</div>`;
+                box.innerHTML = `<div class="adm-empty">Новых заказов нет ✅</div>`;
                 return;
             }
             const renderOrderDiscountHtml = (o) => {
@@ -3762,130 +4070,146 @@
 
             box.innerHTML = orders.map(o => `
                 <div class="order-card">
-                    <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:700;">
+                    <div class="adm-order-head">
                         <span>@${escHtml(o.username)}</span>
                         <span>${escHtml(o.total)} BYN</span>
                     </div>
-                    <div style="font-size:11px; color:#ffb74d;">
-                        📅 ${escHtml(o.date || '—')} · ⏰ ${escHtml(o.time || '—')} · 📍 ${escHtml(o.pickup || 'ВОКЗАЛ')}
+                    <div class="adm-order-chips">
+                        <span class="adm-order-chip">📅 ${escHtml(o.date || '—')}</span>
+                        <span class="adm-order-chip">⏰ ${escHtml(o.time || '—')}</span>
+                        <span class="adm-order-chip">📍 ${escHtml(o.pickup || 'ВОКЗАЛ')}</span>
                     </div>
-                    <div style="font-size:12px; color:var(--text-gray);">
-                        ${(o.items || []).map(i => `${escHtml(i.name)} (${escHtml(i.color)}) × ${Number(i.qty) || 1}`).join(', ')}
+                    <div class="adm-order-items">
+                        ${(o.items || []).map(i => `<div>• ${escHtml(i.name)}${i.color ? ` (${escHtml(i.color)})` : ''} × ${Number(i.qty) || 1}</div>`).join('')}
                     </div>
                     ${renderOrderDiscountHtml(o)}
-                    <div style="display:flex; gap:8px; margin-top:4px;">
-                        <button class="profile-btn primary" data-confirm-order="${o.id}" style="padding:8px; font-size:11px;">✓ Забрал заказ (+баллы и отзыв)</button>
-                        <button class="profile-btn" data-cancel-order="${o.id}" style="padding:8px; font-size:11px; width:auto; border-color:rgba(255,59,48,0.4); color:#ff6961;">✕</button>
+                    <div class="adm-order-btns">
+                        <button class="profile-btn primary" data-confirm-order="${escHtml(o.id)}">✓ Забрал заказ (+баллы и отзыв)</button>
+                        <button class="profile-btn adm-cancel" data-cancel-order="${escHtml(o.id)}" aria-label="Отменить заказ">✕</button>
                     </div>
                 </div>
             `).join('');
-
-            box.querySelectorAll('[data-confirm-order]').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const ord = orders.find(x => x.id === btn.dataset.confirmOrder);
-                    if (!ord) return;
-                    btn.disabled = true;
-
-                    const lowItems = (ord.items || []).filter(i => {
-                        const live = getLiveStockForItem(i);
-                        return live !== null && live < (Number(i.qty) || 1);
-                    });
-                    if (lowItems.length > 0) {
-                        const list = lowItems.map(i => `• ${i.name} (${i.color || 'Стандарт'}): нужно ${Number(i.qty) || 1}, в наличии ${getLiveStockForItem(i)}`).join('\n');
-                        if (!confirm(`Остатка по некоторым позициям не хватает:\n${list}\n\nВсё равно завершить заказ?`)) {
-                            btn.disabled = false;
-                            return;
-                        }
-                    }
-
-                    const uniqueItemsMap = new Map();
-                    (ord.items || []).forEach((i, idx) => {
-                        const variant = i.color || 'Стандарт';
-                        const key = `${i.name}||${variant}`.toLowerCase();
-                        if (!uniqueItemsMap.has(key)) {
-                            uniqueItemsMap.set(key, {
-                                id: `rp_${ord.id}_${idx}`,
-                                orderId: ord.id,
-                                productKey: key,
-                                productName: i.name || '',
-                                productVariant: variant,
-                                productImage: i.image || resolveOrderItemImage(i.name, variant)
-                            });
-                        }
-                    });
-
-                    const keys = Array.from(uniqueItemsMap.keys());
-                    const pendingReviewItems = Array.from(uniqueItemsMap.values());
-                    const orderTotalNum = parseFloat(String(ord.total).replace(',', '.')) || 0;
-                    const earnsPoint = orderTotalNum > 0;
-                    // Считаем общее количество товаров в заказе (сумма qty)
-                    const totalItemsInOrder = (ord.items || []).reduce((sum, i) => sum + (Number(i.qty) || 1), 0);
-
-                    try {
-                        const orderRef = db.collection('orders').doc(ord.id);
-                        await db.runTransaction(async (tx) => {
-                            const s = await tx.get(orderRef);
-                            if (!s.exists || s.data().status !== 'pending') throw new Error('ORDER_NOT_PENDING');
-                            tx.update(orderRef, { status: 'confirmed' });
-                        });
-
-                        await deductOrderStockFromFirestore(ord.items);
-
-                        const userRef = await resolveUserRef(ord.userId);
-                        const payload = {};
-                        if (earnsPoint) {
-                            payload.purchases = firebase.firestore.FieldValue.increment(totalItemsInOrder);
-                            payload.totalPurchases = firebase.firestore.FieldValue.increment(totalItemsInOrder);
-                        }
-                        if (keys.length > 0) payload.purchasedKeys = firebase.firestore.FieldValue.arrayUnion(...keys);
-                        if (pendingReviewItems.length > 0) payload.pendingReviews = firebase.firestore.FieldValue.arrayUnion(...pendingReviewItems);
-                        await userRef.set(payload, { merge: true });
-                    } catch (err) {
-                        console.error(err);
-                        showToast(err && err.message === 'ORDER_NOT_PENDING' ? 'Заказ уже обработан' : 'Ошибка при подтверждении заказа');
-                        renderAdminOrders();
-                        return;
-                    }
-
-                    showToast(`Заказ @${ord.username} выдан! Остаток обновлён`);
-                    renderAdminOrders();
-                });
-            });
-
-            box.querySelectorAll('[data-cancel-order]').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const ord = orders.find(x => x.id === btn.dataset.cancelOrder);
-                    if (!ord) return;
-                    btn.disabled = true;
-                    try {
-                        const orderRef = db.collection('orders').doc(ord.id);
-                        const userRef = await resolveUserRef(ord.userId);
-                        const refund = (Array.isArray(ord.usedRewards) ? ord.usedRewards : []).map(r => ({
-                            id: r.id,
-                            type: r.type || '',
-                            percent: Number(r.percent) || 0,
-                            label: r.label || '',
-                            createdAt: Date.now()
-                        }));
-                        await db.runTransaction(async (tx) => {
-                            const s = await tx.get(orderRef);
-                            if (!s.exists || s.data().status !== 'pending') throw new Error('ORDER_NOT_PENDING');
-                            tx.update(orderRef, { status: 'cancelled' });
-                            if (refund.length > 0) {
-                                tx.set(userRef, { rewards: firebase.firestore.FieldValue.arrayUnion(...refund) }, { merge: true });
-                            }
-                        });
-                    } catch (err) {
-                        console.error(err);
-                        showToast(err && err.message === 'ORDER_NOT_PENDING' ? 'Заказ уже обработан' : 'Ошибка отмены заказа');
-                        renderAdminOrders();
-                        return;
-                    }
-                    showToast(Array.isArray(ord.usedRewards) && ord.usedRewards.length ? 'Заказ отменён, призы возвращены' : 'Заказ отменён');
-                    renderAdminOrders();
-                });
-            });
         }
+
+        async function confirmAdminOrder(ordId, btn) {
+            const ord = adminPendingOrders.find(x => x.id === ordId);
+            if (!ord) return;
+            btn.disabled = true;
+
+            const lowItems = (ord.items || []).filter(i => {
+                const live = getLiveStockForItem(i);
+                return live !== null && live < (Number(i.qty) || 1);
+            });
+            if (lowItems.length > 0) {
+                const list = lowItems.map(i => `• ${i.name} (${i.color || 'Стандарт'}): нужно ${Number(i.qty) || 1}, в наличии ${getLiveStockForItem(i)}`).join('\n');
+                const ok = await admConfirm({ title: 'Не хватает остатка', text: `${list}\n\nВсё равно завершить заказ?`, okText: 'Завершить', danger: false });
+                if (!ok) {
+                    btn.disabled = false;
+                    return;
+                }
+            }
+
+            const uniqueItemsMap = new Map();
+            (ord.items || []).forEach((i, idx) => {
+                const variant = i.color || 'Стандарт';
+                const key = `${i.name}||${variant}`.toLowerCase();
+                if (!uniqueItemsMap.has(key)) {
+                    uniqueItemsMap.set(key, {
+                        id: `rp_${ord.id}_${idx}`,
+                        orderId: ord.id,
+                        productKey: key,
+                        productName: i.name || '',
+                        productVariant: variant,
+                        productImage: i.image || resolveOrderItemImage(i.name, variant)
+                    });
+                }
+            });
+
+            const keys = Array.from(uniqueItemsMap.keys());
+            const pendingReviewItems = Array.from(uniqueItemsMap.values());
+            const orderTotalNum = parseFloat(String(ord.total).replace(',', '.')) || 0;
+            const earnsPoint = orderTotalNum > 0;
+            // Считаем общее количество товаров в заказе (сумма qty)
+            const totalItemsInOrder = (ord.items || []).reduce((sum, i) => sum + (Number(i.qty) || 1), 0);
+
+            try {
+                const orderRef = db.collection('orders').doc(ord.id);
+                await db.runTransaction(async (tx) => {
+                    const s = await tx.get(orderRef);
+                    if (!s.exists || s.data().status !== 'pending') throw new Error('ORDER_NOT_PENDING');
+                    tx.update(orderRef, { status: 'confirmed' });
+                });
+
+                await deductOrderStockFromFirestore(ord.items);
+
+                const userRef = await resolveUserRef(ord.userId);
+                const payload = {};
+                if (earnsPoint) {
+                    payload.purchases = firebase.firestore.FieldValue.increment(totalItemsInOrder);
+                    payload.totalPurchases = firebase.firestore.FieldValue.increment(totalItemsInOrder);
+                }
+                if (keys.length > 0) payload.purchasedKeys = firebase.firestore.FieldValue.arrayUnion(...keys);
+                if (pendingReviewItems.length > 0) payload.pendingReviews = firebase.firestore.FieldValue.arrayUnion(...pendingReviewItems);
+                await userRef.set(payload, { merge: true });
+            } catch (err) {
+                console.error(err);
+                showToast(err && err.message === 'ORDER_NOT_PENDING' ? 'Заказ уже обработан' : 'Ошибка при подтверждении заказа');
+                renderAdminOrders();
+                return;
+            }
+
+            showToast(`Заказ @${ord.username} выдан! Остаток обновлён`);
+            renderAdminOrders();
+        }
+
+        async function cancelAdminOrder(ordId, btn) {
+            const ord = adminPendingOrders.find(x => x.id === ordId);
+            if (!ord) return;
+            const hasRewards = Array.isArray(ord.usedRewards) && ord.usedRewards.length > 0;
+            const ok = await admConfirm({
+                title: 'Отменить заказ?',
+                text: `Заказ @${ord.username} на ${ord.total} BYN будет отменён.${hasRewards ? '\nПризы клиента будут возвращены.' : ''}`,
+                okText: 'Отменить заказ'
+            });
+            if (!ok) return;
+            btn.disabled = true;
+            try {
+                const orderRef = db.collection('orders').doc(ord.id);
+                const userRef = await resolveUserRef(ord.userId);
+                const refund = (Array.isArray(ord.usedRewards) ? ord.usedRewards : []).map(r => ({
+                    id: r.id,
+                    type: r.type || '',
+                    percent: Number(r.percent) || 0,
+                    label: r.label || '',
+                    createdAt: Date.now()
+                }));
+                await db.runTransaction(async (tx) => {
+                    const s = await tx.get(orderRef);
+                    if (!s.exists || s.data().status !== 'pending') throw new Error('ORDER_NOT_PENDING');
+                    tx.update(orderRef, { status: 'cancelled' });
+                    if (refund.length > 0) {
+                        tx.set(userRef, { rewards: firebase.firestore.FieldValue.arrayUnion(...refund) }, { merge: true });
+                    }
+                });
+            } catch (err) {
+                console.error(err);
+                showToast(err && err.message === 'ORDER_NOT_PENDING' ? 'Заказ уже обработан' : 'Ошибка отмены заказа');
+                renderAdminOrders();
+                return;
+            }
+            showToast(hasRewards ? 'Заказ отменён, призы возвращены' : 'Заказ отменён');
+            renderAdminOrders();
+        }
+
+        document.getElementById('adminOrdersList').addEventListener('click', (e) => {
+            if (!isAdminUser()) return;
+            const c = e.target.closest('[data-confirm-order]');
+            if (c) { confirmAdminOrder(c.dataset.confirmOrder, c); return; }
+            const x = e.target.closest('[data-cancel-order]');
+            if (x) cancelAdminOrder(x.dataset.cancelOrder, x);
+        });
+
+        syncAdminOrdersListener();
     </script>
 </body>
 </html>
