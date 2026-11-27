@@ -510,7 +510,7 @@
             <div class="page active" id="welcomePage">
                 <div class="welcome-hero">
                     <div class="cat-mask">
-                        <img src="kotii.png" alt="WEGGEW" class="cat-image" id="catImage">
+                        <img src="kotii.png" alt="WEGGEW" class="cat-image" id="catImage" fetchpriority="high" decoding="async">
                     </div>
                 </div>
                 <div class="welcome-bottom">
@@ -742,6 +742,13 @@
             { id: 'disposables', label: '🚬 Одноразки' }
         ];
 
+        const ROULETTE_PRIZES = [
+            { type: 'discount', percent: 5, label: 'Скидка 5% на всё', short: '5% скидка', img: '5proc.png', weight: 50 },
+            { type: 'discount', percent: 10, label: 'Скидка 10% на всё', short: '10% скидка', img: '10proc.png', weight: 30 },
+            { type: 'discount', percent: 15, label: 'Скидка 15% на всё', short: '15% скидка', img: '15proc.png', weight: 15 },
+            { type: 'free_liquid', percent: 100, label: 'Бесплатная жидкость', short: 'Жижа 0 BYN', img: 'zhizhabesplatnaya.jpg', weight: 5 }
+        ];
+
         const catalogData = { vapes: [], snus: [], liquids: [], disposables: [], consumables: [], nicoboosters: [] };
         let extraAdmins = [];
         let userPurchases = 0;
@@ -751,6 +758,7 @@
         let isReviewModalOpen = false;
         let isRouletteSpinning = false;
         let isSubmittingOrder = false;
+        let isRefreshingUser = false;
         let allRawProducts = [];
         let vapeBrands = [];
         let liquidBrands = [];
@@ -766,6 +774,87 @@
         let adminSearchQuery = '';
         let catalogSearchQuery = '';
         let activePageName = 'welcome';
+
+        const preloadedImagesCache = new Map();
+
+        function preloadImageUrl(src) {
+            if (!src) return Promise.resolve();
+            if (preloadedImagesCache.has(src)) return preloadedImagesCache.get(src);
+            const p = new Promise((resolve) => {
+                const img = new Image();
+                img.decoding = 'async';
+                img.onload = () => resolve();
+                img.onerror = () => resolve();
+                img.src = src;
+            });
+            preloadedImagesCache.set(src, p);
+            return p;
+        }
+
+        function preloadCoreAssets() {
+            const urls = [
+                'zadniufon.jpg',
+                'zadniyfondimok.jpg',
+                ...categories.map(c => c.image),
+                ...ROULETTE_PRIZES.map(p => p.img)
+            ].filter(Boolean);
+            urls.forEach(preloadImageUrl);
+        }
+
+        async function ensureImagesReady(urls, timeoutMs = 2200) {
+            const tasks = Promise.all((urls || []).filter(Boolean).map(preloadImageUrl));
+            await Promise.race([tasks, new Promise(r => setTimeout(r, timeoutMs))]);
+        }
+
+        async function compressImageForUpload(file, maxSide = 900, quality = 0.82) {
+            if (!file || !file.type || !file.type.startsWith('image/')) return file;
+            return new Promise((resolve) => {
+                const url = URL.createObjectURL(file);
+                const img = new Image();
+                img.onload = () => {
+                    try {
+                        let w = img.naturalWidth || img.width;
+                        let h = img.naturalHeight || img.height;
+                        if (w > maxSide || h > maxSide) {
+                            const ratio = Math.min(maxSide / w, maxSide / h);
+                            w = Math.max(1, Math.round(w * ratio));
+                            h = Math.max(1, Math.round(h * ratio));
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        URL.revokeObjectURL(url);
+
+                        const tryMime = (mime) => new Promise((res) => {
+                            canvas.toBlob((blob) => res(blob), mime, quality);
+                        });
+
+                        tryMime('image/webp').then(async (blob) => {
+                            if (blob && blob.size > 0 && blob.size < file.size) {
+                                resolve(new File([blob], 'photo.webp', { type: 'image/webp' }));
+                                return;
+                            }
+                            const jpegBlob = await tryMime('image/jpeg');
+                            if (jpegBlob && jpegBlob.size > 0 && jpegBlob.size < file.size) {
+                                resolve(new File([jpegBlob], 'photo.jpg', { type: 'image/jpeg' }));
+                            } else {
+                                resolve(file);
+                            }
+                        });
+                    } catch (e) {
+                        URL.revokeObjectURL(url);
+                        resolve(file);
+                    }
+                };
+                img.onerror = () => {
+                    URL.revokeObjectURL(url);
+                    resolve(file);
+                };
+                img.src = url;
+            });
+        }
 
         const VAPE_COLOR_IMAGES = {
             'PASITO 3': {
@@ -831,7 +920,6 @@
         function getTgId() {
             return window.Telegram?.WebApp?.initDataUnsafe?.user?.id || null;
         }
-        // Основной ключ документа — постоянный Telegram ID (username может меняться)
         function getUserDocId() {
             const tgId = getTgId();
             if (tgId) return `id_${tgId}`;
@@ -848,7 +936,6 @@
             return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         }
 
-        // Миграция старого документа users/{username} -> users/id_<tgId> (старый НЕ удаляется)
         async function migrateLegacyUserDoc() {
             const tgId = getTgId();
             const uname = getTgUsername();
@@ -891,7 +978,7 @@
                 console.error('Ошибка миграции пользователя:', err);
             }
         }
-        // Для заказов со старым userId (username): если документ уже мигрировал — берём новый
+
         async function resolveUserRef(userId) {
             let ref = db.collection('users').doc(userId);
             try {
@@ -903,7 +990,6 @@
             return ref;
         }
 
-        // --- АКТУАЛЬНЫЙ ОСТАТОК ПО ПОЗИЦИИ КОРЗИНЫ (из allRawProducts) ---
         function getLiveStockForItem(item) {
             const norm = (s) => String(s || '').trim().toLowerCase();
             let p = item.docId ? allRawProducts.find(x => x.docId === item.docId) : null;
@@ -983,7 +1069,7 @@
                 <div class="review-author-wrap">
                     <div class="review-user-avatar">
                         ${authorPhoto
-                            ? `<img src="${authorPhoto}" alt="${displayAuthor}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${letter}</span>`
+                            ? `<img src="${authorPhoto}" alt="${displayAuthor}" loading="lazy" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${letter}</span>`
                             : `<span>${letter}</span>`
                         }
                     </div>
@@ -1010,7 +1096,6 @@
                 || 'vape.png';
         }
 
-        // --- РАСЧЁТ АКЦИИ «ПОД-СИСТЕМА + ЛЮБАЯ ЖИДКОСТЬ ЗА 15 BYN» ---
         function getCartPodCount() {
             return cart.reduce((sum, item) => sum + (item.category === 'vapes' ? item.qty : 0), 0);
         }
@@ -1161,11 +1246,52 @@
             });
         }
 
-        async function startUserPurchasesSync() {
+        function applyUserSnapshotData(data = {}) {
+            userPurchases = Number(data.purchases) || 0;
+            userRewards = Array.isArray(data.rewards) ? data.rewards : [];
+            userPurchasedKeys = Array.isArray(data.purchasedKeys) ? data.purchasedKeys : [];
+            userPendingReviews = Array.isArray(data.pendingReviews) ? data.pendingReviews : [];
+            syncCartRewardsValidity();
+
+            if (!isRouletteSpinning && pages.profile.classList.contains('active')) renderProfile();
+            if (pages.cart.classList.contains('active')) renderCart();
+            if (currentCategoryId === 'liquids' && pages.brand.classList.contains('active')) openCategory('liquids');
+
+            if (userPendingReviews.length > 0 && !isReviewModalOpen && !isRouletteSpinning) {
+                const eligible = userPendingReviews.filter(p => userPurchasedKeys.includes(p.productKey) || isAdminUser());
+                if (eligible.length > 0) {
+                    openPendingReviewsModal(eligible);
+                }
+            }
+        }
+
+        async function refreshUserDataFromServer() {
+            const docId = getUserDocId();
+            if (!docId || isRefreshingUser) return;
+            isRefreshingUser = true;
+            try {
+                const snap = await db.collection('users').doc(docId).get({ source: 'server' });
+                applyUserSnapshotData(snap.exists ? (snap.data() || {}) : {});
+            } catch (e) {
+                try {
+                    const snap = await db.collection('users').doc(docId).get();
+                    applyUserSnapshotData(snap.exists ? (snap.data() || {}) : {});
+                } catch (err) {}
+            } finally {
+                isRefreshingUser = false;
+            }
+        }
+
+        function startUserPurchasesSync() {
             const docId = getUserDocId();
             if (!docId) return;
 
-            await migrateLegacyUserDoc();
+            // Подписка вешается мгновенно, не дожидаясь migrateLegacyUserDoc
+            db.collection('users').doc(docId).onSnapshot((doc) => {
+                applyUserSnapshotData(doc.exists ? (doc.data() || {}) : {});
+            });
+
+            migrateLegacyUserDoc().then(() => refreshUserDataFromServer()).catch(() => {});
 
             const tgU = getTgUsername();
             const tgPhoto = getTgPhotoUrl();
@@ -1175,29 +1301,19 @@
                 if (tgPhoto) profilePatch.photoUrl = tgPhoto;
                 db.collection('users').doc(docId).set(profilePatch, { merge: true }).catch(() => {});
             }
-
-            db.collection('users').doc(docId).onSnapshot((doc) => {
-                const data = doc.exists ? doc.data() : {};
-                userPurchases = Number(data.purchases) || 0;
-                userRewards = Array.isArray(data.rewards) ? data.rewards : [];
-                userPurchasedKeys = Array.isArray(data.purchasedKeys) ? data.purchasedKeys : [];
-                userPendingReviews = Array.isArray(data.pendingReviews) ? data.pendingReviews : [];
-                syncCartRewardsValidity();
-
-                if (!isRouletteSpinning && pages.profile.classList.contains('active')) renderProfile();
-                if (pages.cart.classList.contains('active')) renderCart();
-                if (currentCategoryId === 'liquids' && pages.brand.classList.contains('active')) openCategory('liquids');
-
-                if (userPendingReviews.length > 0 && !isReviewModalOpen && !isRouletteSpinning) {
-                    const eligible = userPendingReviews.filter(p => userPurchasedKeys.includes(p.productKey) || isAdminUser());
-                    if (eligible.length > 0) {
-                        openPendingReviewsModal(eligible);
-                    }
-                }
-            });
         }
 
-        // Уже есть отзыв этого пользователя на этот вариант товара?
+        // Обновление данных с сервера при возвращении из чата Telegram / сворачивании WebView
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') refreshUserDataFromServer();
+        });
+        window.addEventListener('focus', () => {
+            refreshUserDataFromServer();
+        });
+        if (window.Telegram?.WebApp?.onEvent) {
+            window.Telegram.WebApp.onEvent('activated', () => refreshUserDataFromServer());
+        }
+
         async function hasUserReviewed(productKey) {
             if (isAdminUser()) return false;
             const ids = Array.from(new Set([getUserDocId(), getTgUsername()].filter(Boolean)));
@@ -1210,7 +1326,6 @@
             return false;
         }
 
-        // --- АВТОМАТИЧЕСКОЕ ОКНО ОТЗЫВА ПОСЛЕ ТОГО КАК АДМИН ПОДТВЕРДИЛ ЧТО ЧЕЛОВЕК ЗАБРАЛ ЗАКАЗ ---
         function openPendingReviewsModal(items) {
             if (isReviewModalOpen || !items || items.length === 0) return;
             isReviewModalOpen = true;
@@ -1264,11 +1379,11 @@
                     return `
                         <div class="review-prompt-card" data-rp-idx="${idx}">
                             <div class="review-prompt-prod">
-                                <div class="upsell-thumb"><img src="${img}" alt="${it.productName}"></div>
+                                <div class="upsell-thumb"><img src="${img}" alt="${escHtml(it.productName)}" loading="lazy" decoding="async"></div>
                                 <div style="flex:1; min-width:0;">
-                                    <div class="upsell-name">${it.productName}</div>
+                                    <div class="upsell-name">${escHtml(it.productName)}</div>
                                     ${it.productVariant && it.productVariant.toLowerCase() !== 'стандарт'
-                                        ? `<div style="font-size:11px; color:var(--text-gray);">Вариант: ${it.productVariant}</div>`
+                                        ? `<div style="font-size:11px; color:var(--text-gray);">Вариант: ${escHtml(it.productVariant)}</div>`
                                         : ''
                                     }
                                 </div>
@@ -1439,7 +1554,6 @@
             subBtn.disabled = true;
 
             try {
-                // 1) ищем по полю username (документ id_<tgId>), 2) иначе — документ users/{clean}
                 let userRef = null;
                 const q = await db.collection('users').where('username', '==', clean).get();
                 const cands = [];
@@ -1681,7 +1795,6 @@
             }, (err) => console.error('Ошибка Firestore:', err));
         }
 
-        // --- ПОИСК ПО КАТАЛОГУ ---
         function getAllSearchableProducts() {
             const items = [];
             vapeBrands.forEach(b => b.models.forEach(m => items.push({
@@ -1747,7 +1860,7 @@
             if (matched.length === 0) {
                 searchResultsContainer.innerHTML = `
                     <div class="empty-state" style="padding: 40px 16px;">
-                        По запросу «${catalogSearchQuery.trim()}» ничего не найдено
+                        По запросу «${escHtml(catalogSearchQuery.trim())}» ничего не найдено
                     </div>
                 `;
                 return;
@@ -1774,17 +1887,17 @@
                         <div class="product-card" data-search-idx="${idx}">
                             <div class="product-thumb">
                                 ${m.image
-                                    ? `<img src="${m.image}" class="${m.isCover ? 'full-cover' : ''}" alt="${m.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${fallbackIcon}</span>`
+                                    ? `<img src="${m.image}" loading="lazy" decoding="async" class="${m.isCover ? 'full-cover' : ''}" alt="${escHtml(m.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${fallbackIcon}</span>`
                                     : `<span>${fallbackIcon}</span>`
                                 }
                             </div>
                             <div class="product-info">
-                                <div class="search-cat-tag">${tagText}</div>
+                                <div class="search-cat-tag">${escHtml(tagText)}</div>
                                 <div class="product-title">
-                                    ${m.name}
+                                    ${escHtml(m.name)}
                                     ${isVape ? `<span class="promo-badge">🤑 жижа за ${POD_LIQUID_TARGET_PRICE} BYN</span>` : ''}
                                 </div>
-                                <div class="product-desc">${m.desc || ''}${m.colors && (m.colors.length > 1 || (m.colors[0] && m.colors[0] !== 'Стандарт')) ? ` · ${m.colors.length} вар.` : ''}</div>
+                                <div class="product-desc">${escHtml(m.desc || '')}${m.colors && (m.colors.length > 1 || (m.colors[0] && m.colors[0] !== 'Стандарт')) ? ` · ${m.colors.length} вар.` : ''}</div>
                                 <div class="product-price">
                                     ${isLiquid && freeLiquid
                                         ? `<span class="old-price">${m.price} BYN</span><span class="free-badge">БЕСПЛАТНО</span>`
@@ -1837,7 +1950,7 @@
                 <div class="category-card" data-category="${cat.id}">
                     <div class="category-card-image">
                         ${cat.image
-                            ? `<img src="${cat.image}" alt="${cat.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${cat.icon}</span>`
+                            ? `<img src="${cat.image}" alt="${cat.name}" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${cat.icon}</span>`
                             : `<span>${cat.icon}</span>`
                         }
                     </div>
@@ -1874,12 +1987,12 @@
                     <div class="brand-card" data-brand-idx="${bIdx}">
                         <div class="brand-card-thumb">
                             ${firstModel.image
-                                ? `<img src="${firstModel.image}" alt="${firstModel.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${fallbackIcon}</span>`
+                                ? `<img src="${firstModel.image}" loading="lazy" decoding="async" alt="${escHtml(firstModel.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${fallbackIcon}</span>`
                                 : `<span>${fallbackIcon}</span>`
                             }
                         </div>
                         <div class="brand-card-info">
-                            <div class="brand-card-name">${b.brand}</div>
+                            <div class="brand-card-name">${escHtml(b.brand)}</div>
                             <div class="brand-card-count">${b.models.length} ${b.models.length === 1 ? 'позиция' : b.models.length < 5 ? 'позиции' : 'позиций'}</div>
                         </div>
                         <div class="brand-card-arrow">›</div>
@@ -1908,9 +2021,9 @@
                         return `
                         <div class="brand-group">
                             <div class="brand-group-card" data-brand-idx="${bIdx}">
-                                <div class="brand-card-thumb"><img src="${brandImage}" alt="${b.brand}"></div>
+                                <div class="brand-card-thumb"><img src="${brandImage}" loading="lazy" decoding="async" alt="${escHtml(b.brand)}"></div>
                                 <div class="brand-card-info">
-                                    <div class="brand-group-title">${b.brand}</div>
+                                    <div class="brand-group-title">${escHtml(b.brand)}</div>
                                     <div class="brand-card-count">${b.models.length} ${b.models.length === 1 ? 'линейка' : b.models.length < 5 ? 'линейки' : 'линеек'}</div>
                                 </div>
                                 <div class="brand-group-arrow">›</div>
@@ -1921,10 +2034,10 @@
                                     const isDiscounted = hasPodPromo && m.price > POD_LIQUID_TARGET_PRICE;
                                     return `
                                     <div class="product-card" data-liq-brand="${bIdx}" data-liq-model="${mIdx}">
-                                        <div class="product-thumb"><img src="${m.image}" alt="${m.name}"></div>
+                                        <div class="product-thumb"><img src="${m.image}" loading="lazy" decoding="async" alt="${escHtml(m.name)}"></div>
                                         <div class="product-info">
-                                            <div class="product-title">${m.name}</div>
-                                            <div class="product-desc">${m.desc || ''} ${m.colors.length > 1 || m.colors[0] !== 'Стандарт' ? `· ${m.colors.length} вкус.` : ''}</div>
+                                            <div class="product-title">${escHtml(m.name)}</div>
+                                            <div class="product-desc">${escHtml(m.desc || '')} ${m.colors.length > 1 || m.colors[0] !== 'Стандарт' ? `· ${m.colors.length} вкус.` : ''}</div>
                                             <div class="product-price">
                                                 ${freeLiquid
                                                     ? `<span class="old-price">${m.price} BYN</span><span class="free-badge">БЕСПЛАТНО</span>`
@@ -1968,13 +2081,13 @@
                     <div class="product-card" data-flat-idx="${idx}">
                         <div class="product-thumb">
                             ${entry.image
-                                ? `<img src="${entry.image}" class="${entry.isCover ? 'full-cover' : ''}" alt="${entry.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${entry.icon}</span>`
+                                ? `<img src="${entry.image}" loading="lazy" decoding="async" class="${entry.isCover ? 'full-cover' : ''}" alt="${escHtml(entry.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${entry.icon}</span>`
                                 : `<span>${entry.icon}</span>`
                             }
                         </div>
                         <div class="product-info">
-                            <div class="product-title">${entry.name}</div>
-                            <div class="product-desc">${entry.desc || ''} ${entry.colors.length > 1 || entry.colors[0] !== 'Стандарт' ? `· ${entry.colors.length} вар.` : ''}</div>
+                            <div class="product-title">${escHtml(entry.name)}</div>
+                            <div class="product-desc">${escHtml(entry.desc || '')} ${entry.colors.length > 1 || entry.colors[0] !== 'Стандарт' ? `· ${entry.colors.length} вар.` : ''}</div>
                             <div class="product-price">${entry.price} BYN</div>
                         </div>
                         <div class="brand-card-arrow">›</div>
@@ -2020,15 +2133,15 @@
             modelsList.innerHTML = brand.models.map((m, mIdx) => `
                 <div class="product-card" data-model-idx="${mIdx}">
                     <div class="product-thumb">
-                        <img src="${m.image}" class="${m.isCover ? 'full-cover' : ''}" alt="${m.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
+                        <img src="${m.image}" loading="lazy" decoding="async" class="${m.isCover ? 'full-cover' : ''}" alt="${escHtml(m.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
                         <span style="display:none;">${fallbackIcon}</span>
                     </div>
                     <div class="product-info">
                         <div class="product-title">
-                            ${m.name}
+                            ${escHtml(m.name)}
                             ${catId === 'vapes' ? `<span class="promo-badge">🤑 жижа за ${POD_LIQUID_TARGET_PRICE} BYN</span>` : ''}
                         </div>
-                        <div class="product-desc">${m.desc || ''}${m.colors.length > 1 ? ` · ${m.colors.length} вар.` : ''}</div>
+                        <div class="product-desc">${escHtml(m.desc || '')}${m.colors.length > 1 ? ` · ${m.colors.length} вар.` : ''}</div>
                         <div class="product-price">${m.price} BYN</div>
                     </div>
                 </div>
@@ -2059,6 +2172,9 @@
             const promoPrice = getPodPromoLiquidPrice(model.price);
             const fallbackIcon = model.icon || (model.category === 'nicoboosters' ? '🧪' : model.category === 'consumables' ? '🔧' : model.category === 'disposables' ? '🚬' : '📦');
 
+            // Мягкая предзагрузка вариантов открытого товара
+            colors.forEach(c => preloadImageUrl(colorImages[c] || model.image));
+
             function getCurrentVariantData() {
                 const selectedColor = colors[selectedColorIdx];
                 const imageSrc = colorImages[selectedColor] || model.image;
@@ -2071,11 +2187,11 @@
 
             content.innerHTML = `
                 <div class="product-detail-image-wrap">
-                    <img class="product-detail-image" id="productMainImage" src="${initial.imageSrc}" alt="${model.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
+                    <img class="product-detail-image" id="productMainImage" src="${initial.imageSrc}" alt="${escHtml(model.name)}" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
                     <span id="productMainFallback" style="display:none; font-size:72px;">${fallbackIcon}</span>
                 </div>
-                <div class="product-detail-category">${categoryLabel}</div>
-                <div class="product-detail-name">${model.name}</div>
+                <div class="product-detail-category">${escHtml(categoryLabel)}</div>
+                <div class="product-detail-name">${escHtml(model.name)}</div>
                 <div class="product-detail-price">
                     ${freeLiquid
                         ? `<span class="old-price">${model.price} BYN</span><span class="free-badge">БЕСПЛАТНО</span>`
@@ -2086,16 +2202,16 @@
                 </div>
                 ${freeLiquid ? `<div class="free-hint-box">🎁 После добавления в корзину нажмите кнопку «Сделать бесплатно»</div>` : ''}
                 ${hasPodPromo ? `<div class="pod-promo-hint-box">🔥 У вас в корзине под-система — цена этой жидкости будет <b>${POD_LIQUID_TARGET_PRICE} BYN</b>!</div>` : ''}
-                <div class="product-detail-desc">${model.desc || ''}</div>
+                <div class="product-detail-desc">${escHtml(model.desc || '')}</div>
                 <div class="color-selector">
                     <div class="color-selector-label">
-                        <span>${variantLabel}: <b id="selectedColorName">${initial.selectedColor}</b></span>
+                        <span>${escHtml(variantLabel)}: <b id="selectedColorName">${escHtml(initial.selectedColor)}</b></span>
                         <span id="selectedColorStock">В наличии: ${initial.maxStock} шт.</span>
                     </div>
                     <div class="color-thumbs" id="colorThumbs">
                         ${colors.map((c, ci) => {
                             const cImg = colorImages[c] || model.image;
-                            return `<div class="color-thumb ${ci === selectedColorIdx ? 'selected' : ''}" data-color-idx="${ci}"><img src="${cImg}" alt="${c}" onerror="this.style.opacity='0.2'"><div class="color-thumb-name">${c}</div></div>`;
+                            return `<div class="color-thumb ${ci === selectedColorIdx ? 'selected' : ''}" data-color-idx="${ci}"><img src="${cImg}" loading="lazy" decoding="async" alt="${escHtml(c)}" onerror="this.style.opacity='0.2'"><div class="color-thumb-name">${escHtml(c)}</div></div>`;
                         }).join('')}
                     </div>
                 </div>
@@ -2203,7 +2319,6 @@
             showPage('productDetail');
         }
 
-        // --- МОДАЛЬНОЕ ОКНО ПРЕДЛОЖЕНИЯ ЖИДКОСТИ ЗА 15 BYN ПРИ ПОКУПКЕ ПОД-СИСТЕМЫ ---
         function showLiquidUpsellModal(podName = '') {
             if (liquidBrands.length === 0) return;
 
@@ -2224,7 +2339,7 @@
             function renderUpsellContent() {
                 const slots = getUnusedPodPromoSlots();
                 const headerSub = podName
-                    ? `Вы добавили «${podName}». Возьмите любую жидкость к ней всего за <b>${POD_LIQUID_TARGET_PRICE} BYN</b>!`
+                    ? `Вы добавили «${escHtml(podName)}». Возьмите любую жидкость к ней всего за <b>${POD_LIQUID_TARGET_PRICE} BYN</b>!`
                     : `У вас в корзине под-система! Заберите любую жидкость всего за <b>${POD_LIQUID_TARGET_PRICE} BYN</b>.`;
 
                 modal.innerHTML = `
@@ -2245,15 +2360,15 @@
                                 const hasDiscount = m.price > POD_LIQUID_TARGET_PRICE;
                                 return `
                                     <div class="upsell-item" data-upsell-idx="${idx}">
-                                        <div class="upsell-thumb"><img src="${thumbImg}" alt="${m.name}" id="upsellImg_${idx}"></div>
+                                        <div class="upsell-thumb"><img src="${thumbImg}" loading="lazy" decoding="async" alt="${escHtml(m.name)}" id="upsellImg_${idx}"></div>
                                         <div class="upsell-info">
-                                            <div class="upsell-brand">${entry.brand}</div>
-                                            <div class="upsell-name">${m.name}</div>
+                                            <div class="upsell-brand">${escHtml(entry.brand)}</div>
+                                            <div class="upsell-name">${escHtml(m.name)}</div>
                                             ${colors.length > 1 || firstColor !== 'Стандарт' ? `
                                                 <select class="upsell-flavor-select" data-upsell-select="${idx}">
-                                                    ${colors.map((c, ci) => `<option value="${ci}">${c}</option>`).join('')}
+                                                    ${colors.map((c, ci) => `<option value="${ci}">${escHtml(c)}</option>`).join('')}
                                                 </select>
-                                            ` : `<div style="font-size:11px; color:var(--text-gray);">${m.desc || 'Жидкость'}</div>`}
+                                            ` : `<div style="font-size:11px; color:var(--text-gray);">${escHtml(m.desc || 'Жидкость')}</div>`}
                                         </div>
                                         <div class="upsell-price-action">
                                             <div class="upsell-prices">
@@ -2455,9 +2570,9 @@
                         <div class="cart-item" style="background:var(--bg-card); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid var(--border-card); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:10px; box-shadow:var(--shadow-card);">
                             <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
                                 <div style="flex:1; min-width:0;">
-                                    <div style="font-size:15px; font-weight:700; text-transform:uppercase;">${item.name}</div>
-                                    ${item.color ? `<div style="font-size:12px; color:var(--text-gray); margin-top:2px;">Вариант: ${item.color}</div>` : ''}
-                                    ${item.desc ? `<div style="font-size:12px; color:var(--text-gray); margin-top:2px;">${item.desc}</div>` : ''}
+                                    <div style="font-size:15px; font-weight:700; text-transform:uppercase;">${escHtml(item.name)}</div>
+                                    ${item.color ? `<div style="font-size:12px; color:var(--text-gray); margin-top:2px;">Вариант: ${escHtml(item.color)}</div>` : ''}
+                                    ${item.desc ? `<div style="font-size:12px; color:var(--text-gray); margin-top:2px;">${escHtml(item.desc)}</div>` : ''}
                                     ${pricing.podDiscountAmount > 0 ? `
                                         <div style="margin-top:6px;">
                                             <span class="pod-promo-badge">🔥 Акция к поду: ${POD_LIQUID_TARGET_PRICE} BYN (−${formatMoney(pricing.podDiscountAmount)} BYN)</span>
@@ -2575,14 +2690,6 @@
             showDeliveryModal();
         }
 
-        // --- АНИМИРОВАННАЯ РУЛЕТКА 7 СЕКУНД СО ЗВУКОМ ---
-        const ROULETTE_PRIZES = [
-            { type: 'discount', percent: 5, label: 'Скидка 5% на всё', short: '5% скидка', img: '5proc.png', weight: 50 },
-            { type: 'discount', percent: 10, label: 'Скидка 10% на всё', short: '10% скидка', img: '10proc.png', weight: 30 },
-            { type: 'discount', percent: 15, label: 'Скидка 15% на всё', short: '15% скидка', img: '15proc.png', weight: 15 },
-            { type: 'free_liquid', percent: 100, label: 'Бесплатная жидкость', short: 'Жижа 0 BYN', img: 'zhizhabesplatnaya.jpg', weight: 5 }
-        ];
-
         function pickWeightedPrize() {
             const r = Math.random() * 100;
             if (r < 50) return ROULETTE_PRIZES[0];
@@ -2633,9 +2740,14 @@
             }
             isRouletteSpinning = true;
             const spinBtn = document.getElementById('spinRouletteBtn');
-            if (spinBtn) spinBtn.disabled = true;
+            if (spinBtn) {
+                spinBtn.disabled = true;
+                spinBtn.textContent = 'Загрузка...';
+            }
 
-            // Приз определяется и сохраняется ДО анимации; списание покупок — атомарно в транзакции
+            // Ждём загрузки 4 картинок рулетки до старта барабана (не дольше 2.2 сек)
+            await ensureImagesReady(ROULETTE_PRIZES.map(p => p.img), 2200);
+
             const winPrize = pickWeightedPrize();
             const newReward = {
                 id: 'rew_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
@@ -2661,7 +2773,10 @@
             } catch (err) {
                 console.error('Ошибка сохранения приза рулетки:', err);
                 isRouletteSpinning = false;
-                if (spinBtn) spinBtn.disabled = false;
+                if (spinBtn) {
+                    spinBtn.disabled = false;
+                    spinBtn.textContent = 'Крутить рулетку 🎰';
+                }
                 showToast(err && err.message === 'NOT_ENOUGH_PURCHASES'
                     ? `Нужно ${PURCHASES_PER_SPIN} подтверждённых покупок`
                     : 'Не удалось запустить рулетку. Попробуйте ещё раз');
@@ -2807,12 +2922,12 @@
                     <div class="profile-user">
                         <div class="profile-avatar">
                             ${tgPhoto
-                                ? `<img src="${tgPhoto}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${avatarLetter}</span>`
+                                ? `<img src="${tgPhoto}" alt="" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${avatarLetter}</span>`
                                 : `<span>${avatarLetter}</span>`
                             }
                         </div>
                         <div>
-                            <div class="profile-username">${username}</div>
+                            <div class="profile-username">${escHtml(username)}</div>
                             <div class="profile-sub">Подтверждённых покупок: ${userPurchases}</div>
                         </div>
                     </div>
@@ -2868,7 +2983,6 @@
             document.getElementById('spinRouletteBtn').addEventListener('click', openRouletteModal);
         }
 
-        // --- ОТДЕЛЬНАЯ СТРАНИЦА ОТЗЫВОВ ---
         function resolveReviewProductInfo(review) {
             const [keyName = '', keyVariant = ''] = String(review.productKey || '').split('||');
             const norm = (s) => String(s || '').trim().toLowerCase();
@@ -2937,20 +3051,20 @@
                     <div class="full-review-card">
                         <div class="full-review-product">
                             <div class="full-review-thumb">
-                                <img src="${info.image}" alt="${info.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
+                                <img src="${info.image}" loading="lazy" decoding="async" alt="${escHtml(info.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
                                 <span style="display:none;">📦</span>
                             </div>
                             <div class="full-review-meta">
-                                <div class="full-review-prod-name">${info.name}</div>
+                                <div class="full-review-prod-name">${escHtml(info.name)}</div>
                                 ${info.variant && info.variant.toLowerCase() !== 'стандарт'
-                                    ? `<div class="full-review-prod-var">Вариант: ${info.variant}</div>`
+                                    ? `<div class="full-review-prod-var">Вариант: ${escHtml(info.variant)}</div>`
                                     : ''
                                 }
                                 <div class="full-review-stars">${starsHtml} <span style="color:var(--text-gray); font-size:11px; margin-left:4px;">(${ratingNum}/5)</span></div>
                             </div>
                             ${isAdminUser() ? `<button class="admin-del-btn" data-allrev-del="${r.id}" style="flex-shrink:0;">🗑</button>` : ''}
                         </div>
-                        <div class="full-review-text">${r.text || ''}</div>
+                        <div class="full-review-text">${escHtml(r.text || '')}</div>
                         <div class="full-review-footer">
                             ${renderAuthorBadgeHtml(r.author, r.authorPhoto)}
                             <span style="flex-shrink:0;">🕒 ${dateStr}</span>
@@ -2968,7 +3082,6 @@
             });
         }
 
-        // --- АДМИНКА С ОТДЕЛАМИ И СОРТИРОВКОЙ ПО МОДЕЛЯМ И НАЗВАНИЯМ ---
         function getAdminNormalizedCategory(cat) {
             return cat === 'devices' ? 'vapes' : (cat || 'vapes');
         }
@@ -3015,10 +3128,10 @@
             const currentStock = hasVariantStock ? (p.color_stock ?? p.stock ?? 0) : (p.stock ?? 0);
             return `
             <div class="admin-item">
-                <div class="admin-item-thumb">${p.image ? `<img src="${p.image}" alt="" onerror="this.style.opacity='0.25'">` : `<span>📦</span>`}</div>
+                <div class="admin-item-thumb">${p.image ? `<img src="${p.image}" loading="lazy" decoding="async" alt="" onerror="this.style.opacity='0.25'">` : `<span>📦</span>`}</div>
                 <div class="admin-item-info">
-                    <div class="admin-item-title">${p.name || 'Без названия'}</div>
-                    <div class="admin-item-sub">${p.brand || ''} ${p.color ? '· ' + p.color : ''}</div>
+                    <div class="admin-item-title">${escHtml(p.name || 'Без названия')}</div>
+                    <div class="admin-item-sub">${escHtml(p.brand || '')} ${p.color ? '· ' + escHtml(p.color) : ''}</div>
                     <div class="admin-price-edit">
                         <input type="number" class="admin-price-input" id="priceInput_${p.docId}" value="${p.price || 0}" placeholder="BYN">
                         <span style="font-size:11px; color:var(--text-gray);">BYN</span>
@@ -3044,7 +3157,7 @@
                 let subhead = '';
                 if (groupKey !== lastGroupKey) {
                     lastGroupKey = groupKey;
-                    subhead = `<div class="admin-model-subhead">${brandPart ? `${brandPart} · ` : ''}${namePart}</div>`;
+                    subhead = `<div class="admin-model-subhead">${brandPart ? `${escHtml(brandPart)} · ` : ''}${escHtml(namePart)}</div>`;
                 }
                 return subhead + renderAdminItemHtml(p);
             }).join('');
@@ -3131,11 +3244,12 @@
         });
 
         document.getElementById('admPhotoFile').addEventListener('change', async (e) => {
-            const file = e.target.files?.[0];
-            if (!file) return;
-            showToast('Загрузка фото...');
+            const rawFile = e.target.files?.[0];
+            if (!rawFile) return;
+            showToast('Сжатие и загрузка фото...');
+            const optimizedFile = await compressImageForUpload(rawFile, 900, 0.82);
             const formData = new FormData();
-            formData.append('image', file);
+            formData.append('image', optimizedFile);
             try {
                 const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
                 const json = await res.json();
@@ -3280,10 +3394,8 @@
             let consumedRewardObjs = [];
 
             try {
-                // Актуальные остатки (может скорректировать корзину)
                 if (!validateCartStock()) return;
 
-                // --- СНИМОК корзины и расчётов ДО любых await ---
                 const cartSnap = cart.map(i => ({ ...i }));
                 const details = calculateCartDetails();
                 const username = getTgUsername() || userId;
@@ -3333,7 +3445,6 @@
                 };
                 const totalLabel = formatMoney(details.finalTotal);
 
-                // --- Лимит активных заявок (pending) ---
                 const idsToCheck = Array.from(new Set([userId, getTgUsername()].filter(Boolean)));
                 let pendingCount = 0;
                 try {
@@ -3349,7 +3460,6 @@
                     return;
                 }
 
-                // --- Атомарное списание использованных наград ---
                 if (usedRewards.length > 0) {
                     const ids = new Set(usedRewards.map(r => r.id));
                     try {
@@ -3370,7 +3480,6 @@
                     }
                 }
 
-                // --- Повторная сверка остатков непосредственно перед записью заказа ---
                 const problems = checkItemsStock(cartSnap);
                 if (problems.length > 0) {
                     if (rewardsConsumed) {
@@ -3429,7 +3538,7 @@
                 if (tab === 'home') showPage('welcome');
                 if (tab === 'catalog') showPage('catalog');
                 if (tab === 'cart') { showPage('cart'); renderCart(); }
-                if (tab === 'profile') { showPage('profile'); renderProfile(); }
+                if (tab === 'profile') { showPage('profile'); renderProfile(); refreshUserDataFromServer(); }
                 if (tab === 'admin' && isAdminUser()) { showPage('admin'); renderAdminList(); renderAdminsList(); renderAdminOrders(); }
             });
         });
@@ -3446,6 +3555,7 @@
         startAdminsSync();
         startUserPurchasesSync();
         startFirestoreSync();
+        setTimeout(preloadCoreAssets, 400);
 
         const initialCat = document.getElementById('catImage');
         if (initialCat) {
@@ -3558,7 +3668,6 @@
             });
         }
 
-        // --- АВТОМАТИЧЕСКОЕ СПИСАНИЕ ОСТАТКОВ ПРИ ВЫДАЧЕ ЗАКАЗА ---
         async function deductOrderStockFromFirestore(orderItems) {
             const norm = (s) => String(s || '').trim().toLowerCase();
             const qtyByDocId = new Map();
@@ -3671,7 +3780,6 @@
                     if (!ord) return;
                     btn.disabled = true;
 
-                    // Предупреждение, если текущего стока уже не хватает
                     const lowItems = (ord.items || []).filter(i => {
                         const live = getLiveStockForItem(i);
                         return live !== null && live < (Number(i.qty) || 1);
@@ -3706,7 +3814,6 @@
                     const earnsPoint = orderTotalNum > 0;
 
                     try {
-                        // Атомарно «забираем» заказ: защита от двойного начисления
                         const orderRef = db.collection('orders').doc(ord.id);
                         await db.runTransaction(async (tx) => {
                             const s = await tx.get(orderRef);
