@@ -819,6 +819,7 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        db.settings({ experimentalAutoDetectLongPolling: true });
 
         const categories = [
             { id: 'vapes', name: 'ПОД-СИСТЕМЫ', sub: '0 брендов', icon: '📱', image: 'vape.png' },
@@ -1723,7 +1724,10 @@
         }
 
         function startFirestoreSync() {
-            db.collection('products').onSnapshot((snapshot) => {
+            let productsLoadedOnce = false;
+
+            const handleProductsSnapshot = (snapshot) => {
+                productsLoadedOnce = true;
                 const defaultImages = {
                     vapes: 'vape.png',
                     snus: 'snus.png',
@@ -1896,7 +1900,20 @@
                     else showPage('brand');
                 }
                 if (pages.admin.classList.contains('active')) renderAdminList();
-            }, (err) => console.error('Ошибка Firestore:', err));
+            };
+
+            db.collection('products').get()
+                .then(handleProductsSnapshot)
+                .catch((err) => console.error('Ошибка get products:', err));
+
+            db.collection('products').onSnapshot(handleProductsSnapshot, (err) => {
+                console.error('Ошибка Firestore:', err);
+                if (!productsLoadedOnce) {
+                    setTimeout(() => {
+                        db.collection('products').get().then(handleProductsSnapshot).catch(() => {});
+                    }, 3000);
+                }
+            });
         }
 
         function getAllSearchableProducts() {
