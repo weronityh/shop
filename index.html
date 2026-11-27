@@ -3081,7 +3081,7 @@
                     <div class="roulette-result" id="rouletteResult"></div>
                     <div class="roulette-note">* Каждые 5 товаров дают 1 вращение. Товары сверх 5 не сгорают, а все выпавшие призы сохраняются в вашем профиле.</div>
                 </div>
-                <div class="profile-card"><div class="profile-card-title">Обратная связь</div><button class="profile-btn" id="feedbackBtn">Написать в Telegram (@Seregablatnou)</button></div>
+                <div class="profile-card"><div class="profile-card-title">Обратная связь</div><button class="profile-btn" id="feedbackBtn">Написать в Telegram (@weggewpod)</button></div>
             `;
 
             container.querySelectorAll('.reward-use-btn').forEach(btn => {
@@ -3101,7 +3101,7 @@
             });
 
             document.getElementById('feedbackBtn').addEventListener('click', () => {
-                const url = 'https://t.me/Seregablatnou';
+                const url = 'https://t.me/weggewpod';
                 if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
                 else window.open(url, '_blank');
             });
@@ -3811,7 +3811,7 @@
                     return;
                 }
 
-                const url = 'https://t.me/Seregablatnou?text=' + encodeURIComponent(orderText);
+                const url = 'https://t.me/weggewpod?text=' + encodeURIComponent(orderText);
                 if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
                 else window.open(url, '_blank');
 
