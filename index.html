@@ -21,6 +21,11 @@
             --border-card: rgba(255, 255, 255, 0.1);
             --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.04);
             --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --press-scale: 0.96;
+            --press-duration: 120ms;
+            --ripple-duration: 400ms;
+            --stagger-delay: 40ms;
+            --spring-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         html, body { height: 100%; height: 100dvh; overflow: hidden; overscroll-behavior: none; }
         body { font-family: var(--font-main); background: var(--bg-dark); color: var(--text-white); display: flex; flex-direction: column; font-size: 15px; line-height: 1.4; }
@@ -36,6 +41,25 @@
         .page.active { display: flex; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @keyframes pressDown { to { transform: scale(var(--press-scale)); } }
+        @keyframes pressUp { from { transform: scale(var(--press-scale)); } to { transform: scale(1); } }
+        @keyframes bounce { 0%, 100% { transform: scale(1); } 30% { transform: scale(1.25); } 60% { transform: scale(0.95); } 80% { transform: scale(1.05); } }
+        @keyframes ripple { 0% { transform: scale(0); opacity: 0.5; } 100% { transform: scale(2.5); opacity: 0; } }
+        @keyframes staggerIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+        .pressable { transition: transform var(--press-duration) var(--spring-ease), background 0.15s ease; will-change: transform; }
+        .pressable:active { transform: scale(var(--press-scale)); transition-duration: 60ms; }
+
+        .ripple-btn { position: relative; overflow: hidden; }
+        .ripple-btn::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(circle at center, rgba(255,255,255,0.35) 0%, transparent 70%); transform: scale(0); opacity: 0; pointer-events: none; }
+        .ripple-btn:active::after { animation: ripple var(--ripple-duration) ease-out forwards; }
+
+        .stagger-in { opacity: 0; animation: staggerIn 0.4s var(--spring-ease) forwards; will-change: opacity, transform; }
+
+        .cart-bounce { animation: bounce 0.5s var(--spring-ease); }
+
+        .category-card, .product-card, .brand-card, .brand-group-card, .add-to-cart-btn, .add-to-cart-main, .checkout-btn, .main-btn, .nav-btn, .back-btn, .qty-btn, .pickup-btn, .cart-bonus-btn, .profile-btn, .adm-tab, .adm-act, .adm-stock-btn, .adm-del, .admin-dept-tab, .color-thumb, .search-clear-btn { touch-action: manipulation; }
 
         /* КОТ НА ГЛАВНОЙ */
         .cat-mask { width: 100%; height: 100%; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; position: relative; }
@@ -72,8 +96,8 @@
         @keyframes subtitleReveal { to { opacity: 1; transform: translateY(0); filter: blur(0); } }
         .welcome-hint { font-size: clamp(11px, 2.8vw, 12px); font-weight: 400; letter-spacing: clamp(1.5px, 0.5vw, 2px); line-height: 1.4; color: #ffffff; text-transform: uppercase; margin-bottom: clamp(16px, 2.5vh, 22px); position: relative; z-index: 3; opacity: 0; transform: translateY(8px); filter: blur(4px); animation: hintReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: 1.4s; will-change: opacity, transform, filter; }
         @keyframes hintReveal { to { opacity: 1; transform: translateY(0); filter: blur(0); } }
-        .main-btn { width: 100%; max-width: 100%; padding: clamp(16px, 2.6vh, 20px) 24px; border: 1px solid rgba(255,255,255,0.4); border-radius: 40px; background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: var(--text-white); font-size: clamp(11px, 3.1vw, 13px); font-weight: 500; letter-spacing: clamp(2px, 0.8vw, 3px); text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; position: relative; z-index: 3; transition: all 0.2s ease; }
-        .main-btn:active { background: var(--accent); color: var(--bg-dark); }
+        .main-btn { width: 100%; max-width: 100%; padding: clamp(16px, 2.6vh, 20px) 24px; border: 1px solid rgba(255,255,255,0.4); border-radius: 40px; background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: var(--text-white); font-size: clamp(11px, 3.1vw, 13px); font-weight: 500; letter-spacing: clamp(2px, 0.8vw, 3px); text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; position: relative; z-index: 3; transition: all 0.2s ease; touch-action: manipulation; overflow: hidden; }
+        .main-btn:active { background: var(--accent); color: var(--bg-dark); transform: scale(var(--press-scale)); transition-duration: 60ms; }
 
         /* ЭКРАН 3: КАТАЛОГ */
         #catalogPage { padding: 20px 16px 100px; }
@@ -83,14 +107,15 @@
         .search-bar input { background: transparent; border: none; outline: none; color: var(--text-white); font-size: 14px; width: 100%; font-family: inherit; }
         .search-bar input::placeholder { color: var(--text-gray); }
         .search-bar svg { width: 20px; height: 20px; stroke: var(--text-gray); flex-shrink: 0; }
-        .search-clear-btn { display: none; width: 24px; height: 24px; border-radius: 50%; border: none; background: rgba(255,255,255,0.14); color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0; align-items: center; justify-content: center; }
+        .search-clear-btn { display: none; width: 24px; height: 24px; border-radius: 50%; border: none; background: rgba(255,255,255,0.14); color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0; align-items: center; justify-content: center; touch-action: manipulation; }
         .search-clear-btn.visible { display: flex; }
+        .search-clear-btn:active { transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .search-results-meta { font-size: 12px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; position: relative; z-index: 1; }
         .search-results-list { display: flex; flex-direction: column; gap: 12px; }
         .search-cat-tag { display: inline-block; font-size: 10px; font-weight: 700; color: #bdbdbd; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); padding: 2px 7px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
         .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .category-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; cursor: pointer; transition: background 0.2s; text-align: center; position: relative; z-index: 1; box-shadow: var(--shadow-card); }
-        .category-card:active { background: var(--bg-card-hover); }
+        .category-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; cursor: pointer; transition: background 0.2s; text-align: center; position: relative; z-index: 1; box-shadow: var(--shadow-card); touch-action: manipulation; }
+        .category-card:active { background: var(--bg-card-hover); transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .category-card-image { width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 48px; }
         .category-card-image img { width: 100%; height: 100%; object-fit: contain; }
         .category-card-title { font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
@@ -98,17 +123,19 @@
 
         /* НИЖНЯЯ НАВИГАЦИЯ */
         .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; background: var(--bg-card); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border-card); display: flex; justify-content: space-around; align-items: center; height: calc(68px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); z-index: 100; box-shadow: var(--shadow-card); }
-        .nav-btn { position: relative; background: none; border: none; color: var(--text-gray); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; padding: 8px 10px; font-family: inherit; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; transition: color 0.2s; }
+        .nav-btn { position: relative; background: none; border: none; color: var(--text-gray); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; padding: 8px 10px; font-family: inherit; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; transition: color 0.2s; touch-action: manipulation; }
         .nav-btn.active { color: var(--text-white); }
+        .nav-btn:active { transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .nav-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; }
 
         /* СТРАНИЦА БРЕНДА */
         .sub-header { display: flex; align-items: center; gap: 12px; padding: 16px; margin-bottom: 16px; background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-card); position: sticky; top: 0; z-index: 10; box-shadow: var(--shadow-card); }
-        .back-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-white); box-shadow: var(--shadow-card); flex-shrink: 0; }
+        .back-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-white); box-shadow: var(--shadow-card); flex-shrink: 0; touch-action: manipulation; }
+        .back-btn:active { transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .sub-title { font-size: 18px; font-weight: 600; }
         .product-list { display: flex; flex-direction: column; gap: 12px; padding: 0 16px 100px; }
-        .product-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 14px; display: flex; gap: 14px; align-items: center; cursor: pointer; transition: background 0.2s; position: relative; z-index: 1; box-shadow: var(--shadow-card); }
-        .product-card:active { background: var(--bg-card-hover); }
+        .product-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 14px; display: flex; gap: 14px; align-items: center; cursor: pointer; transition: background 0.2s; position: relative; z-index: 1; box-shadow: var(--shadow-card); touch-action: manipulation; }
+        .product-card:active { background: var(--bg-card-hover); transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .product-thumb { width: 80px; height: 80px; border-radius: 14px; background: var(--border-card); display: flex; align-items: center; justify-content: center; font-size: 32px; flex-shrink: 0; overflow: hidden; border: 1px solid var(--border-card); }
         .product-thumb img { width: 100%; height: 100%; object-fit: contain; }
         .product-thumb img.full-cover { object-fit: cover; transform: scale(1.25); }
@@ -120,13 +147,13 @@
         .free-badge { display: inline-block; background: linear-gradient(135deg, #28cd41, #1e9e32); color: #ffffff; font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 999px; letter-spacing: 0.6px; text-transform: uppercase; box-shadow: 0 2px 10px rgba(40, 205, 65, 0.35); }
         .pod-promo-badge { display: inline-block; background: linear-gradient(135deg, #ff9800, #ff6d00); color: #000; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 999px; letter-spacing: 0.4px; text-transform: uppercase; }
         .old-price { text-decoration: line-through; color: var(--text-gray); font-size: 13px; font-weight: 500; }
-        .add-to-cart-btn { margin-left: auto; padding: 8px 14px; background: var(--text-white); color: var(--bg-dark); border: none; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; flex-shrink: 0; transition: background 0.2s, transform 0.1s; }
-        .add-to-cart-btn:active { background: #e0e0e0; transform: scale(0.98); }
+        .add-to-cart-btn { margin-left: auto; padding: 8px 14px; background: var(--text-white); color: var(--bg-dark); border: none; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; flex-shrink: 0; transition: background 0.2s, transform 0.1s; touch-action: manipulation; }
+        .add-to-cart-btn:active { background: #e0e0e0; transform: scale(var(--press-scale)); transition-duration: 60ms; }
 
         /* АККОРДЕОН БРЕНДОВ */
         .brand-group { display: flex; flex-direction: column; gap: 8px; }
-        .brand-group-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: background 0.2s, border-color 0.2s; box-shadow: var(--shadow-card); }
-        .brand-group-card:active { background: var(--bg-card-hover); }
+        .brand-group-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: background 0.2s, border-color 0.2s; box-shadow: var(--shadow-card); touch-action: manipulation; }
+        .brand-group-card:active { background: var(--bg-card-hover); transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .brand-group-card.open { border-color: var(--text-white); }
         .brand-group-title { font-size: 16px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
         .brand-group-arrow { font-size: 20px; color: var(--text-gray); transition: transform 0.2s; margin-left: auto; }
@@ -135,8 +162,8 @@
         .brand-models-list.open { display: flex; }
 
         /* БРЕНДЫ СПИСОК */
-        .brand-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: background 0.2s, border-color 0.2s; box-shadow: var(--shadow-card); }
-        .brand-card:active { background: var(--bg-card-hover); }
+        .brand-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: background 0.2s, border-color 0.2s; box-shadow: var(--shadow-card); touch-action: manipulation; }
+        .brand-card:active { background: var(--bg-card-hover); transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .brand-card-thumb { width: 56px; height: 56px; border-radius: 12px; background: var(--border-card); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; border: 1px solid var(--border-card); font-size: 24px; }
         .brand-card-thumb img { width: 100%; height: 100%; object-fit: cover; }
         .brand-card-info { flex: 1; min-width: 0; }
@@ -162,7 +189,7 @@
         .color-selector-label span, .color-selector-label b { color: var(--text-white); font-weight: 600; }
         .color-thumbs { display: flex; gap: 10px; overflow-x: auto; padding: 4px 4px 8px; scrollbar-width: none; }
         .color-thumbs::-webkit-scrollbar { display: none; }
-        .color-thumb { width: 64px; height: 64px; border-radius: 12px; overflow: hidden; flex-shrink: 0; border: 2px solid transparent; cursor: pointer; transition: border-color 0.2s, transform 0.1s; background: var(--border-card); position: relative; }
+        .color-thumb { width: 64px; height: 64px; border-radius: 12px; overflow: hidden; flex-shrink: 0; border: 2px solid transparent; cursor: pointer; transition: border-color 0.2s, transform 0.1s; background: var(--border-card); position: relative; touch-action: manipulation; }
         .color-thumb:active { transform: scale(0.95); }
         .color-thumb.selected { border-color: var(--text-white); }
         .color-thumb img { width: 100%; height: 100%; object-fit: cover; }
@@ -173,11 +200,11 @@
         .quantity-selector { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
         .quantity-selector-label { font-size: 12px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; min-width: 60px; }
         .quantity-control { display: flex; align-items: center; gap: 0; background: var(--bg-dark); border: 1px solid var(--border-card); border-radius: 14px; overflow: hidden; }
-        .qty-btn { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; color: var(--text-white); font-size: 20px; font-weight: 700; cursor: pointer; transition: background 0.1s; }
-        .qty-btn:active { background: rgba(255,255,255,0.1); }
+        .qty-btn { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; color: var(--text-white); font-size: 20px; font-weight: 700; cursor: pointer; transition: background 0.1s; touch-action: manipulation; }
+        .qty-btn:active { background: rgba(255,255,255,0.1); transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .qty-value { min-width: 48px; text-align: center; font-size: 18px; font-weight: 700; color: var(--text-white); }
-        .add-to-cart-main { width: 100%; height: 56px; background: var(--text-white); color: var(--bg-dark); border: none; border-radius: 16px; font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: background 0.1s, transform 0.1s; }
-        .add-to-cart-main:active { background: #e0e0e0; transform: scale(0.98); }
+        .add-to-cart-main { width: 100%; height: 56px; background: var(--text-white); color: var(--bg-dark); border: none; border-radius: 16px; font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: background 0.1s, transform 0.1s; touch-action: manipulation; overflow: hidden; position: relative; }
+        .add-to-cart-main:active { background: #e0e0e0; transform: scale(var(--press-scale)); transition-duration: 60ms; }
 
         /* КОРЗИНА, ПРОФИЛЬ, АДМИНКА */
         #cartPage, #profilePage, #adminPage { padding: 20px 16px 100px; }
@@ -188,13 +215,16 @@
 
         /* КНОПКИ СПОСОБА ПОЛУЧЕНИЯ И БОНУСОВ В КОРЗИНЕ */
         .pickup-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .pickup-btn { padding: 12px 10px; border-radius: 12px; border: 1px solid var(--border-card); background: rgba(255,255,255,0.05); color: var(--text-white); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; text-align: center; transition: all 0.2s ease; }
+        .pickup-btn { padding: 12px 10px; border-radius: 12px; border: 1px solid var(--border-card); background: rgba(255,255,255,0.05); color: var(--text-white); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; text-align: center; transition: all 0.2s ease; touch-action: manipulation; }
         .pickup-btn.selected { background: var(--text-white); color: var(--bg-dark); border-color: var(--text-white); }
         .pickup-btn.disabled { opacity: 0.4; cursor: not-allowed; }
+        .pickup-btn:not(.disabled):active { transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .checkout-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .checkout-btn { width: 100%; padding: 15px 24px; border: none; border-radius: 16px; background: var(--text-white); color: var(--bg-dark); font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; touch-action: manipulation; overflow: hidden; position: relative; }
+        .checkout-btn:active { transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .cart-bonus-row { display: flex; flex-wrap: wrap; gap: 8px; border-top: 1px dashed rgba(255,255,255,0.12); padding-top: 10px; align-items: center; }
-        .cart-bonus-btn { padding: 7px 12px; border-radius: 10px; border: 1px solid rgba(255,152,0,0.5); background: rgba(255,152,0,0.14); color: #ffb74d; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; cursor: pointer; transition: all 0.15s ease; }
-        .cart-bonus-btn:active { transform: scale(0.97); }
+        .cart-bonus-btn { padding: 7px 12px; border-radius: 10px; border: 1px solid rgba(255,152,0,0.5); background: rgba(255,152,0,0.14); color: #ffb74d; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; cursor: pointer; transition: all 0.15s ease; touch-action: manipulation; }
+        .cart-bonus-btn:active { transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .cart-bonus-btn.free { border-color: rgba(40,205,65,0.55); background: rgba(40,205,65,0.16); color: #69f07a; }
         .cart-bonus-btn.applied { border-color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.12); color: #ffffff; }
         .cart-bonus-banner { background: rgba(255,152,0,0.12); border: 1px solid rgba(255,152,0,0.35); border-radius: 14px; padding: 10px 14px; margin: 0 16px 12px; font-size: 12px; color: #ffd180; line-height: 1.4; }
@@ -208,9 +238,9 @@
         .cart-upsell-btn {
             width: 100%; padding: 11px 14px; border-radius: 12px; border: none;
             background: linear-gradient(135deg, #ff9800, #ff6d00); color: #000;
-            font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;
+            font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; touch-action: manipulation;
         }
-        .cart-upsell-btn:active { transform: scale(0.98); }
+        .cart-upsell-btn:active { transform: scale(var(--press-scale)); transition-duration: 60ms; }
 
         /* МОДАЛКА ПРЕДЛОЖЕНИЯ ЖИДКОСТИ И ПОПАП ОТЗЫВА ПОСЛЕ ЗАКАЗА */
         .upsell-modal, .review-prompt-modal {
@@ -278,9 +308,9 @@
         .upsell-add-btn {
             padding: 8px 12px; border-radius: 10px; border: none;
             background: var(--text-white); color: var(--bg-dark);
-            font-size: 11px; font-weight: 800; text-transform: uppercase; cursor: pointer;
+            font-size: 11px; font-weight: 800; text-transform: uppercase; cursor: pointer; touch-action: manipulation;
         }
-        .upsell-add-btn:active { transform: scale(0.95); }
+        .upsell-add-btn:active { transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .upsell-footer { display: flex; flex-direction: column; gap: 8px; padding-top: 4px; }
 
         .review-prompt-card {
@@ -345,16 +375,18 @@
         .profile-card-title { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
         .profile-list { list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #dcdcdc; }
         .profile-love { margin-top: 10px; font-size: 13px; font-weight: 600; color: var(--text-white); }
-        .profile-btn { width: 100%; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--border-card); background: rgba(255,255,255,0.08); color: var(--text-white); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; text-align: center; text-decoration: none; display: block; }
+        .profile-btn { width: 100%; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--border-card); background: rgba(255,255,255,0.08); color: var(--text-white); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; text-align: center; text-decoration: none; display: block; touch-action: manipulation; }
         .profile-btn.primary { background: var(--text-white); color: var(--bg-dark); border-color: var(--text-white); }
         .profile-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .profile-btn:not(:disabled):active { transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .roulette-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 999px; overflow: hidden; margin: 10px 0; }
         .roulette-fill { height: 100%; background: var(--text-white); width: 0%; transition: width 0.3s ease; }
         .roulette-note { font-size: 11px; color: var(--text-gray); margin-top: 8px; line-height: 1.4; }
         .roulette-result { margin-top: 10px; font-size: 14px; font-weight: 700; color: #ff9800; }
         .reward-item-card { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); margin-bottom: 8px; }
         .reward-item-card:last-child { margin-bottom: 0; }
-        .reward-use-btn { padding: 7px 12px; border-radius: 10px; border: none; background: var(--text-white); color: var(--bg-dark); font-size: 11px; font-weight: 800; text-transform: uppercase; cursor: pointer; flex-shrink: 0; }
+        .reward-use-btn { padding: 7px 12px; border-radius: 10px; border: none; background: var(--text-white); color: var(--bg-dark); font-size: 11px; font-weight: 800; text-transform: uppercase; cursor: pointer; flex-shrink: 0; touch-action: manipulation; }
+        .reward-use-btn:active { transform: scale(var(--press-scale)); transition-duration: 60ms; }
 
         /* АВАТАР + ЮЗ ПОЛЬЗОВАТЕЛЯ В ОТЗЫВАХ */
         .review-author-wrap { display: flex; align-items: center; gap: 8px; min-width: 0; }
@@ -452,11 +484,12 @@
             flex-shrink: 0; padding: 8px 14px; border-radius: 999px;
             border: 1px solid var(--border-card); background: rgba(255,255,255,0.05);
             color: var(--text-gray); font-size: 12px; font-weight: 700;
-            text-transform: uppercase; cursor: pointer; transition: all 0.15s ease;
+            text-transform: uppercase; cursor: pointer; transition: all 0.15s ease; touch-action: manipulation;
         }
         .admin-dept-tab.active {
             background: var(--text-white); color: var(--bg-dark); border-color: var(--text-white);
         }
+        .admin-dept-tab:active { transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .admin-dept-group-title {
             font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px;
             color: #ffb74d; margin: 12px 0 6px; display: flex; align-items: center; justify-content: space-between;
@@ -477,13 +510,17 @@
         .admin-item-title { font-size: 14px; font-weight: 700; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .admin-item-sub { font-size: 11px; color: var(--text-gray); margin-top: 2px; }
         .admin-stock-ctrl { display: flex; align-items: center; gap: 6px; }
-        .admin-mini-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border-card); background: rgba(255,255,255,0.08); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
-        .admin-del-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid rgba(255,59,48,0.4); background: rgba(255,59,48,0.15); color: #ff453a; font-size: 14px; cursor: pointer; }
+        .admin-mini-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border-card); background: rgba(255,255,255,0.08); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+        .admin-mini-btn:active { transform: scale(var(--press-scale)); transition-duration: 60ms; }
+        .admin-del-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid rgba(255,59,48,0.4); background: rgba(255,59,48,0.15); color: #ff453a; font-size: 14px; cursor: pointer; touch-action: manipulation; }
+        .admin-del-btn:active { transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .admin-price-edit { display: flex; align-items: center; gap: 4px; margin-top: 4px; }
         .admin-price-input { width: 72px; padding: 4px 8px; border-radius: 8px; border: 1px solid var(--border-card); background: rgba(255,255,255,0.08); color: #fff; font-size: 12px; font-weight: 700; outline: none; }
-        .admin-price-save { padding: 4px 8px; border-radius: 8px; border: none; background: var(--text-white); color: var(--bg-dark); font-size: 11px; font-weight: 800; cursor: pointer; }
+        .admin-price-save { padding: 4px 8px; border-radius: 8px; border: none; background: var(--text-white); color: var(--bg-dark); font-size: 11px; font-weight: 800; cursor: pointer; touch-action: manipulation; }
+        .admin-price-save:active { transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .admin-chip { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-card); font-size: 14px; font-weight: 600; }
-        .admin-remove-btn { padding: 6px 12px; border-radius: 10px; border: 1px solid rgba(255,59,48,0.4); background: rgba(255,59,48,0.15); color: #ff453a; font-size: 11px; font-weight: 700; text-transform: uppercase; cursor: pointer; }
+        .admin-remove-btn { padding: 6px 12px; border-radius: 10px; border: 1px solid rgba(255,59,48,0.4); background: rgba(255,59,48,0.15); color: #ff453a; font-size: 11px; font-weight: 700; text-transform: uppercase; cursor: pointer; touch-action: manipulation; }
+        .admin-remove-btn:active { transform: scale(var(--press-scale)); transition-duration: 60ms; }
 
         /* ОТЗЫВЫ И ЗАКАЗЫ */
         .reviews-box { width: 100%; max-width: 360px; margin-top: 10px; border-top: 1px solid var(--border-card); padding-top: 16px; }
@@ -492,8 +529,9 @@
         .reviews-avg { font-size: 13px; font-weight: 700; color: #ffb74d; }
         .review-form { background: rgba(255,255,255,0.04); border: 1px solid var(--border-card); border-radius: 16px; padding: 12px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 8px; }
         .star-picker { display: flex; gap: 6px; font-size: 22px; cursor: pointer; }
-        .star-btn { background: none; border: none; color: #444; font-size: 22px; cursor: pointer; padding: 0; }
+        .star-btn { background: none; border: none; color: #444; font-size: 22px; cursor: pointer; padding: 0; touch-action: manipulation; }
         .star-btn.active { color: #ffb74d; }
+        .star-btn:active { transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .review-card { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 14px; padding: 12px; margin-bottom: 8px; }
         .review-top { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-bottom: 6px; gap: 8px; }
         .review-author { font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -503,8 +541,9 @@
 
         /* ===== АДМИНКА v2 ===== */
         .adm-tabs { position: sticky; top: 0; z-index: 20; display: flex; gap: 6px; padding: 6px; margin-bottom: 14px; background: var(--bg-card); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border-card); border-radius: 18px; box-shadow: var(--shadow-card); }
-        .adm-tab { flex: 1; min-width: 0; padding: 12px 4px; border: none; border-radius: 13px; background: transparent; color: var(--text-gray); font-family: inherit; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; transition: background 0.15s, color 0.15s; }
+        .adm-tab { flex: 1; min-width: 0; padding: 12px 4px; border: none; border-radius: 13px; background: transparent; color: var(--text-gray); font-family: inherit; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; transition: background 0.15s, color 0.15s; touch-action: manipulation; }
         .adm-tab.active { background: var(--text-white); color: var(--bg-dark); }
+        .adm-tab:active { transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .adm-badge { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: #ff3b30; color: #fff; font-size: 10px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; letter-spacing: 0; line-height: 1; }
         .adm-nav-badge { position: absolute; top: 2px; right: 4px; }
         .adm-pane { display: none; flex-direction: column; gap: 12px; }
@@ -513,8 +552,8 @@
         .adm-section-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-gray); padding: 0 2px; }
         .adm-toolbar { display: flex; gap: 8px; }
         .adm-toolbar .admin-input { flex: 1; min-width: 0; }
-        .adm-add-btn { flex-shrink: 0; padding: 0 16px; border-radius: 14px; border: none; background: var(--text-white); color: var(--bg-dark); font-family: inherit; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; cursor: pointer; }
-        .adm-add-btn:active { transform: scale(0.97); }
+        .adm-add-btn { flex-shrink: 0; padding: 0 16px; border-radius: 14px; border: none; background: var(--text-white); color: var(--bg-dark); font-family: inherit; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; cursor: pointer; touch-action: manipulation; }
+        .adm-add-btn:active { transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .adm-filter-out.active { background: #ff453a; border-color: #ff453a; color: #fff; }
         .adm-filter-low.active { background: #ff9f0a; border-color: #ff9f0a; color: #000; }
 
@@ -530,15 +569,16 @@
         .adm-meta { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
         .adm-price { padding: 3px 9px; border-radius: 8px; border: 1px solid var(--border-card); background: rgba(255,255,255,0.08); color: #fff; font-family: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
         .adm-state { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; color: var(--adm-c); }
-        .adm-del { width: 36px; height: 36px; flex-shrink: 0; align-self: flex-start; border-radius: 10px; border: 1px solid rgba(255,59,48,0.35); background: rgba(255,59,48,0.12); color: #ff453a; font-size: 14px; cursor: pointer; }
+        .adm-del { width: 36px; height: 36px; flex-shrink: 0; align-self: flex-start; border-radius: 10px; border: 1px solid rgba(255,59,48,0.35); background: rgba(255,59,48,0.12); color: #ff453a; font-size: 14px; cursor: pointer; touch-action: manipulation; }
+        .adm-del:active { transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .adm-card-bottom { display: flex; align-items: center; gap: 8px; }
         .adm-stock { display: flex; align-items: center; background: rgba(255,255,255,0.05); border: 1px solid var(--border-card); border-radius: 14px; overflow: hidden; flex-shrink: 0; }
-        .adm-stock-btn { width: 46px; height: 44px; border: none; background: transparent; color: #fff; font-family: inherit; font-size: 22px; font-weight: 700; cursor: pointer; }
-        .adm-stock-btn:active { background: rgba(255,255,255,0.12); }
+        .adm-stock-btn { width: 46px; height: 44px; border: none; background: transparent; color: #fff; font-family: inherit; font-size: 22px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+        .adm-stock-btn:active { background: rgba(255,255,255,0.12); transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .adm-stock-val { min-width: 40px; text-align: center; font-size: 18px; font-weight: 800; color: var(--adm-c); }
         .adm-actions { flex: 1; display: flex; justify-content: flex-end; gap: 6px; }
-        .adm-act { height: 44px; min-width: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--border-card); background: rgba(255,255,255,0.08); color: #fff; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-        .adm-act:active { background: rgba(255,255,255,0.16); }
+        .adm-act { height: 44px; min-width: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--border-card); background: rgba(255,255,255,0.08); color: #fff; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; touch-action: manipulation; }
+        .adm-act:active { background: rgba(255,255,255,0.16); transform: scale(var(--press-scale)); transition-duration: 60ms; }
 
         .adm-order-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; }
         .adm-order-chips { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -553,7 +593,8 @@
         .adm-sheet { width: 100%; max-width: 640px; max-height: 92vh; overflow-y: auto; -webkit-overflow-scrolling: touch; background: rgba(12,12,12,0.98); border: 1px solid var(--border-card); border-bottom: none; border-radius: 24px 24px 0 0; padding: 16px 16px calc(18px + env(safe-area-inset-bottom)); animation: slideUp 0.25s cubic-bezier(0.22, 1, 0.36, 1); }
         .adm-sheet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
         .adm-sheet-title { font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-        .adm-sheet-close { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-card); background: rgba(255,255,255,0.08); color: #fff; font-size: 14px; cursor: pointer; }
+        .adm-sheet-close { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-card); background: rgba(255,255,255,0.08); color: #fff; font-size: 14px; cursor: pointer; touch-action: manipulation; }
+        .adm-sheet-close:active { transform: scale(var(--press-scale)); transition-duration: 60ms; }
         .adm-label { font-size: 11px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; margin: 4px 2px -4px; }
         .adm-photo-row { display: flex; gap: 10px; align-items: stretch; }
         .adm-photo-prev { width: 52px; border-radius: 12px; background: rgba(255,255,255,0.06); border: 1px solid var(--border-card); overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; }
@@ -1035,8 +1076,21 @@
             }
             return guestId;
         }
-        function escHtml(s) {
-            return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function escHtml(s) {
+            return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&', '<': '<', '>': '>', '"': '"', "'": ''' }[c]));
+        }
+
+        function hapticLight() {
+            try { window.Telegram?.WebApp?.HapticFeedback?.impactOccurred('light'); } catch (e) {}
+        }
+        function hapticSuccess() {
+            try { window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('success'); } catch (e) {}
+        }
+        function hapticError() {
+            try { window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('error'); } catch (e) {}
+        }
+        function hapticSelection() {
+            try { window.Telegram?.WebApp?.HapticFeedback?.selectionChanged(); } catch (e) {}
         }
 
         async function migrateLegacyUserDoc() {
@@ -2041,7 +2095,7 @@
         });
 
         function renderCategories() {
-            categoryGrid.innerHTML = categories.map(cat => {
+            categoryGrid.innerHTML = categories.map((cat, i) => {
                 let count = 0;
                 const isBrandCat = (cat.id === 'vapes' || cat.id === 'liquids' || cat.id === 'consumables' || cat.id === 'disposables');
                 if (cat.id === 'vapes') count = vapeBrands.length;
@@ -2051,7 +2105,7 @@
                 else count = catalogData[cat.id]?.length || 0;
 
                 return `
-                <div class="category-card" data-category="${cat.id}">
+                <div class="category-card stagger-in" style="animation-delay: ${i * 40}ms" data-category="${cat.id}">
                     <div class="category-card-image">
                         ${cat.image
                             ? `<img src="${cat.image}" alt="${cat.name}" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${cat.icon}</span>`
@@ -2088,7 +2142,7 @@
                 brandList.innerHTML = brandsArr.map((b, bIdx) => {
                     const firstModel = b.models[0];
                     return `
-                    <div class="brand-card" data-brand-idx="${bIdx}">
+                    <div class="brand-card stagger-in" style="animation-delay: ${bIdx * 40}ms" data-brand-idx="${bIdx}">
                         <div class="brand-card-thumb">
                             ${firstModel.image
                                 ? `<img src="${firstModel.image}" loading="lazy" decoding="async" alt="${escHtml(firstModel.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${fallbackIcon}</span>`
@@ -2103,7 +2157,7 @@
                     </div>`;
                 }).join('');
                 brandList.querySelectorAll('.brand-card').forEach(card => {
-                    card.addEventListener('click', () => openBrandModels(card.dataset.brandIdx, categoryId));
+                    card.addEventListener('click', () => { hapticLight(); openBrandModels(card.dataset.brandIdx, categoryId); });
                 });
                 showPage('brand'); return;
             }
@@ -2124,7 +2178,7 @@
                         const brandImage = (b.models.find(m => m.image && m.image !== 'novayazhizha.png')?.image) || b.models[0]?.image || 'novayazhizha.png';
                         return `
                         <div class="brand-group">
-                            <div class="brand-group-card" data-brand-idx="${bIdx}">
+                            <div class="brand-group-card stagger-in" style="animation-delay: ${bIdx * 40}ms" data-brand-idx="${bIdx}">
                                 <div class="brand-card-thumb"><img src="${brandImage}" loading="lazy" decoding="async" alt="${escHtml(b.brand)}"></div>
                                 <div class="brand-card-info">
                                     <div class="brand-group-title">${escHtml(b.brand)}</div>
@@ -2137,7 +2191,7 @@
                                     const promoPrice = getPodPromoLiquidPrice(m.price);
                                     const isDiscounted = hasPodPromo && m.price > POD_LIQUID_TARGET_PRICE;
                                     return `
-                                    <div class="product-card" data-liq-brand="${bIdx}" data-liq-model="${mIdx}">
+                                    <div class="product-card stagger-in" style="animation-delay: ${mIdx * 40}ms" data-liq-brand="${bIdx}" data-liq-model="${mIdx}">
                                         <div class="product-thumb"><img src="${m.image}" loading="lazy" decoding="async" alt="${escHtml(m.name)}"></div>
                                         <div class="product-info">
                                             <div class="product-title">${escHtml(m.name)}</div>
@@ -2158,21 +2212,12 @@
                         </div>
                     `;
                     }).join('')}
-                `;
+`; 
                 brandList.querySelectorAll('.brand-group-card').forEach(card => {
-                    card.addEventListener('click', () => {
-                        const idx = card.dataset.brandIdx;
-                        card.classList.toggle('open');
-                        document.getElementById(`liquidFlavors_${idx}`).classList.toggle('open');
-                    });
+                    card.addEventListener('click', () => { hapticLight(); const idx = card.dataset.brandIdx; card.classList.toggle('open'); document.getElementById(`liquidFlavors_${idx}`).classList.toggle('open'); });
                 });
                 brandList.querySelectorAll('.product-card[data-liq-brand]').forEach(card => {
-                    card.addEventListener('click', () => {
-                        const bIdx = parseInt(card.dataset.liqBrand, 10);
-                        const mIdx = parseInt(card.dataset.liqModel, 10);
-                        detailBackPage = 'brand';
-                        openProductDetailObj(liquidBrands[bIdx].models[mIdx], 'ЖИДКОСТИ', 'ВКУС');
-                    });
+                    card.addEventListener('click', () => { hapticLight(); const bIdx = parseInt(card.dataset.liqBrand, 10); const mIdx = parseInt(card.dataset.liqModel, 10); detailBackPage = 'brand'; openProductDetailObj(liquidBrands[bIdx].models[mIdx], 'ЖИДКОСТИ', 'ВКУС'); });
                 });
                 showPage('brand'); return;
             }
@@ -2182,7 +2227,7 @@
                 brandList.innerHTML = `<div class="empty-state">В этой категории пока нет товаров в наличии</div>`;
             } else {
                 brandList.innerHTML = entries.map((entry, idx) => `
-                    <div class="product-card" data-flat-idx="${idx}">
+                    <div class="product-card stagger-in" style="animation-delay: ${idx * 40}ms" data-flat-idx="${idx}">
                         <div class="product-thumb">
                             ${entry.image
                                 ? `<img src="${entry.image}" loading="lazy" decoding="async" class="${entry.isCover ? 'full-cover' : ''}" alt="${escHtml(entry.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${entry.icon}</span>`
@@ -2199,10 +2244,7 @@
                 `).join('');
 
                 brandList.querySelectorAll('.product-card[data-flat-idx]').forEach(card => {
-                    card.addEventListener('click', () => {
-                        const idx = parseInt(card.dataset.flatIdx, 10);
-                        detailBackPage = 'brand';
-                        const varLabel = categoryId === 'nicoboosters' ? 'ВАРИАНТ' : 'ВКУС';
+                    card.addEventListener('click', () => { hapticLight(); const idx = parseInt(card.dataset.flatIdx, 10); detailBackPage = 'brand'; const varLabel = categoryId === 'nicoboosters' ? 'ВАРИАНТ' : 'ВКУС';
                         openProductDetailObj(entries[idx], category.name, varLabel);
                     });
                 });
@@ -2235,7 +2277,7 @@
             document.getElementById('brandModelsTitle').textContent = brand.brand;
             const modelsList = document.getElementById('brandModelsList');
             modelsList.innerHTML = brand.models.map((m, mIdx) => `
-                <div class="product-card" data-model-idx="${mIdx}">
+                <div class="product-card stagger-in" style="animation-delay: ${mIdx * 40}ms" data-model-idx="${mIdx}">
                     <div class="product-thumb">
                         <img src="${m.image}" loading="lazy" decoding="async" class="${m.isCover ? 'full-cover' : ''}" alt="${escHtml(m.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
                         <span style="display:none;">${fallbackIcon}</span>
@@ -2252,10 +2294,7 @@
             `).join('');
 
             modelsList.querySelectorAll('.product-card[data-model-idx]').forEach(card => {
-                card.addEventListener('click', () => {
-                    detailBackPage = 'brandModels';
-                    openProductDetailObj(brand.models[parseInt(card.dataset.modelIdx, 10)], categoryLabel, variantLabel);
-                });
+                card.addEventListener('click', () => { hapticLight(); detailBackPage = 'brandModels'; openProductDetailObj(brand.models[parseInt(card.dataset.modelIdx, 10)], categoryLabel, variantLabel); });
             });
             showPage('brandModels');
         }
@@ -2376,32 +2415,12 @@
             }
 
             thumbsEls.forEach(thumb => {
-                thumb.addEventListener('click', () => {
-                    const idx = parseInt(thumb.dataset.colorIdx, 10);
-                    if (idx !== selectedColorIdx) {
-                        updateSelectedVariantUI(idx);
-                    }
-                });
+                thumb.addEventListener('click', () => { hapticSelection(); const idx = parseInt(thumb.dataset.colorIdx, 10); if (idx !== selectedColorIdx) { updateSelectedVariantUI(idx); } });
             });
 
-            document.getElementById('qtyDecrease').addEventListener('click', () => {
-                if (qty > 1) {
-                    qty--;
-                    qtyValue.textContent = qty;
-                }
-            });
-            document.getElementById('qtyIncrease').addEventListener('click', () => {
-                const { maxStock } = getCurrentVariantData();
-                if (qty < maxStock) {
-                    qty++;
-                    qtyValue.textContent = qty;
-                } else {
-                    showToast(`В наличии только ${maxStock} шт.`);
-                }
-            });
-            document.getElementById('addToCartMain').addEventListener('click', () => {
-                const { selectedColor, imageSrc, maxStock, variantDocId } = getCurrentVariantData();
-                addToCart({
+            document.getElementById('qtyDecrease').addEventListener('click', () => { hapticLight(); if (qty > 1) { qty--; qtyValue.textContent = qty; } });
+            document.getElementById('qtyIncrease').addEventListener('click', () => { hapticLight(); const { maxStock } = getCurrentVariantData(); if (qty < maxStock) { qty++; qtyValue.textContent = qty; } else { showToast(`В наличии только ${maxStock} шт.`); } });
+            document.getElementById('addToCartMain').addEventListener('click', () => { hapticSuccess(); const { selectedColor, imageSrc, maxStock, variantDocId } = getCurrentVariantData(); addToCart({
                     docId: variantDocId,
                     category: model.category || currentCategoryId || (isLiquid ? 'liquids' : 'other'),
                     name: model.name,
@@ -2586,7 +2605,8 @@
                     appliedRewardId: null
                 });
             }
-            updateCartCount();
+            updateCartCount(true);
+            hapticSuccess();
             if (!options.silentToast) {
                 showToast('Добавлено в корзину');
             }
@@ -2597,9 +2617,23 @@
             return true;
         }
 
-        function updateCartCount() {
+        function updateCartCount(animate = false) {
             const total = cart.reduce((sum, item) => sum + item.qty, 0);
-            if (cartCountEl) { cartCountEl.textContent = total; cartCountEl.style.display = total > 0 ? 'flex' : 'none'; }
+            if (cartCountEl) { 
+                cartCountEl.textContent = total; 
+                cartCountEl.style.display = total > 0 ? 'flex' : 'none';
+                if (animate && total > 0) {
+                    cartCountEl.classList.remove('cart-bounce');
+                    void cartCountEl.offsetWidth;
+                    cartCountEl.classList.add('cart-bounce');
+                    const cartBtn = document.querySelector('.nav-btn[data-tab="cart"]');
+                    if (cartBtn) {
+                        cartBtn.classList.remove('cart-bounce');
+                        void cartBtn.offsetWidth;
+                        cartBtn.classList.add('cart-bounce');
+                    }
+                }
+            }
         }
 
         function renderCart() {
@@ -2671,7 +2705,7 @@
                         }
 
                         return `
-                        <div class="cart-item" style="background:var(--bg-card); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid var(--border-card); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:10px; box-shadow:var(--shadow-card);">
+                        <div class="cart-item stagger-in" style="animation-delay: ${cart.indexOf(item) * 40}ms; background:var(--bg-card); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid var(--border-card); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:10px; box-shadow:var(--shadow-card);">
                             <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
                                 <div style="display:flex; align-items:flex-start; gap:12px; flex:1; min-width:0;">
                                     <div class="product-thumb" style="width:60px; height:60px; border-radius:10px; flex-shrink:0; overflow:hidden; border:1px solid var(--border-card); background:var(--border-card); display:flex; align-items:center; justify-content:center;">
@@ -2746,49 +2780,22 @@
             });
 
             cartPage.querySelectorAll('.cart-bonus-btn[data-action="apply-reward"]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const item = cart.find(i => i.id === btn.dataset.cartId);
-                    const rewardId = btn.dataset.rewardId;
-                    if (!item || !rewardId) return;
-                    item.appliedRewardId = rewardId;
-                    renderCart();
-                    showToast('Бонус применён к товару!');
-                });
+                btn.addEventListener('click', () => { hapticLight(); const item = cart.find(i => i.id === btn.dataset.cartId); const rewardId = btn.dataset.rewardId; if (!item || !rewardId) return; item.appliedRewardId = rewardId; renderCart(); showToast('Бонус применён к товару!'); });
             });
 
             cartPage.querySelectorAll('.cart-bonus-btn[data-action="remove-reward"]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const item = cart.find(i => i.id === btn.dataset.cartId);
-                    if (!item) return;
-                    item.appliedRewardId = null;
-                    renderCart();
-                    showToast('Бонус снят');
-                });
+                btn.addEventListener('click', () => { hapticLight(); const item = cart.find(i => i.id === btn.dataset.cartId); if (!item) return; item.appliedRewardId = null; renderCart(); showToast('Бонус снят'); });
             });
 
             cartPage.querySelectorAll('.qty-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const item = cart.find(i => i.id === btn.dataset.id);
-                    if (!item) return;
-                    if (btn.dataset.action === 'increase') {
-                        if (item.maxStock && item.qty >= item.maxStock) { showToast(`Максимум в наличии: ${item.maxStock} шт.`); return; }
-                        item.qty += 1;
-                    } else {
-                        item.qty -= 1;
-                        if (item.qty <= 0) cart.splice(cart.indexOf(item), 1);
-                    }
-                    renderCart(); updateCartCount();
-                });
+                btn.addEventListener('click', () => { hapticLight(); const item = cart.find(i => i.id === btn.dataset.id); if (!item) return; if (btn.dataset.action === 'increase') { if (item.maxStock && item.qty >= item.maxStock) { showToast(`Максимум в наличии: ${item.maxStock} шт.`); return; } item.qty += 1; } else { item.qty -= 1; if (item.qty <= 0) cart.splice(cart.indexOf(item), 1); } renderCart(); updateCartCount(); });
             });
 
             cartPage.querySelectorAll('.remove-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const idx = cart.findIndex(i => i.id === btn.dataset.id);
-                    if (idx !== -1) { cart.splice(idx, 1); renderCart(); updateCartCount(); }
-                });
+                btn.addEventListener('click', () => { hapticLight(); const idx = cart.findIndex(i => i.id === btn.dataset.id); if (idx !== -1) { cart.splice(idx, 1); renderCart(); updateCartCount(); } });
             });
 
-            document.getElementById('checkoutBtn').addEventListener('click', checkout);
+            document.getElementById('checkoutBtn').addEventListener('click', () => { hapticSuccess(); checkout(); });
         }
 
         function checkout() {
@@ -3027,7 +3034,7 @@
             ` : '';
 
             container.innerHTML = `
-                <div class="profile-card">
+                <div class="profile-card stagger-in" style="animation-delay: 0ms">
                     <div class="profile-user">
                         <div class="profile-avatar">
                             ${tgPhoto
@@ -3042,12 +3049,12 @@
                     </div>
                 </div>
                 ${rewardsHtml}
-                <div class="profile-card"><div class="profile-card-title">Время работы</div><div style="font-size: 16px; font-weight: 700;">11:00 - 23:00</div></div>
-                <div class="profile-card">
+                <div class="profile-card stagger-in" style="animation-delay: 40ms"><div class="profile-card-title">Время работы</div><div style="font-size: 16px; font-weight: 700;">11:00 - 23:00</div></div>
+                <div class="profile-card stagger-in" style="animation-delay: 80ms">
                     <div class="profile-card-title">Только честные отзывы</div>
                     <button type="button" class="profile-btn primary" id="openReviewsPageBtn">Открыть отзывы покупателей →</button>
                 </div>
-                <div class="profile-card">
+                <div class="profile-card stagger-in" style="animation-delay: 120ms">
                     <div class="profile-card-title">Рулетка после 5 товаров</div>
                     <div style="font-size: 13px; color: #dcdcdc;">
                         Прогресс: <b id="rouletteCount">${progressCount}</b> / ${PURCHASES_PER_SPIN}
@@ -3064,12 +3071,11 @@
                     <div class="roulette-result" id="rouletteResult"></div>
                     <div class="roulette-note">* Каждые 5 товаров дают 1 вращение. Товары сверх 5 не сгорают, а все выпавшие призы сохраняются в вашем профиле.</div>
                 </div>
-                <div class="profile-card"><div class="profile-card-title">Обратная связь</div><button class="profile-btn" id="feedbackBtn">Написать в Telegram (@Seregablatnou)</button></div>
+                <div class="profile-card stagger-in" style="animation-delay: 160ms"><div class="profile-card-title">Обратная связь</div><button class="profile-btn" id="feedbackBtn">Написать в Telegram (@Seregablatnou)</button></div>
             `;
 
-            container.querySelectorAll('.reward-use-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    if (btn.dataset.rewardAction === 'go-liquids') {
+            container.querySelectorAll('.reward-use-btn').forEach((btn, i) => {
+                btn.addEventListener('click', () => { hapticLight(); if (btn.dataset.rewardAction === 'go-liquids') {
                         openCategory('liquids');
                     } else {
                         showPage('cart');
@@ -3078,18 +3084,11 @@
                 });
             });
 
-            document.getElementById('openReviewsPageBtn').addEventListener('click', () => {
-                showPage('reviews');
-                renderAllReviewsPage();
-            });
+            document.getElementById('openReviewsPageBtn').addEventListener('click', () => { hapticLight(); showPage('reviews'); renderAllReviewsPage(); });
 
-            document.getElementById('feedbackBtn').addEventListener('click', () => {
-                const url = 'https://t.me/Seregablatnou';
-                if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
-                else window.open(url, '_blank');
-            });
+            document.getElementById('feedbackBtn').addEventListener('click', () => { hapticLight(); const url = 'https://t.me/Seregablatnou'; if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url); else window.open(url, '_blank'); });
 
-            document.getElementById('spinRouletteBtn').addEventListener('click', openRouletteModal);
+            document.getElementById('spinRouletteBtn').addEventListener('click', () => { hapticSuccess(); openRouletteModal(); });
         }
 
         function resolveReviewProductInfo(review) {
@@ -3806,21 +3805,14 @@
             }
         }
 
-        document.getElementById('goToCatalogBtn').addEventListener('click', () => { renderCategories(); showPage('catalog'); });
-        document.getElementById('backToCatalog').addEventListener('click', () => showPage('catalog'));
-        document.getElementById('backToBrands').addEventListener('click', () => showPage('brand'));
-        document.getElementById('backToModels').addEventListener('click', () => showPage(detailBackPage));
-        document.getElementById('backToProfileFromReviews').addEventListener('click', () => { showPage('profile'); renderProfile(); });
+        document.getElementById('goToCatalogBtn').addEventListener('click', () => { hapticSuccess(); renderCategories(); showPage('catalog'); });
+        document.getElementById('backToCatalog').addEventListener('click', () => { hapticLight(); showPage('catalog'); });
+        document.getElementById('backToBrands').addEventListener('click', () => { hapticLight(); showPage('brand'); });
+        document.getElementById('backToModels').addEventListener('click', () => { hapticLight(); showPage(detailBackPage); });
+        document.getElementById('backToProfileFromReviews').addEventListener('click', () => { hapticLight(); showPage('profile'); renderProfile(); });
 
         document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tab = btn.dataset.tab;
-                if (tab === 'home') showPage('welcome');
-                if (tab === 'catalog') showPage('catalog');
-                if (tab === 'cart') { showPage('cart'); renderCart(); }
-                if (tab === 'profile') { showPage('profile'); renderProfile(); refreshUserDataFromServer(); }
-                if (tab === 'admin' && isAdminUser()) { showPage('admin'); renderAdminList(); renderAdminsList(); renderAdminOrders(); }
-            });
+            btn.addEventListener('click', () => { hapticLight(); const tab = btn.dataset.tab; if (tab === 'home') showPage('welcome'); if (tab === 'catalog') showPage('catalog'); if (tab === 'cart') { showPage('cart'); renderCart(); } if (tab === 'profile') { showPage('profile'); renderProfile(); refreshUserDataFromServer(); } if (tab === 'admin' && isAdminUser()) { showPage('admin'); renderAdminList(); renderAdminsList(); renderAdminOrders(); } });
         });
 
         if (window.Telegram?.WebApp) {
