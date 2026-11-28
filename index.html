@@ -72,8 +72,7 @@
         @keyframes subtitleReveal { to { opacity: 1; transform: translateY(0); filter: blur(0); } }
         .welcome-hint { font-size: clamp(11px, 2.8vw, 12px); font-weight: 400; letter-spacing: clamp(1.5px, 0.5vw, 2px); line-height: 1.4; color: #ffffff; text-transform: uppercase; margin-bottom: clamp(16px, 2.5vh, 22px); position: relative; z-index: 3; opacity: 0; transform: translateY(8px); filter: blur(4px); animation: hintReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: 1.4s; will-change: opacity, transform, filter; }
         @keyframes hintReveal { to { opacity: 1; transform: translateY(0); filter: blur(0); } }
-        .main-btn { width: 100%; max-width: 100%; padding: clamp(16px, 2.6vh, 20px) 24px; border: 1px solid rgba(255,255,255,0.4); border-radius: 40px; background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: var(--text-white); font-size: clamp(11px, 3.1vw, 13px); font-weight: 500; letter-spacing: clamp(2px, 0.8vw, 3px); text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; position: relative; z-index: 3; transition: all 0.2s ease; }
-        .main-btn:active { background: var(--accent); color: var(--bg-dark); }
+        .main-btn { width: 100%; max-width: 100%; padding: clamp(16px, 2.6vh, 20px) 24px; border: 1px solid rgba(255,255,255,0.4); border-radius: 40px; background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: var(--text-white); font-size: clamp(11px, 3.1vw, 13px); font-weight: 500; letter-spacing: clamp(2px, 0.8vw, 3px); text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; position: relative; z-index: 3; transition: all 0.2s ease; box-shadow: 0 0 25px rgba(255, 255, 255, 0.12); }        .main-btn:active { background: var(--accent); color: var(--bg-dark); }
 
         /* ЭКРАН 3: КАТАЛОГ */
         #catalogPage { padding: 20px 16px 100px; }
@@ -89,8 +88,8 @@
         .search-results-list { display: flex; flex-direction: column; gap: 12px; }
         .search-cat-tag { display: inline-block; font-size: 10px; font-weight: 700; color: #bdbdbd; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); padding: 2px 7px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
         .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .category-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; cursor: pointer; transition: background 0.2s; text-align: center; position: relative; z-index: 1; box-shadow: var(--shadow-card); }
-        .category-card:active { background: var(--bg-card-hover); }
+        .category-card { background: rgba(16, 16, 16, 0.92); border: 1px solid var(--border-card); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; cursor: pointer; transition: background 0.15s, transform 0.12s ease; text-align: center; position: relative; z-index: 1; box-shadow: var(--shadow-card); }
+        .category-card:active { background: var(--bg-card-hover); transform: scale(0.98); }
         .category-card-image { width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 48px; }
         .category-card-image img { width: 100%; height: 100%; object-fit: contain; }
         .category-card-title { font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
@@ -107,8 +106,8 @@
         .back-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-white); box-shadow: var(--shadow-card); flex-shrink: 0; }
         .sub-title { font-size: 18px; font-weight: 600; }
         .product-list { display: flex; flex-direction: column; gap: 12px; padding: 0 16px 100px; }
-        .product-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 14px; display: flex; gap: 14px; align-items: center; cursor: pointer; transition: background 0.2s; position: relative; z-index: 1; box-shadow: var(--shadow-card); }
-        .product-card:active { background: var(--bg-card-hover); }
+        .product-card { background: rgba(16, 16, 16, 0.92); border: 1px solid var(--border-card); border-radius: 20px; padding: 14px; display: flex; gap: 14px; align-items: center; cursor: pointer; transition: background 0.15s, transform 0.12s ease; position: relative; z-index: 1; box-shadow: var(--shadow-card); }
+        .product-card:active { background: var(--bg-card-hover); transform: scale(0.98); }
         .product-thumb { width: 80px; height: 80px; border-radius: 0; background: transparent; display: flex; align-items: center; justify-content: center; font-size: 32px; flex-shrink: 0; overflow: visible; border: none; }
         .product-thumb img { width: 100%; height: 100%; object-fit: contain; }
         .product-thumb img.full-cover { object-fit: contain; }
@@ -125,8 +124,8 @@
 
         /* АККОРДЕОН БРЕНДОВ */
         .brand-group { display: flex; flex-direction: column; gap: 8px; }
-        .brand-group-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: background 0.2s, border-color 0.2s; box-shadow: var(--shadow-card); }
-        .brand-group-card:active { background: var(--bg-card-hover); }
+        .brand-group-card { background: rgba(16, 16, 16, 0.92); border: 1px solid var(--border-card); border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: background 0.15s, border-color 0.2s, transform 0.12s ease; box-shadow: var(--shadow-card); }
+        .brand-group-card:active { background: var(--bg-card-hover); transform: scale(0.98); }
         .brand-group-card.open { border-color: var(--text-white); }
         .brand-group-title { font-size: 16px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
         .brand-group-arrow { font-size: 20px; color: var(--text-gray); transition: transform 0.2s; margin-left: auto; }
@@ -135,8 +134,8 @@
         .brand-models-list.open { display: flex; }
 
         /* БРЕНДЫ СПИСОК */
-        .brand-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: background 0.2s, border-color 0.2s; box-shadow: var(--shadow-card); }
-        .brand-card:active { background: var(--bg-card-hover); }
+        .brand-card { background: rgba(16, 16, 16, 0.92); border: 1px solid var(--border-card); border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: background 0.15s, border-color 0.2s, transform 0.12s ease; box-shadow: var(--shadow-card); }
+        .brand-card:active { background: var(--bg-card-hover); transform: scale(0.98); }
         .brand-card-thumb { width: 64px; height: 64px; border-radius: 0; background: transparent; display: flex; align-items: center; justify-content: center; overflow: visible; flex-shrink: 0; border: none; font-size: 28px; }
         .brand-card-thumb img { width: 100%; height: 100%; object-fit: contain; }
         .brand-card-info { flex: 1; min-width: 0; }
