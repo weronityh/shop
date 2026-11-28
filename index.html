@@ -109,9 +109,9 @@
         .product-list { display: flex; flex-direction: column; gap: 12px; padding: 0 16px 100px; }
         .product-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 14px; display: flex; gap: 14px; align-items: center; cursor: pointer; transition: background 0.2s; position: relative; z-index: 1; box-shadow: var(--shadow-card); }
         .product-card:active { background: var(--bg-card-hover); }
-        .product-thumb { width: 80px; height: 80px; border-radius: 14px; background: var(--border-card); display: flex; align-items: center; justify-content: center; font-size: 32px; flex-shrink: 0; overflow: hidden; border: 1px solid var(--border-card); }
+        .product-thumb { width: 80px; height: 80px; border-radius: 0; background: transparent; display: flex; align-items: center; justify-content: center; font-size: 32px; flex-shrink: 0; overflow: visible; border: none; }
         .product-thumb img { width: 100%; height: 100%; object-fit: contain; }
-        .product-thumb img.full-cover { object-fit: cover; transform: scale(1.25); }
+        .product-thumb img.full-cover { object-fit: contain; }
         .product-info { flex: 1; min-width: 0; }
         .product-title { font-size: 15px; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
         .product-desc { font-size: 12px; color: var(--text-gray); margin-bottom: 6px; line-height: 1.3; }
@@ -137,8 +137,8 @@
         /* БРЕНДЫ СПИСОК */
         .brand-card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-card); border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: background 0.2s, border-color 0.2s; box-shadow: var(--shadow-card); }
         .brand-card:active { background: var(--bg-card-hover); }
-        .brand-card-thumb { width: 56px; height: 56px; border-radius: 12px; background: var(--border-card); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; border: 1px solid var(--border-card); font-size: 24px; }
-        .brand-card-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .brand-card-thumb { width: 64px; height: 64px; border-radius: 0; background: transparent; display: flex; align-items: center; justify-content: center; overflow: visible; flex-shrink: 0; border: none; font-size: 28px; }
+        .brand-card-thumb img { width: 100%; height: 100%; object-fit: contain; }
         .brand-card-info { flex: 1; min-width: 0; }
         .brand-card-name { font-size: 16px; font-weight: 700; text-transform: uppercase; }
         .brand-card-count { font-size: 12px; color: var(--text-gray); margin-top: 2px; }
@@ -148,7 +148,7 @@
         .product-detail-header { display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-card); position: sticky; top: 0; z-index: 10; box-shadow: var(--shadow-card); }
         .product-detail-title { font-size: 18px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .product-detail-content { padding: 20px 16px 190px; display: flex; flex-direction: column; align-items: center; }
-        .product-detail-image-wrap { width: 100%; max-width: 320px; aspect-ratio: 1; margin-bottom: 20px; border-radius: 24px; overflow: hidden; background: var(--bg-dark); position: relative; display: flex; align-items: center; justify-content: center; }
+        .product-detail-image-wrap { width: 100%; max-width: 320px; aspect-ratio: 1; margin-bottom: 20px; border-radius: 0; overflow: visible; background: transparent; position: relative; display: flex; align-items: center; justify-content: center; } 
         .product-detail-image { width: 100%; height: 100%; object-fit: contain; transition: opacity 0.2s ease; }
         .product-detail-category { font-size: 12px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
         .product-detail-name { font-size: 22px; font-weight: 900; text-transform: uppercase; text-align: center; margin-bottom: 6px; }
@@ -162,10 +162,10 @@
         .color-selector-label span, .color-selector-label b { color: var(--text-white); font-weight: 600; }
         .color-thumbs { display: flex; gap: 10px; overflow-x: auto; padding: 4px 4px 8px; scrollbar-width: none; }
         .color-thumbs::-webkit-scrollbar { display: none; }
-        .color-thumb { width: 64px; height: 64px; border-radius: 12px; overflow: hidden; flex-shrink: 0; border: 2px solid transparent; cursor: pointer; transition: border-color 0.2s, transform 0.1s; background: var(--border-card); position: relative; }
+        .color-thumb { width: 64px; height: 64px; border-radius: 12px; overflow: visible; flex-shrink: 0; border: 2px solid transparent; cursor: pointer; transition: border-color 0.2s, transform 0.1s; background: transparent; position: relative; }
         .color-thumb:active { transform: scale(0.95); }
         .color-thumb.selected { border-color: var(--text-white); }
-        .color-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .color-thumb img { width: 100%; height: 100%; object-fit: contain; }
         .color-thumb-name { position: absolute; bottom: 0; left: 0; right: 0; padding: 4px; font-size: 9px; text-align: center; background: linear-gradient(180deg, transparent, rgba(0,0,0,0.8)); color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .product-detail-footer { position: fixed; bottom: 0; left: 0; right: 0; padding: 16px; padding-bottom: calc(16px + env(safe-area-inset-bottom)); background: linear-gradient(180deg, transparent, var(--bg-dark) 30%, var(--bg-dark)); z-index: 50; }
@@ -259,8 +259,8 @@
             border-radius: 16px; padding: 10px; display: flex; align-items: center; gap: 10px;
         }
         .upsell-thumb {
-            width: 56px; height: 56px; border-radius: 12px; background: rgba(255, 255, 255, 0.06);
-            overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+            width: 56px; height: 56px; border-radius: 0; background: transparent;
+            overflow: visible; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
         }
         .upsell-thumb img { width: 100%; height: 100%; object-fit: contain; }
         .upsell-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
@@ -381,8 +381,8 @@
         }
         .full-review-product { display: flex; align-items: center; gap: 12px; }
         .full-review-thumb {
-            width: 56px; height: 56px; border-radius: 12px; background: rgba(255,255,255,0.06);
-            border: 1px solid var(--border-card); overflow: hidden; flex-shrink: 0;
+            width: 56px; height: 56px; border-radius: 0; background: transparent;
+            border: none; overflow: visible; flex-shrink: 0;
             display: flex; align-items: center; justify-content: center; font-size: 24px;
         }
         .full-review-thumb img { width: 100%; height: 100%; object-fit: contain; }
@@ -471,8 +471,8 @@
             content: ""; width: 6px; height: 6px; border-radius: 50%; background: #ffffff; opacity: 0.55;
         }
         .admin-item { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 18px; padding: 12px; display: flex; align-items: center; gap: 12px; }
-        .admin-item-thumb { width: 52px; height: 52px; border-radius: 12px; background: rgba(255,255,255,0.06); overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-        .admin-item-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .admin-item-thumb { width: 52px; height: 52px; border-radius: 0; background: transparent; overflow: visible; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .admin-item-thumb img { width: 100%; height: 100%; object-fit: contain; }
         .admin-item-info { flex: 1; min-width: 0; }
         .admin-item-title { font-size: 14px; font-weight: 700; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .admin-item-sub { font-size: 11px; color: var(--text-gray); margin-top: 2px; }
@@ -522,8 +522,8 @@
         .adm-card.st-low { --adm-c: #ff9f0a; }
         .adm-card.st-out { --adm-c: #ff453a; }
         .adm-card-top { display: flex; align-items: center; gap: 12px; }
-        .adm-thumb { width: 56px; height: 56px; border-radius: 14px; background: rgba(255,255,255,0.06); border: 1px solid var(--border-card); overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-        .adm-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .adm-thumb { width: 56px; height: 56px; border-radius: 0; background: transparent; border: none; overflow: visible; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .adm-thumb img { width: 100%; height: 100%; object-fit: contain; }
         .adm-info { flex: 1; min-width: 0; }
         .adm-title { font-size: 14px; font-weight: 700; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .adm-variant { font-size: 12px; color: #d6d6d6; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -556,8 +556,8 @@
         .adm-sheet-close { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-card); background: rgba(255,255,255,0.08); color: #fff; font-size: 14px; cursor: pointer; }
         .adm-label { font-size: 11px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; margin: 4px 2px -4px; }
         .adm-photo-row { display: flex; gap: 10px; align-items: stretch; }
-        .adm-photo-prev { width: 52px; border-radius: 12px; background: rgba(255,255,255,0.06); border: 1px solid var(--border-card); overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; }
-        .adm-photo-prev img { width: 100%; height: 100%; object-fit: cover; }
+        .adm-photo-prev { width: 52px; border-radius: 0; background: transparent; border: none; overflow: visible; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .adm-photo-prev img { width: 100%; height: 100%; object-fit: contain; }
         .adm-photo-row .admin-upload-label { flex: 1; }
         .adm-confirm { width: 100%; max-width: 340px; background: rgba(14,14,14,0.99); border: 1px solid var(--border-card); border-radius: 22px; padding: 20px; box-shadow: var(--shadow-card); animation: slideUp 0.2s ease; }
         .adm-confirm-title { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
@@ -910,16 +910,27 @@
             await Promise.race([tasks, new Promise(r => setTimeout(r, timeoutMs))]);
         }
 
+        function canvasHasTransparency(ctx, w, h) {
+            try {
+                const data = ctx.getImageData(0, 0, w, h).data;
+                for (let i = 3; i < data.length; i += 4) {
+                    if (data[i] < 250) return true;
+                }
+            } catch (e) {}
+            return false;
+        }
+
         async function compressImageForUpload(file, maxSide = 900, quality = 0.82) {
             if (!file || !file.type || !file.type.startsWith('image/')) return file;
             return new Promise((resolve) => {
                 const url = URL.createObjectURL(file);
                 const img = new Image();
-                img.onload = () => {
+                img.onload = async () => {
                     try {
                         let w = img.naturalWidth || img.width;
                         let h = img.naturalHeight || img.height;
-                        if (w > maxSide || h > maxSide) {
+                        const needsResize = w > maxSide || h > maxSide;
+                        if (needsResize) {
                             const ratio = Math.min(maxSide / w, maxSide / h);
                             w = Math.max(1, Math.round(w * ratio));
                             h = Math.max(1, Math.round(h * ratio));
@@ -928,25 +939,42 @@
                         canvas.width = w;
                         canvas.height = h;
                         const ctx = canvas.getContext('2d');
+                        ctx.clearRect(0, 0, w, h);
                         ctx.drawImage(img, 0, 0, w, h);
                         URL.revokeObjectURL(url);
+
+                        const hasAlpha = (file.type === 'image/png' || file.type === 'image/webp')
+                            ? canvasHasTransparency(ctx, w, h)
+                            : false;
 
                         const tryMime = (mime) => new Promise((res) => {
                             canvas.toBlob((blob) => res(blob), mime, quality);
                         });
 
-                        tryMime('image/webp').then(async (blob) => {
-                            if (blob && blob.size > 0 && blob.size < file.size) {
-                                resolve(new File([blob], 'photo.webp', { type: 'image/webp' }));
-                                return;
+                        const webpBlob = await tryMime('image/webp');
+                        if (webpBlob && webpBlob.type === 'image/webp' && webpBlob.size > 0 && (webpBlob.size < file.size || needsResize)) {
+                            resolve(new File([webpBlob], 'photo.webp', { type: 'image/webp' }));
+                            return;
+                        }
+
+                        if (hasAlpha) {
+                            if (needsResize) {
+                                const pngBlob = await tryMime('image/png');
+                                if (pngBlob && pngBlob.size > 0 && pngBlob.size < file.size) {
+                                    resolve(new File([pngBlob], 'photo.png', { type: 'image/png' }));
+                                    return;
+                                }
                             }
-                            const jpegBlob = await tryMime('image/jpeg');
-                            if (jpegBlob && jpegBlob.size > 0 && jpegBlob.size < file.size) {
-                                resolve(new File([jpegBlob], 'photo.jpg', { type: 'image/jpeg' }));
-                            } else {
-                                resolve(file);
-                            }
-                        });
+                            resolve(file);
+                            return;
+                        }
+
+                        const jpegBlob = await tryMime('image/jpeg');
+                        if (jpegBlob && jpegBlob.size > 0 && (jpegBlob.size < file.size || needsResize)) {
+                            resolve(new File([jpegBlob], 'photo.jpg', { type: 'image/jpeg' }));
+                        } else {
+                            resolve(file);
+                        }
                     } catch (e) {
                         URL.revokeObjectURL(url);
                         resolve(file);
@@ -2691,7 +2719,7 @@
                         <div class="cart-item" style="background:var(--bg-card); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid var(--border-card); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:10px; box-shadow:var(--shadow-card);">
                             <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
                                 <div style="display:flex; align-items:flex-start; gap:12px; flex:1; min-width:0;">
-                                    <div class="product-thumb" style="width:60px; height:60px; border-radius:10px; flex-shrink:0; overflow:hidden; border:1px solid var(--border-card); background:var(--border-card); display:flex; align-items:center; justify-content:center;">
+                                    <div class="product-thumb" style="width:60px; height:60px; border-radius:0; flex-shrink:0; overflow:visible; border:none; background:transparent; display:flex; align-items:center; justify-content:center;">
                                         ${item.image ? `<img src="${item.image}" alt="${escHtml(item.name)}" style="width:100%; height:100%; object-fit:contain;" loading="lazy" decoding="async">` : `<span style="font-size:24px;">📦</span>`}
                                     </div>
                                     <div style="flex:1; min-width:0;">
