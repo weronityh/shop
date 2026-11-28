@@ -3640,7 +3640,7 @@
                             </div>
                             <div class="delivery-field">
                                 <label class="delivery-label">Время</label>
-                                <input type="time" id="orderTimeInput" class="delivery-input" min="11:00" max="23:00">
+                                <input type="time" id="orderTimeInput" class="delivery-input">
                             </div>
                         </div>
                         <div id="timeErrorMsg" style="display:none; color:#ff453a; font-size:12px; margin-top:8px;">Это время уже прошло — выберите позже</div>
@@ -3667,11 +3667,8 @@
                 }
                 const chosen = new Date(`${dVal}T${tVal}:00`);
                 const current = new Date();
-                const outOfHours = tVal < '11:00' || tVal > '23:00';
-                if (outOfHours || isNaN(chosen.getTime()) || chosen < current) {
-                    timeError.textContent = outOfHours
-                        ? 'Мы работаем с 11:00 до 23:00 — выберите время в этом интервале'
-                        : 'Это время уже прошло — выберите позже';
+                if (isNaN(chosen.getTime()) || chosen < current) {
+                    timeError.textContent = 'Это время уже прошло — выберите позже';
                     timeError.style.display = 'block';
                     dateInput.style.borderColor = '#ff453a';
                     timeInput.style.borderColor = '#ff453a';
