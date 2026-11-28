@@ -3705,6 +3705,63 @@
 
             modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
         }
+function copyTextToClipboard(text) {
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(text).catch(() => {});
+                }
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.setAttribute('readonly', '');
+                ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0;';
+                document.body.appendChild(ta);
+                ta.select();
+                ta.setSelectionRange(0, text.length);
+                document.execCommand('copy');
+                ta.remove();
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function showOrderSentModal(orderText, tgUrl) {
+            const old = document.querySelector('.order-sent-modal');
+            if (old) old.remove();
+
+            const modal = document.createElement('div');
+            modal.className = 'order-sent-modal';
+            modal.style.cssText = 'position:fixed;inset:0;z-index:1250;background:rgba(0,0,0,0.88);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:16px;';
+            modal.innerHTML = `
+                <div style="width:100%;max-width:380px;background:var(--bg-card);border:1px solid rgba(40,205,65,0.45);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow-card);">
+                    <div style="font-size:18px;font-weight:800;color:#69f07a;text-align:center;">✅ Заказ оформлен!</div>
+                    <div style="font-size:13px;color:#dcdcdc;line-height:1.45;text-align:center;">
+                        Текст заказа <b>уже скопирован</b>.<br>
+                        Нажмите кнопку ниже и отправьте его менеджеру <b>@weggewpod</b> (если сообщение не подставилось само — нажмите «Вставить» в чате).
+                    </div>
+                    <pre style="margin:0;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid var(--border-card);font-family:inherit;font-size:11px;color:#cfcfcf;white-space:pre-wrap;max-height:160px;overflow-y:auto;">${escHtml(orderText)}</pre>
+                    <button type="button" class="profile-btn primary" id="openTgChatBtn">💬 Открыть чат @weggewpod</button>
+                    <button type="button" class="profile-btn" id="copyOrderTextBtn">📋 Скопировать текст заказа</button>
+                    <button type="button" class="profile-btn" id="closeOrderSentBtn" style="opacity:0.75;">Закрыть</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            modal.querySelector('#openTgChatBtn').addEventListener('click', () => {
+                copyTextToClipboard(orderText);
+                if (window.Telegram?.WebApp?.openTelegramLink) {
+                    window.Telegram.WebApp.openTelegramLink(tgUrl);
+                } else {
+                    window.open(tgUrl, '_blank');
+                }
+            });
+            modal.querySelector('#copyOrderTextBtn').addEventListener('click', () => {
+                copyTextToClipboard(orderText);
+                showToast('Текст заказа скопирован!');
+            });
+            modal.querySelector('#closeOrderSentBtn').addEventListener('click', () => modal.remove());
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+        }
 
         async function sendOrder(dayLabel, timeLabel) {
             if (isSubmittingOrder) return;
@@ -3754,6 +3811,7 @@
                     orderText += `${i + 1}. ${item.name}${colorStr} × ${item.qty} — ${formatMoney(pricing.finalTotal)} BYN${bonusNote}\n`;
                 });
                 orderText += `\nИтого: ${formatMoney(details.finalTotal)} BYN\n📍 Способ получения: ${pickup}\n📅 Дата: ${dayLabel}\n⏰ Время: ${timeLabel}`;
+copyTextToClipboard(orderText);
 
                 const orderItems = cartSnap.map(i => ({
                     docId: i.docId || '',
@@ -3840,10 +3898,9 @@
                 }
 
                 const url = 'https://t.me/weggewpod?text=' + encodeURIComponent(orderText);
+                cart = []; selectedPickup = null; updateCartCount(); renderCart();
+                showOrderSentModal(orderText, url);
                 if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
-                else window.open(url, '_blank');
-
-                cart = []; selectedPickup = null; updateCartCount(); renderCart(); showToast('Заказ сформирован');
             } finally {
                 isSubmittingOrder = false;
                 const b = document.getElementById('checkoutBtn');
