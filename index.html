@@ -574,7 +574,7 @@
             <div class="page active" id="welcomePage">
                 <div class="welcome-hero">
                     <div class="cat-mask">
-                        <img src="kotii.png" alt="WEGGEW" class="cat-image" id="catImage" fetchpriority="high" decoding="async">
+                        <img src="kotii.jpg" alt="WEGGEW" class="cat-image" id="catImage" fetchpriority="high" decoding="async">
                     </div>
                 </div>
                 <div class="welcome-bottom">
@@ -824,7 +824,7 @@
         const categories = [
             { id: 'vapes', name: 'ПОД-СИСТЕМЫ', sub: '0 брендов', icon: '📱', image: 'vape.png' },
             { id: 'snus', name: 'СНЮС', sub: '0 шт.', icon: '📦', image: 'snus.png' },
-            { id: 'liquids', name: 'ЖИДКОСТИ', sub: '0 брендов', icon: '💧', image: 'novayazhizha.png' },
+            { id: 'liquids', name: 'ЖИДКОСТИ', sub: '0 брендов', icon: '💧', image: 'novayazhizha.jpg' },
             { id: 'disposables', name: 'ОДНОРАЗКИ', sub: '0 брендов', icon: '🚬', image: 'odnorazki.png' },
             { id: 'consumables', name: 'РАСХОДНИКИ', sub: '0 брендов', icon: '🔧', image: 'rashodniki.png' },
             { id: 'nicoboosters', name: 'НИКОБУСТЕРЫ', sub: '0 шт.', icon: '🧪', image: 'nikobuster.png' }
@@ -1238,7 +1238,7 @@
                 matched = allRawProducts.find(p => norm(p.name) === norm(name));
             }
             const defaultImages = {
-                vapes: 'vape.png', snus: 'snus.png', liquids: 'novayazhizha.png',
+                vapes: 'vape.png', snus: 'snus.png', liquids: 'novayazhizha.jpg',
                 disposables: 'odnorazki.png', consumables: 'rashodniki.png', nicoboosters: 'nikobuster.png'
             };
             const cat = matched?.category === 'devices' ? 'vapes' : (matched?.category || 'vapes');
@@ -1779,7 +1779,7 @@
                 const defaultImages = {
                     vapes: 'vape.png',
                     snus: 'snus.png',
-                    liquids: 'novayazhizha.png',
+                    liquids: 'novayazhizha.jpg',
                     disposables: 'odnorazki.png',
                     consumables: 'rashodniki.png',
                     nicoboosters: 'nikobuster.png'
@@ -2186,7 +2186,7 @@
                     ${freeLiquid ? `<div class="free-hint-box">🎁 У вас есть приз «Бесплатная жидкость» — выберите любую и примените в корзине!</div>` : ''}
                     ${hasPodPromo ? `<div class="pod-promo-hint-box">🔥 У вас в корзине под-система! Любая жидкость стоит <b>${POD_LIQUID_TARGET_PRICE} BYN</b> (доступно: ${podPromoSlots} шт.)</div>` : ''}
                     ${liquidBrands.map((b, bIdx) => {
-                        const brandImage = (b.models.find(m => m.image && m.image !== 'novayazhizha.png')?.image) || b.models[0]?.image || 'novayazhizha.png';
+                        const brandImage = (b.models.find(m => m.image && m.image !== 'novayazhizha.jpg')?.image) || b.models[0]?.image || 'novayazhizha.jpg';
                         return `
                         <div class="brand-group">
                             <div class="brand-group-card" data-brand-idx="${bIdx}">
@@ -2528,7 +2528,7 @@
                                 const m = entry.model;
                                 const colors = m.colors && m.colors.length > 0 ? m.colors : ['Стандарт'];
                                 const firstColor = colors[0];
-                                const thumbImg = (m.colorImages && m.colorImages[firstColor]) || m.image || 'novayazhizha.png';
+                                const thumbImg = (m.colorImages && m.colorImages[firstColor]) || m.image || 'novayazhizha.jpg';
                                 const promoPrice = getPodPromoLiquidPrice(m.price);
                                 const hasDiscount = m.price > POD_LIQUID_TARGET_PRICE;
                                 return `
@@ -2571,7 +2571,7 @@
                         const chosenColor = (m.colors && m.colors[cIdx]) || 'Стандарт';
                         const imgEl = modal.querySelector(`#upsellImg_${idx}`);
                         if (imgEl) {
-                            imgEl.src = (m.colorImages && m.colorImages[chosenColor]) || m.image || 'novayazhizha.png';
+                            imgEl.src = (m.colorImages && m.colorImages[chosenColor]) || m.image || 'novayazhizha.jpg';
                         }
                     });
                 });
@@ -3179,7 +3179,7 @@
             }
 
             const defaultImages = {
-                vapes: 'vape.png', snus: 'snus.png', liquids: 'novayazhizha.png',
+                vapes: 'vape.png', snus: 'snus.png', liquids: 'novayazhizha.jpg',
                 disposables: 'odnorazki.png', consumables: 'rashodniki.png', nicoboosters: 'nikobuster.png'
             };
 
