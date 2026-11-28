@@ -1332,7 +1332,7 @@
                 restartWelcomeAnimations();
             }
 
-            document.body.classList.toggle('catalog-bg', name === 'catalog');
+            document.body.classList.toggle('catalog-bg', ['catalog', 'brand', 'brandModels', 'productDetail', 'reviews', 'admin'].includes(name));
             document.body.classList.toggle('cart-bg', name === 'cart');
             document.body.classList.toggle('profile-bg', name === 'profile');
 
