@@ -2539,6 +2539,7 @@
                                             <div class="upsell-name">${escHtml(m.name)}</div>
                                             ${colors.length > 1 || firstColor !== 'Стандарт' ? `
                                                 <select class="upsell-flavor-select" data-upsell-select="${idx}">
+                                                    <option value="" selected disabled>Выбрать вкус ▾</option>
                                                     ${colors.map((c, ci) => `<option value="${ci}">${escHtml(c)}</option>`).join('')}
                                                 </select>
                                             ` : `<div style="font-size:11px; color:var(--text-gray);">${escHtml(m.desc || 'Жидкость')}</div>`}
@@ -2580,6 +2581,11 @@
                         const idx = parseInt(btn.dataset.upsellAdd, 10);
                         const m = flatLiquids[idx].model;
                         const sel = modal.querySelector(`[data-upsell-select="${idx}"]`);
+                        if (sel && sel.value === '') {
+                            showToast('Сначала выберите вкус');
+                            sel.focus();
+                            return;
+                        }
                         const cIdx = sel ? parseInt(sel.value, 10) : 0;
                         const colors = m.colors && m.colors.length > 0 ? m.colors : ['Стандарт'];
                         const chosenColor = colors[cIdx] || 'Стандарт';
