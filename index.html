@@ -1006,6 +1006,26 @@
                 sensitivity: 'base'
             });
         }
+        function getStockStatusInfo(stock) {
+            const n = Number(stock) || 0;
+            if (n <= 0) return { label: 'Нет в наличии', color: '#ff453a' };
+            if (n <= 2) return { label: 'Мало', color: '#ff9f0a' };
+            return { label: 'В наличии', color: '#69f07a' };
+        }
+
+        function openManagerChat(url) {
+            try {
+                if (window.Telegram?.WebApp?.openTelegramLink) {
+                    window.Telegram.WebApp.openTelegramLink(url);
+                    return;
+                }
+            } catch (e) {}
+            try {
+                window.location.href = url;
+            } catch (e) {
+                window.open(url, '_blank');
+            }
+        }
 
         function getFallbackColorImage(modelName, colorName) {
             const norm = (value) => String(value || '').toUpperCase().replace(/\s+/g, ' ').trim();
@@ -1158,7 +1178,7 @@
             const label = `${p.item.name}${p.item.color ? ` (${p.item.color})` : ''}`;
             showToast(p.live <= 0
                 ? `«${label}» закончился — удалите из корзины`
-                : `«${label}»: в наличии только ${p.live} шт.`);
+                : `«${label}»: доступно меньше, количество обновлено`);
             return false;
         }
         function isSuperAdmin() {
@@ -2333,6 +2353,7 @@
             }
 
             const initial = getCurrentVariantData();
+            const initialStockInfo = getStockStatusInfo(initial.maxStock);
 
             content.innerHTML = `
                 <div class="product-detail-image-wrap">
@@ -2355,7 +2376,7 @@
                 <div class="color-selector">
                     <div class="color-selector-label">
                         <span>${escHtml(variantLabel)}: <b id="selectedColorName">${escHtml(initial.selectedColor)}</b></span>
-                        <span id="selectedColorStock">В наличии: ${initial.maxStock} шт.</span>
+                        <span id="selectedColorStock">Наличие: <b style="color:${initialStockInfo.color};">${initialStockInfo.label}</b></span>
                     </div>
                     <div class="color-thumbs" id="colorThumbs">
                         ${colors.map((c, ci) => {
@@ -2401,7 +2422,10 @@
                     mainImg.src = imageSrc;
                 }
                 if (colorNameEl) colorNameEl.textContent = selectedColor;
-                if (colorStockEl) colorStockEl.textContent = `В наличии: ${maxStock} шт.`;
+                if (colorStockEl) {
+                    const stockInfo = getStockStatusInfo(maxStock);
+                    colorStockEl.innerHTML = `Наличие: <b style="color:${stockInfo.color};">${stockInfo.label}</b>`;
+                }
 
                 thumbsEls.forEach((thumb, i) => {
                     thumb.classList.toggle('selected', i === selectedColorIdx);
@@ -2441,7 +2465,7 @@
                     qty++;
                     qtyValue.textContent = qty;
                 } else {
-                    showToast(`В наличии только ${maxStock} шт.`);
+                    showToast('Больше нет в наличии');
                 }
             });
             document.getElementById('addToCartMain').addEventListener('click', () => {
@@ -2609,7 +2633,7 @@
             const existing = cart.find(item => item.name === product.name && item.color === product.color && item.category === category);
             const currentQty = existing ? existing.qty : 0;
             if (currentQty + count > maxStock) {
-                showToast(`Максимум в наличии: ${maxStock} шт.`);
+                showToast('Больше нет в наличии');
                 return false;
             }
             if (existing) {
@@ -2816,7 +2840,7 @@
                     const item = cart.find(i => i.id === btn.dataset.id);
                     if (!item) return;
                     if (btn.dataset.action === 'increase') {
-                        if (item.maxStock && item.qty >= item.maxStock) { showToast(`Максимум в наличии: ${item.maxStock} шт.`); return; }
+                        if (item.maxStock && item.qty >= item.maxStock) { showToast('Больше нет в наличии'); return; }
                         item.qty += 1;
                     } else {
                         item.qty -= 1;
@@ -3744,13 +3768,9 @@ function copyTextToClipboard(text) {
             `;
             document.body.appendChild(modal);
 
-            modal.querySelector('#openTgChatBtn').addEventListener('click', () => {
+           modal.querySelector('#openTgChatBtn').addEventListener('click', () => {
                 copyTextToClipboard(orderText);
-                if (window.Telegram?.WebApp?.openTelegramLink) {
-                    window.Telegram.WebApp.openTelegramLink(tgUrl);
-                } else {
-                    window.open(tgUrl, '_blank');
-                }
+                openManagerChat(tgUrl);
             });
             modal.querySelector('#copyOrderTextBtn').addEventListener('click', () => {
                 copyTextToClipboard(orderText);
@@ -3766,6 +3786,7 @@ function copyTextToClipboard(text) {
             isSubmittingOrder = true;
             const checkoutBtnEl = document.getElementById('checkoutBtn');
             if (checkoutBtnEl) checkoutBtnEl.disabled = true;
+            showToast('Оформляем заказ...');
 
             let rewardsConsumed = false;
             const userId = getUserDocId();
@@ -3897,7 +3918,7 @@ copyTextToClipboard(orderText);
                 const url = 'https://t.me/weggewpod?text=' + encodeURIComponent(orderText);
                 cart = []; selectedPickup = null; updateCartCount(); renderCart();
                 showOrderSentModal(orderText, url);
-                if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(url);
+                openManagerChat(url);
             } finally {
                 isSubmittingOrder = false;
                 const b = document.getElementById('checkoutBtn');
