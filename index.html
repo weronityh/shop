@@ -33,8 +33,8 @@
         .app { flex: 1; min-height: 0; width: 100%; max-width: 640px; margin: 0 auto; background: transparent; display: flex; flex-direction: column; overflow: hidden; position: relative; }
         main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; position: relative; }
         .page { display: none; min-height: 100%; flex-direction: column; }
-        .page.active { display: flex; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .page.active { display: flex; animation: pageSlide 0.18s ease-out; }
+        @keyframes pageSlide { from { opacity: 0.92; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* КОТ НА ГЛАВНОЙ */
